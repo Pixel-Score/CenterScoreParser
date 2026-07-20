@@ -25,15 +25,6 @@ python3 shs_decoder.py 1_Making_Some_Dough.exp --format txt -o dough.txt
 python3 shs_decoder.py 1_Making_Some_Dough.exp --disasm -o dough_disasm.txt
 ```
 
-Some episodes need a per-episode overlay of hand-verified gameplay logic that the
-bytes alone can't yield reliably (scene carving, per-option branch boundaries,
-effects, gates). Pass it with `--overlay`:
-
-```bash
-python3 shs_decoder.py 2_As_Time_Goes_By.exp --overlay atgb.overlay.json \
-    --format json -o atgb.json
-```
-
 ---
 
 ## 2. Command-line options
