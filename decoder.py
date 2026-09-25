@@ -66,7 +66,130 @@ import struct
 import sys
 from pathlib import Path
 
-STRING_BASE = 15          # text offset = ref * 2 + STRING_BASE
+# --------------------------------------------------------------------------- #
+# KiWi v2 instruction core (authoritative, verified against libshs09.so)
+# --------------------------------------------------------------------------- #
+# Ground-truth decode of the KiWi v2 script format, folded in from the reference
+# runtime (decode verified against FUN_00057068, jump model against FUN_00055ce0).
+# This replaced an earlier heuristic model that guessed the code-section start
+# (max-string-end), guessed which opcodes take operands, and computed jump
+# targets in byte space -- all three were systematically wrong. The format has a
+# real header with explicit counts, an authoritative operand table, and jump
+# targets in logical-PC space; the code below reads exactly that.
+
+# int32 table at libshs09.so 0x002593a8: only these opcodes consume a 2-byte
+# operand. Everything else is a lone opcode byte.
+_KIWI_OPERAND_OPCODES = frozenset({
+    0x01, 0x19, 0x1A, 0x1B, 0x1E, 0x1F, 0x20, 0x23,
+    0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x40, 0x41, 0x5C,
+})
+
+
+class _KiwiFormatError(ValueError):
+    """Not a decodable KiWi v2 program (bad signature, version, or truncated)."""
+
+
+class _KiwiInstr:
+    """One decoded instruction: logical pc, byte offset, opcode, operand."""
+    __slots__ = ("pc", "byte_offset", "opcode", "operand")
+
+    def __init__(self, pc, byte_offset, opcode, operand):
+        self.pc = pc
+        self.byte_offset = byte_offset
+        self.opcode = opcode
+        self.operand = operand
+
+    def branch_target(self):
+        """Statically encoded branch target in logical instruction indices, or
+        None. Native PC arithmetic wraps at 16 bits; the dynamic-return opcode
+        0x43 is deliberately not assigned a guessed target."""
+        op = self.opcode
+        if op == 0x29:
+            return self.operand
+        if op in (0x28, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E):
+            return (self.pc + self.operand) & 0xFFFF
+        if op == 0x5C:
+            return (self.pc + (self.operand >> 8)) & 0xFFFF
+        return None
+
+
+class _KiwiProgram:
+    """Decoded header counts plus the instruction stream. Only the fields the
+    decoder actually consumes are kept (no re-encoder)."""
+    __slots__ = ("main_words", "extra_words", "code_start", "instructions")
+
+    def __init__(self, main_words, extra_words, code_start, instructions):
+        self.main_words = main_words
+        self.extra_words = extra_words
+        self.code_start = code_start
+        self.instructions = instructions
+
+
+def _kiwi_decode(data):
+    """Decode a KiWi v2 script strictly. Header: 'kiwi' + version(=2) +
+    previous_flag + [prev_data,prev_code if flag] + flag + 4 counts
+    (main,gap,extra,instr); then the word table (main+extra 16-bit words); then
+    `instr` instructions, each an opcode with a 2-byte operand iff the opcode is
+    in _KIWI_OPERAND_OPCODES. Raises _KiwiFormatError on anything unexpected."""
+    pos = 0
+    n = len(data)
+
+    def take(size):
+        nonlocal pos
+        if pos + size > n:
+            raise _KiwiFormatError("truncated KiWi at byte 0x%x" % pos)
+        chunk = data[pos:pos + size]
+        pos += size
+        return chunk
+
+    def u16():
+        return struct.unpack(">H", take(2))[0]
+
+    if take(4) != b"kiwi":
+        raise _KiwiFormatError("invalid KiWi signature at byte 0x0")
+    version = take(1)[0]
+    if version != 2:
+        raise _KiwiFormatError("unsupported KiWi version %d" % version)
+    previous_flag = take(1)[0]
+    _prev_data = u16() if previous_flag else None
+    previous_code = u16() if previous_flag else None
+    _flag = take(1)[0]
+    main, _gap, extra, count = (u16() for _ in range(4))
+    main_words = tuple(u16() for _ in range(main))
+    extra_words = tuple(u16() for _ in range(extra))
+    code_start = pos
+    base_pc = previous_code or 0
+    instructions = []
+    for index in range(count):
+        offset = pos
+        opcode = take(1)[0]
+        operand = u16() if opcode in _KIWI_OPERAND_OPCODES else None
+        instructions.append(_KiwiInstr(base_pc + index, offset, opcode, operand))
+    if pos != n:
+        raise _KiwiFormatError("%d trailing bytes at byte 0x%x" % (n - pos, pos))
+    return _KiwiProgram(main_words, extra_words, code_start, tuple(instructions))
+
+
+_kiwi_cache = {}
+
+
+def _kiwi_program(data):
+    """Cached _kiwi_decode keyed by object identity (script payloads are reused
+    within a run)."""
+    hit = _kiwi_cache.get(id(data))
+    if hit is not None and hit[0] is data:
+        return hit[1]
+    prog = _kiwi_decode(data)
+    _kiwi_cache[id(data)] = (data, prog)
+    return prog
+
+STRING_BASE = 15
+EPISODE_ASSET_BASE = 20000  # asset ids at/above this are PNG chunks packaged in
+                            # the .exp itself (episode-specific art); below are
+                            # ids into the shared, external sprite library.          # text offset = ref * 2 + STRING_BASE
+SFX_ID_MIN, SFX_ID_MAX = 8001, 8113      # engine-validated bands, read from
+MUSIC_ID_MIN, MUSIC_ID_MAX = 8201, 8232  # libshs09.so's own range checks
+                                         # (`id - 0x1f41 < 0x71`, `id - 0x2009 < 0x20`)
 CAST_START = 14           # first cast string begins here ('L' + name)
 
 # In-dialogue emphasis: the script marks emphasised words/titles with backticks
@@ -122,8 +245,12 @@ SET_BACKGROUND = 0x0b     # 1f 0b -> set the displayed background image, by *glo
 SET_MUSIC = 0x50          # 1f 50 -> change background music, by track id (0x20xx ~ 8201-8230,
                           #          a separate audio band from the 0x4f SFX cues at ~8003-8007).
                           #          Reused across scenes/moods; this is the "sound change" cue.
-STOP_MUSIC = 0x52         # 1f 52 -> stop / fade out the current music (no track operand; the VM
-                          #          calls a fade-out with ~1000ms). Rare; used at dramatic beats.
+STOP_MUSIC = 0x51         # 1f 51 -> stop/fade the current music (yield 81, need 1;
+                          #          engine sets audio_stopped, music_id=-1). Appears
+                          #          ~158x; distinct from 0x52. (Corrected: 0x52 is
+                          #          vibrate, not stop-music -- verified vs the
+                          #          reference engine's yield handlers.)
+VIBRATE = 0x52            # 1f 52 -> haptic buzz (yield 82, need 0). No audio effect.
 PRESENT_CHOICE = 0x01     # 1f 01 -> present a branching choice menu ("opt|opt|...")
 TCHOICE_SETUP = 0x02      # 1f 02 -> begin a TIMED text choice: pushes the prompt, the
                           #          setup line, and a countdown timer (ms, e.g. 8000),
@@ -148,6 +275,21 @@ PLACE_SPRITE = 0x34       # 1f 34 -> position a character's portrait as an on-sc
 ACTION_MINIGAME = 0x47    # 1f 47 -> action/word minigame round: prompt + one or more
                           #          pipe-delimited option groups (e.g. tutoring rounds)
 SCORE_FEEDBACK = 0x58     # 1f 58 -> minigame score / feedback banner ("Score Up!")
+SET_EXPRESSION = 0x05     # (handled via SET_SPEAKER path; expression 0x05 shares selector)
+SET_SCENE_VALUE = 0x10    # 1f 10 -> set the scene 'value' register (yield 16, need 1)
+TEXT_EQUAL = 0x18         # 1f 18 -> compare two strings, push bool (yield 24, need 2)
+COPY_LAST_INPUT = 0x1c    # 1f 1c -> copy the last text input into a string slot (yield 28)
+TEXT_INPUT = 0x28         # 1f 28 -> prompt the player to type text (yield 40, need 3:
+                          #          title, prompt, destination string slot)
+SET_STRING = 0x2e         # 1f 2e -> string variable write [key_ref, value_ref] (yield 46).
+                          #          NOTE: 0x2e is also the $token rename; a write with two
+                          #          NON-$ string refs is a set_string, a $Token first ref is
+                          #          a rename (handled via _name_renames).
+CHARACTER_PICKER = 0x4e   # 1f 4e -> player picks 1..5 characters (yield 78, need 3:
+                          #          prompt, count, address-of-id-table in the word region)
+SET_UI_DEFAULT = 0x4b     # 1f 4b -> set a UI default slot (yield 75, need 1)
+WOBBLE = 0x59             # 1f 59 -> wobble the next dialogue line (yield 89, need 0)
+LOADING = 0x5b            # 1f 5b -> show/hide the loading screen (yield 91, need 1 flag)
 SET_POV = 0x4a            # 1f 4a -> set the player-controlled (POV) character, by cast
                           #          index. The engine's authoritative "you now play as X"
                           #          state set; the on-screen "You are now playing as X"
@@ -168,6 +310,74 @@ VAR_WRITE = 0x2c          # 1f 2c -> write a game variable. Two operand forms:
 # DEPICTS is observed, so names come from the per-episode overlay (key
 # `bg_names`: {"0x6596": "...", ...}) and the parser ships none of its own.
 KNOWN_BG = {}
+
+
+# --------------------------------------------------------------------------- #
+# VM opcode reference: builtins the interpreter handles but the decoder does not
+# yet emit a node for.
+#
+# These were read directly from the engine's bytecode interpreter (FUN_0009fe3c
+# in libshs09.so), which dispatches on the raw opcode byte; a `1f` byte is an
+# escape meaning "the next byte is the opcode". Everything below is a `1f XX`
+# builtin whose XX is listed. None of them appears in the ~9 episodes decoded so
+# far, so they are documented rather than handled -- when an episode that uses
+# one turns up, this is the spec for adding it. Operand fetch is the usual
+# 16-bit word; a name-slot operand (>= 0x7ff5) resolves through the runtime
+# name table, i.e. it is a $Player/$Antagonist-style substitution.
+#
+# TEXT-EMITTING builtins (all call the same display routine as SAY/NARR, but wrap
+# it differently -- these DO produce on-screen lines and would need transcript
+# nodes):
+#   1f 22  SAY_WITH_PORTRAIT   spoken line that also (re)positions the speaker's
+#                              portrait sprite; falls back to a plain line if no
+#                              portrait is active.
+#   1f 24  SAY_INTERP1         line with ONE runtime value interpolated into the
+#                              text (a name-slot or number spliced in at render).
+#   1f 25  SAY_INTERP1_MODAL   as 1f24, but shown as a blocking/await card (sets
+#                              the "awaiting input" flag; execution pauses).
+#   1f 26  SAY_POSITIONED      line drawn at explicit screen coordinates (operand
+#                              selects the anchor), rather than the default box.
+#   1f 27  SAY_STYLED          line with a style/format variant applied (no extra
+#                              operand; a preset look).
+#   1f 4c  SAY_INTERP2_MODAL   line with TWO runtime values interpolated, modal.
+#   1f 56  SAY_AUTO            line that auto-advances (no tap): if its slot is 0
+#                              it triggers an auto-advance before positioning.
+#   1f 5e  CHOICE_BUILD        emits the line then constructs a full choice-menu
+#                              object -- a menu-building card distinct from the
+#                              1f01 choice path already handled.
+#
+# NON-CONTENT builtins (state, frame, audio, widget -- correctly produce NO
+# transcript node; listed so their bytes are not mistaken for missing content):
+#   1f 10  scene/transition style set (cosmetic; operand is 20 or 6). Investigated
+#          separately: not gender/character, tracks episode+scene presentation.
+#   1f 11  jump/continue (shares the 1f28 jump landing).
+#   1f 16/18/19/1a  frame control helpers (advance/query/reset frame state).
+#   1f 1b  RANDOM: pushes abs(rand() % operand) in [0, operand); operand is the
+#          range (a 0 operand yields 0). Consumed on the stack by the following
+#          arithmetic -- e.g. combat damage is RANDOM(0..attack)+1 = [1, attack].
+#          Already reconstructed inside combat_decode.py, not emitted standalone.
+#   1f 1c  frame string fetch into a scratch buffer.
+#   1f 1d  load a frame-local slot value onto the stack.
+#   1f 1e  virtual call through the scene object's vtable (engine-internal).
+#   1f 21  build a UI widget object (operator_new; no story text).
+#   1f 2e  RENAME: bind a $token to a display name (two name-slot operands).
+#          Handled at decode time via _name_renames / runtime_text_vars, so no
+#          node is emitted here.
+#   1f 2f/31  frame-driven widget construction (FUN_0009f420 value fetch + build).
+#   1f 48  frame variable WRITE (array-indexed store into scene state).
+#   1f 49  frame variable READ (array-indexed load from scene state).
+#   1f 4b  companion to 1f4a (POV): sets a secondary control/most-recent slot.
+#   1f 51  MINIGAME_BY_ID / sound trigger: operand is a minigame id (1000/2000/
+#          3000/5000). Used as the content_fork play-point marker; consumed by
+#          the minigame resolution pass, not emitted as its own node.
+#   1f 53/54/55  audio transport (pause/resume/stop-all on the sound engine).
+#   1f 57  read a scene status flag onto the stack.
+#   1f 59  set a scene completion flag.
+#   1f 5b/60  allocate/enter a sub-scene or overlay object (frame push).
+#   1f 5f  conditional scene-state query (branches on operand == 1).
+#   1f 61  toggle a boolean scene flag (operand != 0).
+#   1f 62  no-op in this interpreter.
+# --------------------------------------------------------------------------- #
 
 
 # --------------------------------------------------------------------------- #
@@ -263,6 +473,29 @@ class ExpArchive:
                 for off, text in find_strings(payload):
                     if len(text) >= 4:
                         return text
+        return None
+
+    def episode_meta(self):
+        """Parse the metadata chunk (id 1): {pack_id, episode_id, titles}. The
+        chunk is `>HH pack_id, episode_id` then five `>H`-length UTF-8 titles.
+        pack_id identifies the pack/season; episode_id the number within it."""
+        for eid, payload, kind in self.chunks():
+            if eid == 1 or (kind == "data" and len(payload) >= 4):
+                try:
+                    pack_id, episode_id = struct.unpack(">H", payload[0:2])[0], \
+                        struct.unpack(">H", payload[2:4])[0]
+                    titles, pos = [], 4
+                    for _ in range(5):
+                        if pos + 2 > len(payload):
+                            break
+                        ln = struct.unpack(">H", payload[pos:pos + 2])[0]
+                        pos += 2
+                        titles.append(payload[pos:pos + ln].decode("utf-8", "replace"))
+                        pos += ln
+                    return {"pack_id": pack_id, "episode_id": episode_id,
+                            "titles": titles}
+                except Exception:
+                    return None
         return None
 
     def extract(self, out_dir: Path):
@@ -385,7 +618,24 @@ def _resource_rows(data: bytes):
     if 14 in smap and 15 not in smap:
         smap[15] = smap[14][1:]
     bc_start = max((o + len(t) for o, t in strings if len(t) >= 12), default=0)
-    for off in range(bc_start, bc_start + 12):
+    # The init resource table sits between the strings and the code section. The
+    # max-string heuristic can land short of it when a scene has many option/
+    # choice strings, so also try scanning backward from the authoritative code
+    # start (header-derived) where the table's sentinel/rows end.
+    code_start = _kiwi_code_start(data)
+    scan_offsets = list(range(bc_start, bc_start + 12))
+    if code_start is not None:
+        # The table ends just before the code, as a run of 8-byte rows terminated
+        # by a type-3/asset-0xffff sentinel. Walk backward to the FIRST index-0
+        # row (the head), preferring earlier anchors so we don't lock onto the
+        # sentinel row (which also reports index 0).
+        back = [code_start - 8 * r for r in range(1, 40) if code_start - 8 * r >= 0]
+        scan_offsets += sorted(back)
+    seen_anchor = set()
+    for off in scan_offsets:
+        if off in seen_anchor:
+            continue
+        seen_anchor.add(off)
         if off + 8 > n:
             break
         idx0 = (data[off + 6] << 8) | data[off + 7]
@@ -411,12 +661,121 @@ def _resource_rows(data: bytes):
 def read_resources(data: bytes, smap: dict, bc_start: int, cast):
     """{character_name: sprite_base_asset_id}, names resolved via the resource
     table's own name_ref field (byte-literal; independent of cast alignment).
-    A line's displayed portrait is sprite_base + emotion."""
+    A line's displayed portrait is sprite_base + emotion.
+
+    A character may appear TWICE in the table: once with a shared/global sprite
+    base (~1000-2500, from the library that is not bundled in the .exp) and once
+    with an EPISODE-PACKAGED base (>= EPISODE_ASSET_BASE, a PNG chunk shipped in
+    this .exp -- e.g. Halloween's costumed Kay/Kel at 26000/26005). The packaged
+    art is the episode-specific one and takes precedence.
+    """
     out = {}
     for r in _resource_rows(data):
-        if r["name"]:
-            out.setdefault(r["name"], r["asset"])
+        nm = r["name"]
+        if not nm:
+            continue
+        cur = out.get(nm)
+        if cur is None:
+            out[nm] = r["asset"]
+        elif r["asset"] >= EPISODE_ASSET_BASE > cur:
+            out[nm] = r["asset"]      # episode-packaged art wins over the global
     return out
+
+
+def _text_substitutions(data: bytes, rows=None):
+    """Detect `1f 2e` renames used as TEXT-TEMPLATE substitutions and classify
+    them as STABLE (bound once) or REBOUND (a mutable runtime variable).
+
+    Distinct from `_name_renames` (which relabels a speaker): here a `$Token`
+    appears literally inside narration/status/dialogue strings and is filled with
+    a display value at runtime. Two very different cases occur:
+
+      * STABLE -- a token bound to exactly one display value in the whole scene
+        (e.g. `$MAN1 -> "Ice Cream Jim"`, `$Travis -> "Travis"`, and the
+        customisable `$Player` -> protagonist name). These can be substituted
+        into the text directly, everywhere.
+
+      * REBOUND -- a token rebound to MANY values as the story progresses. Wrong
+        Side of Town's battle system rebinds `$Antagonist` before each fight
+        (`-> Travis`, then `-> Skazz`, `-> Alexei`, ... 14 opponents in all) and
+        the combat HUD template "$Antagonist still has %d life left!" is SHARED,
+        jumped into by every fight. Baking one name into it would be wrong, so
+        `$Antagonist` stays a live variable: instead of substituting, we return
+        its binding SCHEDULE -- the ordered (bytecode-offset, name) pairs -- so
+        the runtime can show the name bound most recently before the line it is
+        rendering.
+
+    Returns (stable, schedule):
+      stable   = {"$Token": "Display"}                 apply directly to text
+      schedule = {"$Token": [(offset, "Display"), ...]} ordered; runtime-resolved
+    Only tokens that literally occur in some string are considered, so speaker-
+    only 1f2e aliases in other episodes are never touched.
+    """
+    strings = find_strings(data)
+    smap = {o: t for o, t in strings}
+    bc = max((o + len(t) for o, t in strings if len(t) >= 12), default=0)
+    fo = _fold_instruction_offsets(data, bc)
+    fi = {o: i for i, o in enumerate(fo)}
+    present = set()
+    for _o, _t in strings:
+        for _m in re.findall(r"\$[A-Za-z][A-Za-z0-9_]*", _t):
+            present.add(_m)
+    _protagonist = None
+    if rows:
+        for _r in rows:
+            if _r.get("idx") == 0 and _r.get("name"):
+                _protagonist = _r["name"]
+                break
+    # ordered list of (offset, token, display) bindings in bytecode order
+    binds = []
+    for q in fo:
+        if not (data[q] == 0x1f and data[q + 1] == 0x2e):
+            continue
+        strs = []
+        for j in range(fi[q] - 1, max(fi[q] - 5, -1), -1):
+            qq = fo[j]
+            if data[qq] == 0x1a:
+                v = (data[qq + 1] << 8) | data[qq + 2]
+                t = smap.get(v * 2 + STRING_BASE)
+                if t and len(t) > 0:
+                    strs.append(t)
+                    if len(strs) == 2:
+                        break
+                else:
+                    break
+            else:
+                break              # stop at any non-push (e.g. a prior 1f2e)
+        strs.reverse()
+        for _k, _s in enumerate(strs):
+            if not (_s.startswith("$") and _s in present):
+                continue
+            _disp = strs[_k + 1] if _k + 1 < len(strs) else None
+            if _disp is not None and not _disp.startswith("$"):
+                binds.append((q, _s, _disp))
+            elif _s == "$Player" and _protagonist:
+                binds.append((q, _s, _protagonist))
+    # group by token, preserving order
+    by_token = {}
+    for off, tok, disp in binds:
+        by_token.setdefault(tok, []).append((off, disp))
+    stable, schedule = {}, {}
+    for tok, seq in by_token.items():
+        distinct = {d for _o, d in seq}
+        if len(distinct) == 1:
+            stable[tok] = seq[0][1]            # bound once -> direct substitution
+        else:
+            schedule[tok] = seq                # rebound -> runtime variable
+    return stable, schedule
+
+
+def _apply_text_subs(text, subs):
+    """Replace every `$Token` in `text` with its bound display value."""
+    if not text or not subs or "$" not in text:
+        return text
+    for _tok in sorted(subs, key=len, reverse=True):
+        if _tok in text:
+            text = text.replace(_tok, subs[_tok])
+    return text
 
 
 def _name_renames(data: bytes, rows):
@@ -449,13 +808,20 @@ def _name_renames(data: bytes, rows):
         if not (data[q] == 0x1f and data[q + 1] == 0x2e):
             continue
         strs = []
-        for j in range(max(fi[q] - 4, 0), fi[q]):
+        for j in range(fi[q] - 1, max(fi[q] - 5, -1), -1):
             qq = fo[j]
             if data[qq] == 0x1a:
                 v = (data[qq + 1] << 8) | data[qq + 2]
                 t = smap.get(v * 2 + STRING_BASE)
                 if t and len(t) > 2:
                     strs.append(t)
+                    if len(strs) == 2:
+                        break
+                else:
+                    break          # a non-string push ends this rename's operands
+            else:
+                break              # any other opcode (e.g. a prior 1f2e) is a boundary
+        strs.reverse()
         # Need a `$var` source followed by a plain display name.
         if len(strs) >= 2 and strs[0].startswith("$") \
                 and not strs[1].startswith("$"):
@@ -609,26 +975,53 @@ def find_cards(strings, displayed_offsets, bc_start, cast, episode_title=None):
 
 
 def _instr_len(data, p):
-    """Length in bytes of the VM instruction at offset p (matches decode_script's
-    walk): push/pair/jump = 3, builtin call (0x1f sel) = 2, branch-separator
-    (0x42) = 4, everything else (markers, 1-byte operands) = 1."""
-    op = data[p]
-    if op in (0x1a, 0x41, 0x1b, 0x2b, 0x28):
-        return 3
-    if op == 0x1f:
-        return 2
-    if op == 0x42:
-        return 4
-    return 1
+    """Length in bytes of the VM instruction at offset p.
+
+    AUTHORITATIVE: an instruction consumes a 2-byte operand iff its opcode is in
+    the OPERAND_OPCODES table decompiled from libshs09.so (int32 table at
+    0x002593a8); otherwise it is a lone opcode byte. This replaces the old
+    heuristic (which special-cased 0x1a/0x41/0x1b/0x2b/0x28=3, 0x1f=2, 0x42=4 and
+    guessed everything else as 1) -- that model mis-sized many opcodes (e.g.
+    0x29, 0x5c) and desynced inside data words. See the KiWi v2 core above.
+    """
+    return 3 if data[p] in _KIWI_OPERAND_OPCODES else 1
 
 
-def _instruction_offsets(data, bc_start):
-    """List of every instruction start offset from bc_start to end, in order."""
-    offs, p, n = [], bc_start, len(data)
-    while p < n:
-        offs.append(p)
-        p += _instr_len(data, p)
-    return offs
+def _kiwi_code_start(data):
+    """Byte offset where the instruction section begins, from the KiWi v2 header
+    (not the old max-string-end guess). Header: 'kiwi' + version + previous_flag
+    + [prev_data,prev_code if flag] + flag + 4 counts(main,gap,extra,instr); then
+    the word table (main+extra 16-bit words). Returns None if not a v2 program."""
+    if data[:4] != b"kiwi" or len(data) < 6 or data[4] != 2:
+        return None
+    prev_flag = data[5]
+    pos = 6 + (4 if prev_flag else 0) + 1        # past prev-block + flag byte
+    if pos + 8 > len(data):
+        return None
+    main = (data[pos] << 8) | data[pos + 1]
+    extra = (data[pos + 4] << 8) | data[pos + 5]
+    return pos + 8 + 2 * (main + extra)
+
+
+def _instruction_offsets(data, bc_start=None):
+    """Authoritative instruction start offsets for the whole code section.
+
+    Locates the code section from the KiWi v2 header counts and walks it with the
+    real operand table. `bc_start` is accepted for call-site compatibility but
+    ignored: the true code start comes from the header. Falls back to a header-
+    less walk only if the data is not a decodable KiWi program.
+    """
+    try:
+        return [ins.byte_offset for ins in _kiwi_program(data).instructions]
+    except _KiwiFormatError:
+        start = _kiwi_code_start(data)
+        if start is None:
+            start = bc_start or 0
+        offs, p, n = [], start, len(data)
+        while p < n:
+            offs.append(p)
+            p += _instr_len(data, p)
+        return offs
 
 
 def _fold_instruction_offsets(data, bc):
@@ -691,6 +1084,126 @@ def resolve_sep_target(data, bc, operand, fold_offs=None, fold_idx=None,
     if near:
         return target, max(near)
     return None
+
+
+def _sim_walk_offsets(data, bc):
+    """Instruction offsets for forward simulation. Same widths as _instr_len,
+    except op5c is a full 3-byte instruction (opcode + 16-bit operand word) --
+    the VM (FUN_00055ce0) consumes op5c's operand word, so it must advance 3
+    bytes. Returns (offsets, index_map)."""
+    offs, p, n = [], bc, len(data)
+    while p < n:
+        offs.append(p)
+        if data[p] == 0x5c:
+            p += 3
+        else:
+            p += _instr_len(data, p)
+    return offs, {o: i for i, o in enumerate(offs)}
+
+
+def _sim_jump_target(data, o, offs, idx):
+    """Fold-free jump target of a 0x28/0x2b at o, as an offset in `offs`.
+    Operand is a signed instruction count from the instruction after the jump."""
+    operand = (data[o + 1] << 8) | data[o + 2]
+    if operand >= 0x8000:
+        operand -= 0x10000
+    i = idx.get(o)
+    if i is None:
+        return None
+    ti = i + 1 + operand
+    return offs[ti] if 0 <= ti < len(offs) else None
+
+
+def simulate_reachable(data, bc, start_off=None):
+    """Forward-execute the bytecode from `start_off` (chunk entry when None),
+    returning the set of reachable instruction offsets. Faithful to the VM's
+    control flow (FUN_00055ce0):
+      - 0x28 JMP: unconditional relative jump by instruction count.
+      - 0x2b/0x2c/0x2d conditional branches: BOTH arms explored (the predicate
+        is runtime data, so statically both are reachable).
+      - 0x5c section dispatch: `if reg==(operand&0xff): PC=(PC-1)+(operand>>8)`.
+        The register is data-dependent, so BOTH the matched-case jump (distance
+        = high operand byte, in instructions) and the fall-through are explored.
+      - 1f0a goto-scene: leaves the chunk; the path ends.
+    This is the byte-derived equivalent of the engine's section-resume: a
+    section body is reachable iff execution can land its PC there."""
+    offs, idx = _sim_walk_offsets(data, bc)
+    n = len(offs)
+    if start_off is None:
+        start = 0
+    else:
+        start = idx.get(start_off)
+        if start is None:
+            start = next((i for i, o in enumerate(offs) if o >= start_off), 0)
+    seen, stack = set(), [start]
+    while stack:
+        i = stack.pop()
+        if i is None or i < 0 or i >= n or i in seen:
+            continue
+        seen.add(i)
+        o = offs[i]
+        b = data[o]
+        if b == 0x28:                                   # JMP
+            t = _sim_jump_target(data, o, offs, idx)
+            if t is not None:
+                stack.append(idx[t])
+            continue
+        if b in (0x2b, 0x2c, 0x2d):                     # conditional: both arms
+            t = _sim_jump_target(data, o, offs, idx)
+            if t is not None:
+                stack.append(idx[t])
+            stack.append(i + 1)
+            continue
+        if b == 0x5c:                                   # section dispatch
+            ti = i + data[o + 1]                        # (PC-1)+(operand>>8)
+            if 0 <= ti < n:
+                stack.append(ti)
+            stack.append(i + 1)
+            continue
+        if b == 0x1f and o + 1 < len(data) and data[o + 1] == 0x0a:
+            continue                                    # goto-scene: leaves chunk
+        stack.append(i + 1)
+    return {offs[i] for i in seen}
+
+
+def resolve_scene_resume_sections(data, bc):
+    """Byte-derive section bodies that are ONLY reachable as a section-register
+    RESUME after a `goto scene` round-trip (the engine re-enters the chunk at a
+    section head, restoring the saved PC). These are exactly the section markers
+    (`22 43 48 4a`) that: (a) forward simulation from the chunk entry cannot
+    reach, but (b) sit immediately after a `goto-scene` (1f0a) -- so control left
+    the chunk right before them and only a resume can land there.
+
+    Returns a list of {"marker": marker_off, "resume_at": body_off,
+    "after_goto": goto_off} -- the goto whose return resumes at that section."""
+    entry_reachable = simulate_reachable(data, bc)
+    markers = _section_markers(data, bc)
+    io = _instruction_offsets(data, bc)
+    io_set = set(io)
+    out = []
+    for m in markers:
+        # section body begins a few instructions past the 22-marker
+        body = m + 4
+        while body < len(data) and body not in io_set:
+            body += 1
+        if body in entry_reachable:
+            continue                        # already reachable by normal flow
+        # find the nearest preceding goto-scene (1f0a); the marker must sit just
+        # after it (control left the chunk, so only a resume reaches this body)
+        prev_goto = None
+        for o in io:
+            if o >= m:
+                break
+            if data[o] == 0x1f and o + 1 < len(data) and data[o + 1] == 0x0a:
+                prev_goto = o
+        if prev_goto is None:
+            continue
+        # the goto must be close (this marker is its resume landing, not a distant one)
+        gap = sum(1 for o in io if prev_goto < o < body)
+        if gap > 12:
+            continue
+        out.append({"marker": m, "resume_at": body, "after_goto": prev_goto})
+    return out
 
 
 def _resolve_degenerate_exits(data, bc):
@@ -811,6 +1324,86 @@ def _resolve_degenerate_exits(data, bc):
     return out
 
 
+def resolve_linear_sep_chains(data, bc):
+    """Byte-derive consecutive sections that play LINEARLY via a bare SEP.
+
+    Most section boundaries are a `42 <op> hi lo` SEP followed by a `22 43 48 4a`
+    section marker. When that SEP does NOT encode a dispatch/section jump (its
+    operand doesn't resolve onto another section body) and the section it closes
+    contains no `goto_scene` (1f 0a) and no forward jump that leaves the section,
+    the VM's SEP handler simply advances the PC (FUN_00055ce0 case 0x42: PC+1),
+    so execution falls straight through into the NEXT section. These sequential
+    story beats -- e.g. Magic School's intro flowing into "Chapter 2 / First
+    Days" and the spell-casting chapters -- have no explicit jump wiring them, so
+    the segmenter leaves the following section orphaned.
+
+    Returns a list of (section_body_offset, next_section_body_offset): the offset
+    of the section that ends in the bare SEP, paired with the body offset of the
+    section it falls through into. The caller resolves each to a segment and adds
+    a `next` edge -- but only when the target is otherwise orphaned, so episodes
+    whose sections are already wired by dispatch/branch edges are untouched.
+    """
+    if data[:4] != b"kiwi":
+        return []
+    io = _instruction_offsets(data, bc)
+    io_set = set(io)
+    markers = sorted(_section_markers(data, bc))
+    if len(markers) < 2:
+        return []
+    fold_offs = _fold_instruction_offsets(data, bc)
+    fold_idx = {o: i for i, o in enumerate(fold_offs)}
+    n = len(data)
+
+    def body_of(marker):
+        # a section body begins a few instructions past its 22-marker (the
+        # 22 43 48 4a run + any title/background setup); use the marker+4 as the
+        # nominal body start, which the segment mapper resolves to the real
+        # first emitted node.
+        return marker + 4
+
+    out = []
+    for i in range(len(markers) - 1):
+        m, nm = markers[i], markers[i + 1]
+        seg_ins = [o for o in io if m < o < nm]
+        if not seg_ins:
+            continue
+        # a goto_scene leaves the chunk -> not a linear fall-through
+        if any(data[o] == 0x1f and o + 1 < n and data[o + 1] == 0x0a
+               for o in seg_ins):
+            continue
+        # a forward jump whose target is at/after the next marker leaves the
+        # section (its own edge already carries the flow)
+        leaves = False
+        for o in seg_ins:
+            if data[o] in (0x28, 0x2b):
+                t = resolve_jump_target(data, o, bc_start=bc)
+                if t is not None and t >= nm:
+                    leaves = True
+                    break
+        if leaves:
+            continue
+        # the section must terminate in a SEP sitting just before the marker,
+        # and that SEP must be BARE (not a dispatch/section jump)
+        sep = None
+        for o in reversed(seg_ins):
+            if data[o] == 0x42:
+                sep = o
+                break
+            # allow only trailing display/return cleanup ops after the SEP-free
+            # tail; a control op other than SEP means this isn't a clean linear end
+            if data[o] in (0x28, 0x2b, 0x5c):
+                break
+        if sep is None:
+            continue
+        operand = (data[sep + 2] << 8) | data[sep + 3] if sep + 3 < n else 0
+        if resolve_sep_target(data, bc, operand,
+                              fold_offs=fold_offs, fold_idx=fold_idx,
+                              markers=markers) is not None:
+            continue                # SEP is a real section jump, already wired
+        out.append((body_of(m), body_of(nm)))
+    return out
+
+
 def _resolve_section_transitions(data, bc):
     """Section-end SEP transitions: a LONE `42 29 hi lo` SEP that sits
     immediately before a section marker (the 4-byte `22 43 48 4a` pattern, or
@@ -913,39 +1506,53 @@ def _resolve_section_transitions(data, bc):
 
 
 def resolve_jump_target(data, jump_off, instr_offsets=None, bc_start=None):
-    """Resolve a 0x2b/0x28 jump's destination offset.
+    """Resolve a branch's destination BYTE offset (authoritative).
 
-    The 16-bit operand is a SIGNED INSTRUCTION COUNT (not a byte displacement):
-    the target is reached by stepping `operand` whole instructions forward, or
-    backward when the operand is negative (>= 0x8000), starting from the
-    instruction immediately after the 3-byte jump. This was reverse-engineered
-    and verified: every 0x2b/0x28 jump in every scene of this episode lands
-    exactly on an instruction boundary under this rule (byte-displacement does
-    not). Returns the target offset, or None if it runs off the end.
+    The operand is interpreted in the VM's logical-PC space and mapped back to a
+    byte offset: 0x28/0x2a/0x2b/0x2c/0x2d/0x2e -> pc+operand; 0x29 -> the operand
+    as an absolute PC; 0x5c -> pc+(operand>>8). A target exactly one past the
+    last instruction maps to end-of-code. This replaced an earlier rule that
+    treated the operand as a signed instruction count stepped through a mis-sized
+    instruction walk, which landed off-boundary on essentially every branch.
     """
-    n = len(data)
-    operand = (data[jump_off + 1] << 8) | data[jump_off + 2]
-    if operand >= 0x8000:
-        operand -= 0x10000
-    after = jump_off + 3
-    if operand >= 0:
-        p = after
-        for _ in range(operand):
-            if p >= n:
-                return None
-            p += _instr_len(data, p)
-        return p
-    if instr_offsets is None:
-        if bc_start is None:
-            bc_start = max((o + len(t) for o, t in find_strings(data)
-                            if len(t) >= 12), default=0)
-        instr_offsets = _instruction_offsets(data, bc_start)
     try:
-        i = instr_offsets.index(after)
-    except ValueError:
+        prog = _kiwi_program(data)
+    except _KiwiFormatError:
+        prog = None
+    if prog is not None:
+        by_off = {ins.byte_offset: ins for ins in prog.instructions}
+        ins = by_off.get(jump_off)
+        if ins is None:
+            return None
+        target_pc = ins.branch_target()
+        if target_pc is None:
+            return None
+        pc2b = {i.pc: i.byte_offset for i in prog.instructions}
+        if target_pc in pc2b:
+            return pc2b[target_pc]
+        maxpc = max((i.pc for i in prog.instructions), default=-1)
+        return len(data) if target_pc == maxpc + 1 else None
+
+    # Header-less fallback: same logical-PC model computed from the raw walk.
+    offs = _instruction_offsets(data, bc_start)
+    pc_of = {o: i for i, o in enumerate(offs)}
+    end_pc = len(offs)
+    if jump_off + 2 >= len(data) or jump_off not in pc_of:
         return None
-    j = i + operand
-    return instr_offsets[j] if 0 <= j < len(instr_offsets) else None
+    op = data[jump_off]
+    operand = (data[jump_off + 1] << 8) | data[jump_off + 2]
+    pc = pc_of[jump_off]
+    if op == 0x29:
+        target_pc = operand
+    elif op in (0x28, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e):
+        target_pc = (pc + operand) & 0xFFFF
+    elif op == 0x5c:
+        target_pc = (pc + (operand >> 8)) & 0xFFFF
+    else:
+        return None
+    if 0 <= target_pc < end_pc:
+        return offs[target_pc]
+    return len(data) if target_pc == end_pc else None
 
 
 def disassemble_script(data, cast=None, resolve_targets=True):
@@ -984,7 +1591,13 @@ def disassemble_script(data, cast=None, resolve_targets=True):
     }
     # standalone (non-0x1f) arithmetic / compare opcodes
     ARITH = {0x50: "ADD", 0x51: "SUB", 0x52: "MUL", 0x53: "DIV"}
-    CMP = {0x0a: "==", 0x0b: "<cmp>", 0x0d: ">=", 0x0e: "<"}
+    # Comparison mnemonics for the diagnostic listing. Operand order is
+    # `var CMP const` (var pushed first, const on top). Verified against the
+    # engine's frame VM (FUN_00055ce0 in libshs09.so): each op computes a
+    # relation between the two stack words --
+    #   0x0a var == const   0x0b var != const   0x0c var > const
+    #   0x0d var >= const    0x0e var < const     0x0f var <= const
+    CMP = {0x0a: "==", 0x0b: "!=", 0x0c: ">", 0x0d: ">=", 0x0e: "<", 0x0f: "<="}
 
     def txt_of(ref):
         return ss.get(ref * 2 + STRING_BASE)
@@ -1187,8 +1800,9 @@ def scan_control_flow(data):
 
 
 def decode_script(data: bytes, cast=None, episode_title=None,
-                  script_ids=None, image_ids=None, sprites_by_idx=None,
-                  costume_rows=None, name_renames=None):
+                  script_ids=None, image_ids=None, audio_ids=None,
+                  sprites_by_idx=None,
+                  costume_rows=None, name_renames=None, text_subs=None):
     """Decode a .kiw script into a list of Line objects.
 
     `script_ids` / `image_ids` are the archive directory's real chunk ids:
@@ -1253,6 +1867,12 @@ def decode_script(data: bytes, cast=None, episode_title=None,
     last_var_read = None  # the variable id read by the most recent 1f 2d call
     saw_add = False       # a 0x50 add byte appeared since the last call (the
                           # read-modify-write marker: read var, push delta, add)
+    computed_write = False  # a LOAD/SLOT op fed the value about to be written by a
+                            # 1f2c: the value is runtime-computed (a score-table
+                            # lookup), not a static constant, so no var node is emitted
+    slot_display = False    # a 0x15 STORE consumed operands into a quiz/array slot;
+                            # a following 1f00/1f41 renders a runtime "%s" from the
+                            # slot, so its stored-string operand is data, not text
     last_spk = None  # most recent speaker index (from any 1b pair); a speaker-less
                      # 0x0d line is a continuation spoken by this "active" speaker
     marker_row = None  # 0x5a / 0x5b before a display call select the speaker by
@@ -1380,7 +2000,14 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                         if pk[0] == "v" and (pk[1] * 2 + STRING_BASE) in smap
                         and smap[pk[1] * 2 + STRING_BASE]]
                 txts = [t for t in txts if t not in cast and len(t) > 6]
-                if txts:
+                if slot_display and txts and all(
+                        t.strip().startswith("%s") for t in txts):
+                    # a runtime quiz display: the visible text is a "%s" template
+                    # filled from the array slot at play time; the stored strings
+                    # (question/answer/feedback) were already consumed by STORE and
+                    # are data, not a static status line. Emit nothing.
+                    pass
+                elif txts:
                     lines.append(Line(txts[-1], "__STATUS__", None))
                 else:
                     ln = _emit(pushes, smap, cast, resources, narration=True,
@@ -1410,11 +2037,24 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                     lines.append(Line(None, "__BG__", ("custom", ids[-1] if image_ids
                                                        else max(ids))))
             elif sel == SET_MUSIC:                            # 0x50 -> background music change
-                codes = [pk[1] for pk in pushes if pk[0] == "v" and pk[1] >= 0x2000]
+                # A track is either a GLOBAL library id -- the native engine
+                # validates these against a fixed band (`param_2 - 0x2009U < 0x20`
+                # in libshs09.so -> 8201..8232, and the base APK ships /8201.mp3
+                # ../8225.mp3) -- or an EPISODE-PACKAGED MP3 chunk shipped in this
+                # .exp (e.g. Swim Team Retreat 2's 26044..26050, Halloween Dance
+                # Part 2's 26000..26005), exactly like packaged sprites/backgrounds.
+                # The old `>= 0x2000` test was too loose (it let packaged PNG ids
+                # through as music); band-only was too strict (it dropped the
+                # packaged tracks).
+                codes = [pk[1] for pk in pushes if pk[0] == "v"
+                         and (MUSIC_ID_MIN <= pk[1] <= MUSIC_ID_MAX
+                              or (audio_ids and pk[1] in audio_ids))]
                 if codes:
                     lines.append(Line(None, "__MUSIC__", codes[-1]))
-            elif sel == STOP_MUSIC:                           # 0x52 -> stop / fade out music
+            elif sel == STOP_MUSIC:                           # 0x51 -> stop / fade out music
                 lines.append(Line(None, "__MUSIC__", "stop"))
+            elif sel == VIBRATE:                              # 0x52 -> haptic buzz
+                lines.append(Line(None, "__VIBRATE__", None))
             elif sel == PRESENT_CHOICE:                       # 0x01 -> choice menu / QTE
                 texts = [smap[pk[1] * 2 + STRING_BASE] for pk in pushes
                          if pk[0] == "v" and (pk[1] * 2 + STRING_BASE) in smap]
@@ -1430,8 +2070,21 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                                     texts.append(t)
                 opts = next((t for t in texts if "|" in t), None)
                 if opts:                                      # story choice (a|b|c)
+                    # Choice prompts like "What do you do?" / "What do you say?" are
+                    # flagged by _is_system (so they don't leak into spoken dialogue),
+                    # but on a choice they ARE the player-facing question. Prefer a
+                    # non-system "?" line; otherwise fall back to a decision-prompt
+                    # phrase, and only then to any non-system line. The "Make your
+                    # choice!" banner stays excluded.
+                    _prompt_phrases = ("what do you", "how do you respond",
+                                       "what will you", "what should you")
                     nonopt = [t for t in texts if "|" not in t and not _is_system(t)]
+                    decision = [t for t in texts if "|" not in t
+                                and any(p in t.lower() for p in _prompt_phrases)]
                     prompt = (next((t for t in nonopt if t.rstrip().endswith("?")), None)
+                              or (next((t for t in decision
+                                        if t.rstrip().endswith("?")), None))
+                              or (decision[0] if decision else None)
                               or (nonopt[0] if nonopt else None))
                     lines.append(Line(opts, "__CHOICE__", prompt))
                 elif len(texts) >= 2 and all(t.rstrip().endswith(("!", "?")) for t in texts):
@@ -1440,7 +2093,7 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                     packed = ([prompt] if prompt else []) + (["|".join(options)] if options else [])
                     lines.append(Line("§".join(packed), "__MINIGAME__", "action"))
                 elif texts:                                   # lone prompt
-                    lines.append(Line(texts[0], "__MINIGAME__", "prompt"))
+                    lines.append(Line(texts[0], "__NOTIFY__", "score"))
             elif sel == TCHOICE_SETUP:                        # 0x02 -> timed choice begin
                 # Text refs pushed: [prompt ("Make your choice!"), setup line,
                 # first option]. A timer (ms) is pushed too. Distinguish the real
@@ -1488,21 +2141,28 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                 texts = [smap[pk[1] * 2 + STRING_BASE] for pk in pushes
                          if pk[0] == "v" and (pk[1] * 2 + STRING_BASE) in smap]
                 if texts:
-                    lines.append(Line(texts[-1], "__MINIGAME__", "feedback"))
+                    lines.append(Line(texts[-1], "__NOTIFY__", "score"))
             elif sel == VAR_READ:                             # 0x2d -> read variable
                 vals = [pk[1] for pk in pushes if pk[0] in ("v", "m")]
                 if vals:
                     last_var_read = vals[-1]
             elif sel == VAR_WRITE:                            # 0x2c -> write variable
                 vals = [pk[1] for pk in pushes if pk[0] in ("v", "m")]
-                if saw_add and vals and last_var_read is not None:
+                if computed_write:
+                    # value came from a LOAD/SLOT (score-table lookup); it is not a
+                    # static constant, so emit no var node rather than a spurious
+                    # set/add built from the leftover index / var-id operands.
+                    pass
+                elif saw_add and vals and last_var_read is not None:
                     # read-modify-write: read var, push delta, 0x50 add, write
                     delta = vals[-1] - 0x10000 if vals[-1] >= 0x8000 else vals[-1]
                     lines.append(Line(None, "__VAR__", ("add", last_var_read, delta)))
                 elif len(vals) >= 2:
                     lines.append(Line(None, "__VAR__", ("set", vals[-2], vals[-1])))
             elif sel == PLAY_SFX:                             # 0x4f -> play sound effect
-                vals = [pk[1] for pk in pushes if pk[0] == "v"]
+                # Engine-validated SFX band (`param_2 - 0x1f41U < 0x71`) = 8001..8113.
+                vals = [pk[1] for pk in pushes
+                        if pk[0] == "v" and SFX_ID_MIN <= pk[1] <= SFX_ID_MAX]
                 if vals:
                     lines.append(Line(None, "__SFX__", vals[-1]))
             elif sel == SCENE_GOTO:                           # 0x0a -> jump to another scene
@@ -1576,6 +2236,46 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                         break
                 if idx is not None and cast[idx]:
                     lines.append(Line(cast[idx], "__POVSET__", idx))
+            elif sel == WOBBLE:                               # 0x59 -> wobble next line
+                lines.append(Line(None, "__WOBBLE__", None))
+            elif sel == LOADING:                              # 0x5b -> loading screen
+                flag = next((pk[1] for pk in reversed(pushes)
+                             if pk[0] in ("v", "m")), 1)
+                lines.append(Line(None, "__LOADING__", flag))
+            elif sel == SET_SCENE_VALUE:                      # 0x10 -> scene value reg
+                val = next((pk[1] for pk in reversed(pushes)
+                            if pk[0] in ("v", "m")), None)
+                if val is not None:
+                    lines.append(Line(None, "__SCENEVAL__", val))
+            elif sel == SET_UI_DEFAULT:                       # 0x4b -> UI default slot
+                val = next((pk[1] for pk in reversed(pushes)
+                            if pk[0] in ("v", "m")), None)
+                if val is not None:
+                    lines.append(Line(None, "__UIDEFAULT__", val))
+            elif sel == SET_STRING:                           # 0x2e -> string var write
+                # [key_ref, value_ref]. A $Token first ref is a rename (handled by
+                # _name_renames), so only emit set_string when the key is a plain
+                # (non-$) string.
+                refs = [pk[1] for pk in pushes if pk[0] == "v"]
+                if len(refs) >= 2:
+                    ktext = smap.get(refs[-2] * 2 + STRING_BASE, "")
+                    vtext = smap.get(refs[-1] * 2 + STRING_BASE, "")
+                    if ktext and not ktext.startswith("$"):
+                        lines.append(Line("%s\x1f%s" % (ktext, vtext),
+                                          "__SETSTR__", None))
+            elif sel == TEXT_INPUT:                           # 0x28 -> player types text
+                texts = [smap.get(pk[1] * 2 + STRING_BASE, "") for pk in pushes
+                         if pk[0] == "v"]
+                texts = [t for t in texts if t]
+                title = texts[0] if texts else ""
+                prompt = texts[1] if len(texts) > 1 else ""
+                lines.append(Line("%s\x1f%s" % (title, prompt),
+                                  "__TEXTINPUT__", None))
+            elif sel == CHARACTER_PICKER:                     # 0x4e -> pick character(s)
+                texts = [smap.get(pk[1] * 2 + STRING_BASE, "") for pk in pushes
+                         if pk[0] == "v"]
+                prompt = next((t for t in texts if t), "")
+                lines.append(Line(prompt, "__PICKCHAR__", None))
             # any other selector (set-sprite, etc.) produces no transcript line.
             for _ln in lines[_before:]:
                 if _ln is not None and _ln.bc_off is None:
@@ -1583,11 +2283,15 @@ def decode_script(data: bytes, cast=None, episode_title=None,
             pushes = []      # a call always consumes the operands pushed for it
             marker_row = None   # a row marker only applies to the call it preceded
             saw_add = False
+            computed_write = False
+            slot_display = False
             p += 2
             continue
         if op in (0x2b, 0x28) and p + 2 < n:  # conditional jump (3 bytes); a
             pushes = []                         # control boundary, so reset operands
             saw_add = False
+            computed_write = False
+            slot_display = False
             p += 3
             continue
         if op == 0x42 and p + 3 < n:  # branch separator (42 29 00 NN) — used by
@@ -1621,6 +2325,29 @@ def decode_script(data: bytes, cast=None, episode_title=None,
             pushes = []
             p += 4
             continue
+        if op in (0x3e, 0x15, 0x3f, 0x60, 0x61, 0x62):
+            # INDEX / STORE / LOAD / SLOT0-2: array & slot-table machinery. A 0x50
+            # ADD that feeds one of these is computing an ARRAY INDEX (e.g. the
+            # extra-credit score table `slot[var2000 + N]`), not a var delta, so a
+            # pending saw_add here is stale -- clear it. A VWRITE fed by LOAD/SLOT
+            # writes a looked-up/computed value that is not a static constant, so
+            # flag it: the write is real but its value is runtime-computed, and
+            # emitting a spurious `set`/`add` with the leftover operand bytes (The
+            # Tutors scene 2's bogus `var2000 += 2000` / `var3 = 2000`) is wrong.
+            saw_add = False
+            if op in (0x3f, 0x60, 0x61, 0x62):
+                computed_write = True
+            if op == 0x15:
+                # 0x15 STORE just wrote the pushed operand(s) into a quiz/array
+                # slot -- they are DATA, not display content. A following 1f00 /
+                # 1f41 that renders a "%s" template filled from that slot would
+                # otherwise pick the stored string as its text (The Tutors scene 2
+                # leaked "A beast...", "Correct!", "Good answer!" as status lines).
+                # Drop the consumed operands so the display sees only its template.
+                pushes = []
+                slot_display = True
+            p += 1
+            continue
         p += 1  # any other opcode (e.g. 0x5a marker): ignore, keep operands
 
     lines = [ln for ln in lines if ln is not None]
@@ -1638,7 +2365,9 @@ def decode_script(data: bytes, cast=None, episode_title=None,
     _lead = lead_of(cast) if cast else None
     _CTRL = ("__CARD__", "__CHOICE__", "__SCENE__", "__MINIGAME__", "__BG__",
              "__MUSIC__", "__SFX__", "__GOTO__", "__STATUS__", "__SEP__",
-             "__POV__", "__VAR__", "__TCHOICE__")
+             "__POV__", "__VAR__", "__TCHOICE__", "__NOTIFY__", "__VIBRATE__",
+             "__WOBBLE__", "__LOADING__", "__SCENEVAL__", "__UIDEFAULT__",
+             "__SETSTR__", "__TEXTINPUT__", "__PICKCHAR__")
     # Iterate to a fixed point: a compact-form line adjacent only to other
     # compact-form lines can be resolved once its neighbour is, so repeat until no
     # further line changes (bounded by the number of lines).
@@ -1813,6 +2542,12 @@ def decode_script(data: bytes, cast=None, episode_title=None,
             new = name_renames.get(ln.speaker.lower())
             if new:
                 ln.speaker = new
+    # Substitute $Token text placeholders (e.g. "$Antagonist ..." -> "Travis ...")
+    # in every line's visible text, using the episode-wide 1f2e text bindings.
+    if text_subs:
+        for ln in all_cards:
+            if ln.text and "$" in ln.text:
+                ln.text = _apply_text_subs(ln.text, text_subs)
     return all_cards, cast
 
 
@@ -2200,6 +2935,8 @@ def line_to_dict(ln):
         return {"type": "end_card", "text": ln.text}
     if ln.speaker == "__MINIGAME_REF__":
         return {"type": "minigame", "kind": ln.emotion, "from_scene_bank": True}
+    if ln.speaker == "__NOTIFY__":
+        return {"type": "notification", "kind": ln.emotion, "text": ln.text}
     if ln.speaker == "__MINIGAME__":
         if ln.emotion == "word-match":
             return {"type": "minigame", "kind": "word-match", "words": ln.text.split(" | ")}
@@ -2239,6 +2976,24 @@ def line_to_dict(ln):
         if ln.emotion == "stop":
             return {"type": "music", "action": "stop"}
         return {"type": "music", "track_id": ln.emotion}
+    if ln.speaker == "__VIBRATE__":
+        return {"type": "vibrate"}
+    if ln.speaker == "__WOBBLE__":
+        return {"type": "wobble"}
+    if ln.speaker == "__LOADING__":
+        return {"type": "loading", "blocking": bool(ln.emotion)}
+    if ln.speaker == "__SCENEVAL__":
+        return {"type": "set_scene_value", "value": ln.emotion}
+    if ln.speaker == "__UIDEFAULT__":
+        return {"type": "set_ui_default", "value": ln.emotion}
+    if ln.speaker == "__SETSTR__":
+        _k, _, _v = (ln.text or "").partition("\x1f")
+        return {"type": "set_string", "key": _k, "value": _v}
+    if ln.speaker == "__TEXTINPUT__":
+        _t, _, _p = (ln.text or "").partition("\x1f")
+        return {"type": "text_input", "title": _t, "prompt": _p}
+    if ln.speaker == "__PICKCHAR__":
+        return {"type": "character_picker", "prompt": ln.text or ""}
     if ln.speaker == "__GOTO__":
         return {"type": "goto_scene", "script": "0x%04x" % ln.emotion}
     if ln.speaker == "__STATUS__":
@@ -2333,6 +3088,9 @@ def restore_int_values(obj):
 _NAME_VAR_RE = re.compile(r'\$[A-Za-z][A-Za-z0-9_]{0,15}$')
 
 
+_BARE_NAME_RE = re.compile(r"[A-Z][A-Za-z.'-]{0,18}$")   # a name-var default
+
+
 def extract_name_vars(data: bytes):
     """Parse the name-variable defaults from a script's head.
 
@@ -2373,13 +3131,19 @@ def extract_name_vars(data: bytes):
         if o <= evt_off or o >= bc_start:
             continue
         if len(t) > 45 and " " in t and "|" not in t:
-            break
+            # A recap/prose line. Some episodes (e.g. Swim Team Retreat 2) open
+            # the head with a "Previously on..." recap BEFORE the name-variable
+            # declarations, so this must not end the zone -- skip it and keep
+            # scanning. The pair test below is tight enough that prose cannot be
+            # mistaken for a declaration.
+            continue
         zone.append(t)
     out = {}
     for i, t in enumerate(zone):
         if _NAME_VAR_RE.match(t) and i + 1 < len(zone):
             nxt = zone[i + 1]
-            if nxt and not nxt.startswith("$") and "|" not in nxt:
+            # a default is a BARE name: single token, capitalised, no spaces
+            if nxt and _BARE_NAME_RE.match(nxt):
                 out.setdefault(t, nxt)
         elif t in cast_vars:
             out.setdefault(cast_vars[t], t)
@@ -2519,10 +3283,50 @@ def resolve_minigame_gates(data):
         elif data[q] == 0x1f and data[q + 1] == 0x51:   # play-minigame-by-id
             # real minigame launch is preceded by push <id ~1000>; the end-of-
             # episode replay/survey screen also uses 0x51 but without an id push.
+            # 0x51 (FUN_000a3260) is ALSO used as a plain asset/sound cue -- it is
+            # not itself a minigame launcher (the real launcher is 0x47, which
+            # allocates the minigame object). A genuine by-id minigame FORK gates
+            # on the minigame SCORE (a slot/threshold compare with no variable read
+            # between the launch and the compare). A 0x51 followed by an ordinary
+            # variable-read gate (`push <var>; 1f2d VREAD; cmp`) is a plain content
+            # branch on that variable -- NOT a minigame -- and must not be carved
+            # into win/lose arms, because the lose arm then swallows the section's
+            # real continuation (e.g. Halloween scene 2's `var2001 == 0` gate, whose
+            # fall-through carries the goto to scene 3). So accept the by-id fork
+            # only when the following result gate does NOT read a variable (1f2d)
+            # before its comparison.
             prev = ins[i - 1] if i > 0 else None
             if prev is not None and data[prev] in (0x1a, 0x41) \
                     and 1000 <= ((data[prev + 1] << 8) | data[prev + 2]) <= 1010:
-                trig = q
+                # scan forward to the result gate (0x2b). A genuine minigame result
+                # gate either tests the score directly or via a score-table lookup
+                # (VREAD used as an INDEX, then a slot LOAD is compared). Reject only
+                # a gate that reads a variable (1f2d VREAD) with NO slot operation
+                # (0x3e INDEX / 0x15 STORE / 0x3f LOAD) anywhere before the compare --
+                # that is a raw variable content branch, not a minigame (Halloween
+                # scene 2's `push 2001; 1f2d; ==0`). Wrong Side of Town's scene-5 fork
+                # reads var2006 but then INDEX/STORE/LOADs a score slot, so it is kept.
+                _has_vread = False
+                _has_slot = False
+                for _k in range(i + 1, min(i + 16, len(ins))):
+                    _o = ins[_k]
+                    _b = data[_o]
+                    if _b in (0x3e, 0x15, 0x3f):
+                        _has_slot = True
+                    if _b == 0x1f and _o + 1 < n and data[_o + 1] == 0x2d:
+                        _has_vread = True
+                    if _b == 0x2b:
+                        break
+                _choice_fed = False
+                for _k in range(i - 1, max(i - 8, -1), -1):
+                    _o = ins[_k]
+                    if data[_o] == 0x1f and _o + 1 < n and data[_o + 1] == 0x01:
+                        _choice_fed = True
+                        break
+                    if data[_o] == 0x2b:
+                        break
+                if not (_has_vread and not _has_slot) and not _choice_fed:
+                    trig = q
         elif data[q] == 0x5e:
             trig = q
         if trig is None:
@@ -2692,6 +3496,141 @@ def resolve_minigame_gates(data):
     return out
 
 
+def resolve_score_tier_cascade(data, start_off=None, window=220):
+    """Execute a score-tier RANK cascade the way the VM would, returning the tiers.
+
+    The end-of-episode rank screen is a chain of score comparisons, each guarding
+    one rank narration, in bytecode:
+
+        op5f op3f            ; load the running score
+        push <N>             ; a tier threshold
+        <cmp>  (0x0e..0x0f)  ; score <cmp> N   (lte in the rank screen)
+        2b <rel=7>           ; JMPF: if false, skip this rank's narration
+        1b <rankref> <..>    ; the rank text ref (1st byte of the pair)
+        1f00 .. 1f41         ; show that one rank
+
+    A LINEAR scan emits every narration; the real VM takes the JMPF and shows
+    exactly ONE. This reads the chain statically and returns the mutually-
+    exclusive tiers [{op, threshold, text}], plus the fall-through `else` rank,
+    so the flattened narrations can be collapsed into a single gated node.
+
+    When start_off is None the whole scene is scanned for the first cascade of
+    3+ tiers; otherwise the scan begins at start_off.
+
+    Returns {"tiers": [...], "else_text": <str|None>} or None.
+    """
+    if data[:4] != b"kiwi":
+        return None
+    strings = find_strings(data)
+    bc = max((o + len(t) for o, t in strings if len(t) >= 12), default=0)
+    smap = {o: t for o, t in normalize_strings(strings)}
+
+    def s(r):
+        return smap.get(r * 2 + STRING_BASE, "")
+
+    fo = _fold_instruction_offsets(data, bc)
+    fi = {o: i for i, o in enumerate(fo)}
+
+    def _scan_from(i0, end):
+        tiers, offsets = [], []
+        i = i0
+        _last_i = None
+        while i < len(fo) - 3 and fo[i] < end:
+            o = fo[i]
+            if data[o] == 0x1a:
+                thr = (data[o + 1] << 8) | data[o + 2]
+                cmp_b = data[fo[i + 1]]
+                if cmp_b in (0x0e, 0x0f, 0x0c, 0x0d) and data[fo[i + 2]] == 0x2b:
+                    op = {0x0e: "lt", 0x0f: "lte", 0x0c: "gt", 0x0d: "gte"}[cmp_b]
+                    txt = None
+                    for j in range(i + 3, i + 7):
+                        if j >= len(fo):
+                            break
+                        if data[fo[j]] == 0x1b:
+                            txt = s(data[fo[j] + 1])
+                            break
+                        if data[fo[j]] == 0x1a:
+                            rr = (data[fo[j] + 1] << 8) | data[fo[j] + 2]
+                            if s(rr):
+                                txt = s(rr)
+                                break
+                    if txt and ("rank for this episode" in txt.lower()
+                                or "grade for this episode" in txt.lower()):
+                        # Tiers of one cascade are tightly packed (~23 instrs
+                        # apart). A large gap means we have run past this cascade
+                        # into a later one (e.g. the extra-credit rescore) -- stop
+                        # so each cascade is resolved separately.
+                        if _last_i is not None and (i - _last_i) > 20:
+                            break
+                        tiers.append({"op": op, "threshold": thr, "text": txt})
+                        offsets.append(fo[i + 3] if i + 3 < len(fo) else o)
+                        _last_i = i
+            i += 1
+        return tiers, offsets
+
+    if start_off is not None and start_off in fi:
+        tiers, offsets = _scan_from(fi[start_off], start_off + window)
+    else:
+        # scan the whole scene; take the first run of >=3 rank tiers
+        tiers, offsets = [], []
+        k = 0
+        while k < len(fo):
+            _t, _o = _scan_from(k, len(data))
+            if len(_t) >= 3:
+                tiers, offsets = _t, _o
+                break
+            if _t:
+                # skip past this short run and keep looking
+                k = fi.get(_o[-1], k + 1) + 1
+            else:
+                k += 1
+    if len(tiers) < 3:
+        return None
+    # The fall-through (else) rank is the pushed rank string right after the last
+    # tier -- the "perfect score" / top grade shown when no threshold matched.
+    else_text = None
+    if offsets:
+        li = fi.get(offsets[-1], 0)
+        for j in range(li, min(li + 24, len(fo))):
+            if data[fo[j]] == 0x1a:
+                v = (data[fo[j] + 1] << 8) | data[fo[j] + 2]
+                t = s(v)
+                if t and ("grade for this episode" in t.lower()
+                          or "rank for this episode" in t.lower()) and t not in \
+                        [ti["text"] for ti in tiers]:
+                    else_text = t
+                    break
+    # Also collect every rank-threshold binding anywhere in the scene (a rescore
+    # screen repeats the ranks with == tests), so a caller can map ANY rank text
+    # to its score threshold, not just the first cascade's.
+    all_thr = {}
+    kk = 0
+    while kk < len(fo) - 3:
+        o = fo[kk]
+        if data[o] == 0x1a:
+            thr = (data[o + 1] << 8) | data[o + 2]
+            cmp_b = data[fo[kk + 1]]
+            if cmp_b in (0x0e, 0x0f, 0x0c, 0x0d, 0x0a) and data[fo[kk + 2]] == 0x2b:
+                op = {0x0e: "lt", 0x0f: "lte", 0x0c: "gt", 0x0d: "gte",
+                      0x0a: "eq"}[cmp_b]
+                for j in range(kk + 3, kk + 7):
+                    if j >= len(fo):
+                        break
+                    rr = None
+                    if data[fo[j]] == 0x1b:
+                        rr = data[fo[j] + 1]
+                    elif data[fo[j]] == 0x1a:
+                        rr = (data[fo[j] + 1] << 8) | data[fo[j] + 2]
+                    if rr is not None:
+                        t = s(rr)
+                        if t and ("rank for this episode" in t.lower()
+                                  or "grade for this episode" in t.lower()):
+                            all_thr.setdefault(t, {"op": op, "threshold": thr})
+                            break
+        kk += 1
+    return {"tiers": tiers, "else_text": else_text, "all_thresholds": all_thr}
+
+
 def resolve_section_dispatch(data):
     """Resolve a scene's SECTION DISPATCH header, derived from the bytecode +
     the native VM (libshs09.so, FUN_0009fe3c).
@@ -2831,12 +3770,64 @@ def resolve_section_dispatch(data):
         return sum(1 for q in fo if lo < q < hi
                    and data[q] == 0x1f and data[q + 1] == 0x0d)
 
+    def _gate_before(tgt):
+        # If a variable-gate (`push VAR ; 1f2d ; ... ; CMP ; 0x2b JMPF`) sits
+        # immediately before a section body such that entering AT the body would
+        # skip the gate (landing inside its then-arm), return the gate's JUMP
+        # offset so the section binds to the gate segment (whose own node carries
+        # that offset) and the gate evaluates -- keeping both arms reachable.
+        # Only triggers when the JMPF's else-target diverts OUTSIDE the section
+        # body region (the gate genuinely branches to other content, e.g.
+        # Halloween scene 4's `var2002 == 1` gate whose else-arm is the twins
+        # reunion). Byte-derived: gate, var-read, and jump target all from bytes.
+        ti = fi.get(tgt)
+        if ti is None:
+            return None
+        for k in range(ti - 1, max(ti - 12, -1), -1):
+            o = fo[k]
+            if data[o] == 0x2b:                       # JMPF (the gate branch)
+                jt = resolve_jump_target(data, o, bc_start=bc)
+                if jt is None or jt <= tgt:           # else-arm not diverting away
+                    return None
+                # The else-arm must be a SUBSTANTIAL diverting section, not a small
+                # in-line conditional skip. A section-entry gate whose else-arm is a
+                # whole alternate scene (Halloween s4's var2002 gate: else-arm 452
+                # bytes away, the twins-reunion) is worth entering at; a local
+                # `skip a couple of lines` gate (e.g. Making Some Dough scene 2's
+                # value-1 arm, whose gate skips ~18 bytes) is not -- backing the
+                # section binding onto it would displace the dispatch arm. Require
+                # the else-target to sit well past the gate AND to contain spoken
+                # lines (a real scene), both byte-derived.
+                if jt - o < 100:
+                    return None
+                _spoken = sum(1 for _q in fo if o < _q < jt
+                              and data[_q] == 0x1f and data[_q + 1] == 0x0d)
+                if _spoken < 3:
+                    return None
+                # confirm a var-read feeds this gate
+                has_vread = False
+                for m in range(k - 1, max(k - 8, -1), -1):
+                    om = fo[m]
+                    if data[om] == 0x1f and om + 1 < n and data[om + 1] == VAR_READ:
+                        has_vread = True
+                        break
+                    if data[om] == 0x2b:
+                        break
+                return o if has_vread else None
+            if data[o] == 0x1f and data[o + 1] in (0x0d, 0x41):
+                return None                            # spoken line: not gate prologue
+        return None
+
     if len(sep_targets) == len(rows) and len(rows) >= 2:
         for idx, (row, tgt) in enumerate(zip(rows, sep_targets)):
             if tgt is None:
                 continue                      # sentinel case (game-end / no body)
             if idx > 0:
                 tgt = _snap_to_title(tgt)
+            elif idx == 0:
+                _g = _gate_before(tgt)
+                if _g is not None:
+                    tgt = _g
             b = {"value": row["case_id"], "section_offset": tgt,
                  "source": "bytecode",
                  "_note": ("Byte-derived from the dispatch table's "
@@ -2959,6 +3950,227 @@ def _natural_section_landings(data, bc):
     return landings
 
 
+def _score_win_flows_to_fail(data, jmp, block_lo, block_hi, smap, bc_start):
+    """True when an equality score-gate's WIN block flows straight into a fail
+    screen -- the mis-merge signature that distinguishes a genuine win/fail gate
+    from an ordinary `score == 0` choice-answer test.
+
+    Walks the win block's execution from block_lo, following linear flow and
+    unconditional 0x28 jumps, and stops at the first choice (1f 01), goto-scene
+    (1f 0a), or the block's natural exit. If a "you have failed" / "has failed"
+    string is displayed along that path, the win narration was concatenated with
+    the fail screen (Magic School's enrollment and beast-QTE dodges) and the gate
+    should be split. Choice-test `== 0` gates branch away before any fail line, so
+    they return False and are left untouched."""
+    n = len(data)
+    fail_refs = set()
+    for o, t in smap.items():
+        lo = t.lower()
+        if "have failed" in lo or "has failed" in lo:
+            fail_refs.add((o - STRING_BASE) // 2)
+    pos, steps, seen = block_lo, 0, set()
+    while steps < 500:
+        steps += 1
+        if pos in seen or pos >= n or pos < 0:
+            break
+        seen.add(pos)
+        b = data[pos]
+        if b == 0x1a:
+            r = (data[pos + 1] << 8) | data[pos + 2]
+            if r in fail_refs:
+                return True
+            pos += 3
+        elif b == 0x28:                         # unconditional jump: follow it
+            t = resolve_jump_target(data, pos, bc_start=bc_start)
+            pos = t if t is not None else pos + 3
+        elif b == 0x1f and pos + 1 < n and data[pos + 1] == 0x01:
+            return False                        # choice prompt: branch point
+        elif b == 0x1f and pos + 1 < n and data[pos + 1] == 0x0a:
+            return False                        # goto-scene: leaves the chunk
+        elif b in (0x41, 0x1b, 0x28, 0x2b, 0x42, 0x1f):
+            pos += 3
+        else:
+            pos += 1
+    return False
+
+
+def resolve_score_gates(data, minigame_gate_offsets=None):
+    """Resolve mid-scene SCORE-THRESHOLD gates: `op5f op3f ; push N ; <cmp> ; 2b`.
+
+    Some scenes decide a win/fail outcome on the accumulated minigame SCORE (the
+    `op5f`/`op3f` running-score load) rather than a stored variable -- e.g. Fallon
+    Family Christmas's intruder fight, which gates the "police training kicks in,
+    Mal wins" narration on `score >= 2`, jumping to the "He has failed" checkpoint
+    branch otherwise. A linear scan emits both the win and fail narration back to
+    back (making the win text run straight into the defeat text); this reads the
+    gate statically so the two outcomes become the `then`/`else` arms of a gate
+    node, exactly like `resolve_var_gates`.
+
+    Shape (byte-verified, in the same 3-byte-call instruction model the other
+    resolvers use):
+        op5f            ; push accumulated score
+        op3f            ; load it
+        push <N> | 5a|5b; the threshold
+        <cmp>           ; 0x0c gt / 0x0d gte / 0x0e lt / 0x0f lte
+        2b <skip>       ; JMPF: skip the fall-through block when the test is false
+
+    Only threshold comparisons (gt/gte/lt/lte) are treated as score gates; an
+    equality (0x0a) after `op5f op3f` is a choice test block (option-index match)
+    handled by resolve_choice_branches, and is left alone. `minigame_gate_offsets`
+    (from resolve_minigame_gates) name gates the minigame-gate machinery already
+    resolves -- those are skipped so this resolver only picks up the win/fail
+    gates nothing else handles. Returns the same {"at", "var": "score",
+    "equals": N, "op", "then": [lo, hi]} shape as resolve_var_gates so downstream
+    gate-nesting consumes it identically."""
+    if data[:4] != b"kiwi":
+        return []
+    _skip = set(minigame_gate_offsets or ())
+    strings = find_strings(data)
+    bc_start = max((o + len(t) for o, t in strings if len(t) >= 12), default=0)
+    n = len(data)
+    ins, p = [], bc_start
+    while p < n:
+        op = data[p]
+        if op in (0x1a, 0x41, 0x1b, 0x28, 0x2b, 0x42, 0x1f):
+            if p + 3 > n:
+                break
+            ins.append(p)
+            p += 3
+        else:
+            ins.append(p)
+            p += 1
+    index = {q: i for i, q in enumerate(ins)}
+    out = []
+    i = 0
+    while i < len(ins) - 4:
+        q = ins[i]
+        # score load: op5f then op3f
+        if not (data[q] == 0x5f and data[ins[i + 1]] == 0x3f):
+            i += 1
+            continue
+        const, jmp, cmp_op = None, None, None
+        for j in range(i + 2, min(i + 6, len(ins))):
+            b = data[ins[j]]
+            if b in (0x1a, 0x41):
+                const = (data[ins[j] + 1] << 8) | data[ins[j] + 2]
+            elif b == 0x5a:
+                const = 0
+            elif b == 0x5b:
+                const = 1
+            elif b in (0x0c, 0x0d, 0x0e, 0x0f):     # threshold comparisons
+                cmp_op = b
+            elif b == 0x0a:                          # equality: only a win/fail
+                cmp_op = b                           # gate if it flows to a fail
+                                                     # screen (checked below)
+            elif b == 0x0b:                          # != : choice inversion, skip
+                break
+            elif b == 0x2b:
+                jmp = ins[j]
+                break
+            elif b == 0x1f:
+                break
+        if const is None or jmp is None or cmp_op is None:
+            i += 1
+            continue
+        # skip gates the minigame-gate machinery already resolves (its `gate`
+        # offset is the 0x2b of this same test), so we don't double-split them
+        if jmp in _skip or q in _skip:
+            i += 1
+            continue
+        v = (data[jmp + 1] << 8) | data[jmp + 2]
+        ti = index[jmp] + v
+        if 0 <= ti < len(ins) and ins[ti] > jmp:
+            block_lo, block_hi = ins[index[jmp] + 1], ins[ti]
+            # Only treat this as a win/fail narrative gate when the fall-through
+            # block carries real, non-rank narration. The end-of-episode RANK
+            # cascade (`score <= 19/39/59...` -> "Your rank for this episode is
+            # ...") uses the same op5f/op3f/threshold shape but is handled by
+            # resolve_score_tier_cascade; its tier bodies are tiny and hold only
+            # rank/points text. Requiring a substantive narrative body keeps this
+            # resolver from double-claiming those tiers.
+            if not hasattr(resolve_score_gates, "_smap_cache") \
+                    or resolve_score_gates._smap_cache[0] is not data:
+                resolve_score_gates._smap_cache = (
+                    data, {o: t for o, t in strings})
+            _smap = resolve_score_gates._smap_cache[1]
+            narrative = []
+            has_choice = False
+            bo = block_lo
+            while bo < block_hi:
+                if data[bo] == 0x1f and bo + 1 < n and data[bo + 1] == 0x01:
+                    has_choice = True        # a choice prompt lives in this block
+                if data[bo] == 0x1a:
+                    r = (data[bo + 1] << 8) | data[bo + 2]
+                    t = _smap.get(r * 2 + STRING_BASE, "")
+                    if t and len(t) > 8:
+                        narrative.append(t)
+                    bo += 3
+                elif data[bo] in (0x41, 0x1b, 0x28, 0x2b, 0x42, 0x1f):
+                    bo += 3
+                else:
+                    bo += 1
+            is_rank = any("rank for this episode" in t.lower()
+                          or "grade for this episode" in t.lower()
+                          for t in narrative)
+            # Require the fail arm (the jump target and just past it) to carry the
+            # checkpoint-replay structure: a `1f63` CHECKPOINT syscall and/or a
+            # "has failed" / "you have earned ... points" fail screen. This is what
+            # distinguishes a genuine minigame WIN/FAIL gate (Fallon's intruder
+            # fight) from an ordinary `op5f`-counter availability gate (Making Some
+            # Dough reuses op5f/op3f as a day counter, `< 3`, with no fail screen),
+            # so the split never fires on those and leaves every other episode's
+            # segmentation byte-identical.
+            fail_lo = block_hi
+            fail_hi = min(n, block_hi + 900)
+            has_ckpt = False
+            fail_text = []
+            fo = fail_lo
+            while fo < fail_hi:
+                b = data[fo]
+                if b == 0x1f and fo + 1 < n and data[fo + 1] == 0x63:
+                    has_ckpt = True
+                if b == 0x1a:
+                    r = (data[fo + 1] << 8) | data[fo + 2]
+                    t = _smap.get(r * 2 + STRING_BASE, "")
+                    if t:
+                        fail_text.append(t)
+                    fo += 3
+                elif b in (0x41, 0x1b, 0x28, 0x2b, 0x42, 0x1f):
+                    fo += 3
+                else:
+                    fo += 1
+            has_fail_screen = any("has failed" in t.lower()
+                                  or "you have earned" in t.lower()
+                                  for t in fail_text)
+            # For a THRESHOLD gate (Fallon's `score >= 2` fight), the checkpoint/
+            # fail signature is enough. For an EQUALITY gate (`score == 0`), that
+            # shape is far more common -- most choice-answer tests use it -- so a
+            # much stricter test is required: the WIN block's own linear execution
+            # (following unconditional jumps, stopping at any choice/goto/branch)
+            # must actually reach a "you have failed" line. That only happens when
+            # the win narration was mis-concatenated with the fail screen in one
+            # segment (Magic School's "you sign your name / ...you have failed"
+            # enrollment, and its beast-QTE dodges). Choice-test `== 0` gates in
+            # other episodes branch away before any fail line, so they never match
+            # and every other episode stays byte-identical.
+            is_eq = cmp_op == 0x0a
+            accept = (narrative and not is_rank and not has_choice)
+            if is_eq:
+                accept = accept and _score_win_flows_to_fail(
+                    data, jmp, block_lo, block_hi, _smap, bc_start)
+            else:
+                accept = accept and (has_ckpt or has_fail_screen)
+            if accept:
+                out.append({"at": jmp, "var": "score", "equals": const,
+                            "op": {0x0a: "eq", 0x0c: "gt", 0x0d: "gte",
+                                   0x0e: "lt", 0x0f: "lte"}[cmp_op],
+                            "then": [block_lo, block_hi]})
+                i = index[jmp] + 1
+                continue
+        i += 1
+    return out
+
+
 def resolve_var_gates(data):
     """Resolve in-script VARIABLE GATES: `1f 2d` (read var) ; 0x21 ;
     <const push / 0x5a / 0x5b> ; 0x0a (compare) ; 0x2b <skip>.
@@ -3014,7 +4226,7 @@ def resolve_var_gates(data):
                 const = 0
             elif b == 0x5b:
                 const = 1
-            elif b in (0x0a, 0x0d, 0x0e):
+            elif b in (0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f):
                 cmp_op = b
             elif b == 0x2b:
                 jmp = ins[j]
@@ -3038,6 +4250,19 @@ def resolve_var_gates(data):
                 # `var2000 >= 200` -> the success path). The jump skips it when
                 # the test fails (money < 200 -> failure setup).
                 g["op"] = "gte"
+            elif cmp_op == 0x0c:
+                # greater-than: fall-through when var > const. (Wrong Side of
+                # Town's walk time-tier boundary `var2007 > 6`.)
+                g["op"] = "gt"
+            elif cmp_op == 0x0f:
+                # less-than-or-equal: fall-through when var <= const (e.g. a
+                # health check `var2001 <= 0` -> defeat).
+                g["op"] = "lte"
+            elif cmp_op == 0x0b:
+                # not-equal: fall-through when var != const.
+                g["op"] = "ne"
+            # cmp_op 0x0a (==) is the default gate shape; leaving op unset keeps
+            # the existing equality semantics that downstream code assumes.
             out.append(g)
             i = index[jmp] + 1
             continue
@@ -3362,54 +4587,19 @@ def _scan_checkpoint_replays(data):
                     fail_sections.append(c)
                 break
             j += 1
+    # General case (byte-derived, no 1f63 required): any section body that the
+    # forward simulator cannot reach from the chunk entry but which sits just
+    # after a `goto scene` is a section-register RESUME target -- the engine
+    # re-enters the chunk at that section head when the scene round-trips back.
+    # This recovers score-gated fail screens and post-round-trip bonus sections
+    # (e.g. Swim's "She has failed", Dough's Sublime Snickerdoodle) that the
+    # narrow 1f63 shape above misses. The downstream orphan guard still applies,
+    # so already-reachable sections are never touched.
+    for _rs in resolve_scene_resume_sections(data, bc):
+        if _rs["resume_at"] not in fail_sections:
+            fail_sections.append(_rs["resume_at"])
     return {"sets": sets, "replays": replays,
             "fail_sections": fail_sections}
-
-
-def _scan_counter_increments(data):
-    """Return every `read varN ; +K ; write` counter increment in bytecode order.
-
-    Surfaces the progress/lock counter bumps (e.g. var2002 quiz-progress, var2003
-    ads-done, var2009 bakery-losses) as {offset, var, value}. The pattern is
-    `push VAR ; 1f2d (read) ; [transform] ; push K ; 0x50 (ADD) ; 1f2c (write)`
-    with a small K; a leading 0x5b const counts as +1. Used by segmentation to
-    recover any increment that fell in a boundary gap and never landed in a node
-    list. All byte-derived; returns [] for scripts with none.
-    """
-    if data[:4] != b"kiwi":
-        return []
-    strings = find_strings(data)
-    bc = max((o + len(t) for o, t in strings if len(t) >= 12), default=0)
-    fo = _fold_instruction_offsets(data, bc)
-    out = []
-    for idx, q in enumerate(fo):
-        if data[q] != 0x1a:
-            continue
-        var = (data[q + 1] << 8) | data[q + 2]
-        if var < 2000 or var > 2099:
-            continue
-        if idx + 1 >= len(fo) or data[fo[idx + 1]] != 0x1f \
-                or data[fo[idx + 1] + 1] != 0x2d:
-            continue                         # must be a read of the var
-        val, saw_add, saw_write = None, False, False
-        for j in range(idx + 2, min(idx + 9, len(fo))):
-            qq = fo[j]
-            if data[qq] == 0x1a and val is None:
-                val = (data[qq + 1] << 8) | data[qq + 2]
-            elif data[qq] == 0x5b and val is None:
-                val = 1
-            elif data[qq] == 0x5a and val is None:
-                val = 0
-            elif data[qq] == 0x50:
-                saw_add = True
-            elif data[qq] == 0x1f and data[qq + 1] == 0x2c:
-                saw_write = True
-                break
-            elif data[qq] == 0x1f and data[qq + 1] == 0x2d:
-                break                        # another read -> not a simple bump
-        if saw_add and saw_write and val is not None and 0 < val < 100:
-            out.append({"offset": q, "var": str(var), "value": int(val)})
-    return out
 
 
 def _scan_ad_flag_writes(data):
@@ -3828,12 +5018,59 @@ def resolve_choice_branches(data):
                                 # branch (e.g. a money check), not an option test
             else:
                 break
+            # Comparison op sits right after the marker: 0x0a (==) is the usual
+            # test, but some choices encode an option with 0x0b (!=), which
+            # INVERTS the branch -- the JMPF then fires when the answer DOES match
+            # (jumping to that option's body) and falls through for the others.
+            # (Byte-verified: Fallon Family Christmas scene 2's intruder QTE
+            # "Duck and dive! / Jump to the side!" encodes option 1 as `push1 !=`,
+            # so its body is the jump target, not the fall-through.) Track it so
+            # the body region is taken from the correct arm.
+            _cmp_off = ins[k + 1] if k + 1 < len(ins) else None
+            is_ne = _cmp_off is not None and data[_cmp_off] == 0x0b
             jmp = next((ins[m] for m in range(k + 1, min(k + 5, len(ins)))
                         if data[ins[m]] == 0x2b), None)
             if jmp is None:
                 break
             fail = jump_target(jmp)
             if fail is None or fail <= jmp:
+                break
+            if is_ne:
+                # `!= ` inverts: the option body is the JUMP TARGET (taken when
+                # the answer matches), and control falls through to the rest.
+                body_lo = fail
+                nxt_ins = ins[index[jmp] + 1]
+                # the fall-through arm (nxt_ins .. body_lo) is the other option/
+                # else; it usually ends in a 0x28 to the merge -- that jump's
+                # target is the merge point bounding this option's body.
+                merge_guess = None
+                for m in ins[index[nxt_ins]:index[fail]]:
+                    if data[m] == 0x28:
+                        t = jump_target(m)
+                        if t is not None and t >= fail:
+                            merge_guess = t
+                if merge is None and merge_guess is not None:
+                    merge = merge_guess
+                body_hi = merge or fail
+                # trim a trailing exit 0x28 inside this option's body
+                last28 = max((m for m in ins[index[fail]:index[body_hi]]
+                              if data[m] == 0x28), default=None) \
+                    if body_hi in index else None
+                if last28 is not None:
+                    t = jump_target(last28)
+                    if t is not None and t >= body_hi \
+                            and index[body_hi] - index[last28] <= 2:
+                        body_hi = last28
+                options.append({"index": const, "region": [body_lo, body_hi]})
+                # The fall-through arm here is the impossible "answer is neither
+                # option" case (option 0 was already matched by its own earlier
+                # test, and this test catches option 1 via `!=`), so it is dead
+                # code -- a freeze/miss branch the engine can never execute. It is
+                # NOT emitted as an option: doing so would orphan real-looking
+                # text that no choice path reaches. (Byte-verified across Fallon
+                # scene 2 and Halloween Part 2's "Scream!/Duck!" QTE.)
+                if merge is None:
+                    merge = body_hi
                 break
             body_lo = ins[index[jmp] + 1]
             body_hi = fail
@@ -3934,6 +5171,27 @@ def extract_minigame_banks(data):
                       "words": [strings[i - 2][1], strings[i - 1][1]],
                       "answers": t.split("|"), "letters": strings[i + 1][1]})
 
+    # SINGLE-word build rounds use the same 6-string record but carry a question
+    # instead of a second word, and so have no `w1|w2` string to anchor on:
+    #     [action_a, action_b, question_a, question_b, word, letter_pool]
+    #   e.g. ['Paint the','coulds!','What color are','clouds?','white','whitexk']
+    # The letter pool is the target word plus a few decoy letters, which is what
+    # identifies the pair (pool starts with the word and is a little longer).
+    if not build:
+        for i, (o, t) in enumerate(strings):
+            if i < 4 or i + 1 >= len(strings):
+                continue
+            nxt = strings[i + 1][1]
+            if not (re.fullmatch(r'[a-z]{3,}', t) and re.fullmatch(r'[a-z]{4,}', nxt)):
+                continue
+            if not (nxt.startswith(t) and 1 <= len(nxt) - len(t) <= 4):
+                continue
+            action = (strings[i - 4][1].lstrip("@") + " " + strings[i - 3][1]).strip()
+            question = (strings[i - 2][1] + " " + strings[i - 1][1]).strip()
+            build.append({"offset": strings[i - 4][0], "subtitle": action,
+                          "question": question, "words": [t.capitalize()],
+                          "answers": [t], "letters": nxt})
+
     pick = []
     i = 0
     while i < len(strings):
@@ -4011,6 +5269,24 @@ def extract_minigame_banks(data):
     def is_q(t):
         return t.rstrip().endswith("?")
 
+    def _is_quiz_feedback(t):
+        # Strings the engine shows AFTER an answer is picked -- they terminate a
+        # quiz record's option list (the last record in a bank has no following
+        # question to bound it, so without this the loop runs on into the feedback
+        # banners and then ordinary story dialogue: The Tutors' "mitigate" record
+        # was absorbing "Good answer!", "The next morning...", etc.). Matched as
+        # anchored phrases, not loose "right"/"wrong" substrings, so a genuine
+        # answer option like "To get a question wrong in a quiz." is NOT treated
+        # as feedback.
+        low = t.strip().lower()
+        if low in ("correct!", "choose wisely!", "good answer!",
+                   "that's right!", "sorry, that's wrong.",
+                   "sorry, that's incorrect.", "sorry, that's not right.",
+                   "that's definitely not right..."):
+            return True
+        return low.startswith(("%s the correct answer",
+                               "the correct answer was"))
+
     def _rephrasing(a, b):
         """A quiz record's short question is a REPHRASING of the long one --
         its tokens are (nearly) a subset of the long form's (e.g. "What does
@@ -4032,8 +5308,18 @@ def extract_minigame_banks(data):
                 and "|" not in region[i2 + 1][1] \
                 and _rephrasing(t, region[i2 + 1][1]):
             opts2, j2 = [], i2 + 2
-            while j2 < len(region) and not is_q(region[j2][1]) \
-                    and "|" not in region[j2][1] and len(region[j2][1]) < 60:
+            while j2 < len(region) \
+                    and "|" not in region[j2][1] and len(region[j2][1]) < 60 \
+                    and not _is_quiz_feedback(region[j2][1]):
+                # A "?"-string normally marks the next question -- but a quiz answer
+                # can itself be phrased as a question (e.g. the joke option
+                # "Norway?"). The genuine next record is a question immediately
+                # followed by its short rephrasing; a lone "?" answer is not. Stop
+                # only at a real question pair, so joke options are kept.
+                if is_q(region[j2][1]):
+                    _nxt = region[j2 + 1][1] if j2 + 1 < len(region) else ""
+                    if is_q(_nxt) and _rephrasing(region[j2][1], _nxt):
+                        break
                 opts2.append(region[j2][1])
                 j2 += 1
             if len(opts2) >= 2:
@@ -4277,7 +5563,8 @@ def build_episode_json(lines, cast, episode, title, main_characters=None,
                        name_vars=None, choice_dispatch=None, chapter_heads=None,
                        var_gates=None, section_dispatch=None,
                        minigame_gates=None, buildword_scoring=None,
-                       merge_jumps=None, choice_forks=None):
+                       merge_jumps=None, choice_forks=None,
+                       score_tier_thresholds=None):
     """Build a branch-aware episode JSON: scenes -> nodes, with choices nesting
     their option branches.
 
@@ -4342,6 +5629,8 @@ def build_episode_json(lines, cast, episode, title, main_characters=None,
             cf = scene_controls.get(scene_meta["script"])
             if cf and cf.get("_sep63_terminals"):
                 scene["_sep63_terminals"] = cf["_sep63_terminals"]
+            if cf and cf.get("_linear_sep_chains"):
+                scene["_linear_sep_chains"] = cf["_linear_sep_chains"]
             if cf and cf.get("branches"):
                 scene["control_flow"] = {
                     "note": ("Branch skeleton in bytecode order (not execution "
@@ -4859,77 +6148,6 @@ def _flatten_choice_node(ch, tail):
     if not ch.get("next"):
         ch["next"] = merge
     return [ch] + hoisted
-
-
-def flatten_doc_for_output(doc):
-    """Convert each scene's nested choice/gate structure into a flat, next-threaded
-    map of nodes -- the same shape as the per-scene story-export files, but keyed by
-    id so any reference resolves in O(1) without scanning. Each scene's `nodes`
-    becomes {id: node}; `entry` holds the start id. A choice references its option
-    branches via options[].goto and its continuation via continues_at; a gate
-    references its then-branch via then_at; goto_scene jumps via to_scene. Run AFTER
-    the story export (which consumes the nested list form)."""
-    # Safety net: every node must have a stable id to be keyable/referable. A few
-    # deeply-nested nodes can slip past id assignment; give them an offset-based id.
-    for scene in doc.get("scenes", []):
-        sc = str(scene.get("scene"))
-
-        def ensure_ids(nodes):
-            for nd in nodes:
-                if not isinstance(nd, dict):
-                    continue
-                if "id" not in nd:
-                    off = nd.get("offset")
-                    nd["id"] = f"{sc}.x{off}" if off is not None else f"{sc}.x{id(nd)}"
-                for b in (nd.get("branch_dialogue") or []):
-                    if isinstance(b, dict) and "lines" in b:
-                        ensure_ids(b["lines"])
-                    elif isinstance(b, dict):
-                        ensure_ids([b])
-                for o in (nd.get("outcomes") or []):
-                    if isinstance(o, dict) and "lines" in o:
-                        ensure_ids(o["lines"])
-                ensure_ids(nd.get("after_choice", []) or [])
-                ensure_ids(nd.get("then", []) or [])
-
-        ensure_ids(scene.get("nodes", []))
-
-    for scene in doc.get("scenes", []):
-        flat = []
-        for nd in scene.get("nodes", []):
-            if isinstance(nd, dict) and nd.get("type") == "choice":
-                flat.extend(_flatten_choice_node(nd, nd.get("continues_at") or nd.get("next")))
-            elif isinstance(nd, dict) and nd.get("type") == "gate" \
-                    and isinstance(nd.get("then"), list):
-                then = nd.pop("then")
-                nxt = nd.get("next")
-                nd["then_at"] = then[0].get("id") if (then and isinstance(then[0], dict)) else nxt
-                flat.append(nd)
-                flat.extend(_thread_flat(then, nxt))
-            else:
-                flat.append(nd)
-        # Thread the flat sequence: nodes that were positional siblings (e.g. the
-        # shared continuation hoisted from after_choice) have no explicit `next`, so
-        # link each to the following node. Nodes that already carry a `next` (linear
-        # flow, branch lines threaded to their merge, choices) are left untouched;
-        # goto_scene is terminal (it jumps via to_scene).
-        for i, nd in enumerate(flat):
-            if not isinstance(nd, dict) or "next" in nd or nd.get("type") == "goto_scene":
-                continue
-            nxt = None
-            for k in range(i + 1, len(flat)):
-                if isinstance(flat[k], dict):
-                    nxt = flat[k].get("id")
-                    break
-            nd["next"] = nxt
-        # Key the scene's nodes by id for O(1) lookup; `entry` (already set) is the
-        # start. Insertion order is preserved, so the map still reads top-to-bottom.
-        scene["nodes"] = {nd["id"]: nd for nd in flat
-                          if isinstance(nd, dict) and "id" in nd}
-        if not scene.get("entry") and flat:
-            scene["entry"] = flat[0].get("id")
-    doc["_flat"] = True
-    return doc
 
 
 def _apply_split_scenes(doc, overlay):
@@ -5594,6 +6812,13 @@ def normalize_graph(doc):
             if isinstance(vg, dict) and vg.get("var") is not None:
                 read_vars.add(str(vg["var"]))
 
+    # "score" is the engine's running minigame score (op5f/op3f), not a slot in
+    # the numeric variable store, so it must not become a variable_defaults entry
+    # (and would break the numeric sort below).
+    set_vars = {v for v in set_vars if v.isdigit()}
+    add_vars = {v for v in add_vars if v.isdigit()}
+    read_vars = {v for v in read_vars if v.isdigit()}
+
     all_vars = set_vars | add_vars | read_vars
     if all_vars:
         doc["variable_defaults"] = {
@@ -5663,7 +6888,8 @@ def render(lines, cast, title="Decoded transcript", fmt="md", backgrounds=True,
            overlay=None, genders=None, minigame_banks=None, name_vars=None,
            choice_dispatch=None, chapter_heads=None, var_gates=None,
            section_dispatch=None, minigame_gates=None, buildword_scoring=None,
-           merge_jumps=None, choice_forks=None):
+           merge_jumps=None, choice_forks=None,
+           score_tier_thresholds=None):
     def bg_text(emotion):
         kind, code = emotion
         if kind == "custom":
@@ -5681,7 +6907,8 @@ def render(lines, cast, title="Decoded transcript", fmt="md", backgrounds=True,
                                  section_dispatch=section_dispatch,
                                  minigame_gates=minigame_gates,
                                  buildword_scoring=buildword_scoring,
-                                 merge_jumps=merge_jumps, choice_forks=choice_forks)
+                                 merge_jumps=merge_jumps, choice_forks=choice_forks,
+                  score_tier_thresholds=score_tier_thresholds)
         if overlay:
             doc = apply_overlay(doc, overlay)
         doc = normalize_graph(doc)
@@ -5720,6 +6947,22 @@ def render(lines, cast, title="Decoded transcript", fmt="md", backgrounds=True,
             if ln.emotion == "stop":
                 return "> 🎵 _music → stop_\n"
             return f"> 🎵 _music → track {ln.emotion}_\n"
+        if ln.speaker == "__VIBRATE__":
+            return "> 📳 _vibrate_\n"
+        if ln.speaker == "__WOBBLE__":
+            return "> 〰️ _wobble next line_\n"
+        if ln.speaker == "__LOADING__":
+            return "> ⏳ _loading_\n"
+        if ln.speaker in ("__SCENEVAL__", "__UIDEFAULT__"):
+            return ""
+        if ln.speaker == "__SETSTR__":
+            _k, _, _v = (ln.text or "").partition("\x1f")
+            return f"> 🔤 _{_k} = {_v}_\n"
+        if ln.speaker == "__TEXTINPUT__":
+            _t, _, _p = (ln.text or "").partition("\x1f")
+            return f"> ⌨️ _text input: {_p or _t}_\n"
+        if ln.speaker == "__PICKCHAR__":
+            return f"> 👥 _pick character: {ln.text}_\n"
         if ln.speaker == "__GOTO__":
             return f"> ➡️ _go to scene 0x{ln.emotion:04x}_\n"
         if ln.speaker == "__STATUS__":
@@ -5773,6 +7016,8 @@ def render(lines, cast, title="Decoded transcript", fmt="md", backgrounds=True,
                 out.append(f"[SFX -> {ln.emotion}]")
             elif ln.speaker == "__MUSIC__":
                 out.append(f"[MUSIC -> {ln.emotion}]")
+            elif ln.speaker == "__VIBRATE__":
+                out.append("[VIBRATE]")
             elif ln.speaker == "__GOTO__":
                 out.append(f"[GOTO SCENE 0x{ln.emotion:04x}]")
             elif ln.speaker == "__STATUS__":
@@ -5909,7 +7154,9 @@ def build_story_segments(doc, var_gates=None):
             return nodes, []
         gates = [g for g in (mgr.get("gates") or [])
                  if g.get("kind") == "outcome_fork"
-                 or (g.get("kind") == "content_fork" and g.get("via") == "by_id")]
+                 or (g.get("kind") == "content_fork" and g.get("via") == "by_id")
+                 or (g.get("via") == "action"
+                     and g.get("pass_at") != g.get("fail_at"))]
         if not gates:
             return nodes, []
 
@@ -6046,6 +7293,25 @@ def build_story_segments(doc, var_gates=None):
                             fork["setup"] = nd["setup"]
                         if nd.get("minigame_type"):
                             fork["minigame_type"] = nd["minigame_type"]
+                        out.pop(k)
+                        break
+            elif g.get("via") == "action":
+                # The action minigame is emitted as a flat play-point node (the
+                # 0x47 prompt/options) just before its score gate. Fold that node
+                # into the fork so the single node carries both the game (prompt,
+                # options, platform variants) and its win/lose arms -- matching
+                # the shape of the by_id / word-bank minigames.
+                trig = int(g.get("trigger") or 0)
+                for k in range(win_start - 1, -1, -1):
+                    nd = out[k]
+                    if not isinstance(nd, dict) or nd.get("fork"):
+                        continue
+                    if nd.get("type") == "minigame" and nd.get("offset") \
+                            and int(nd["offset"]) <= trig:
+                        for _key in ("prompt", "options", "setup", "variants",
+                                     "minigame_type"):
+                            if nd.get(_key) is not None and _key not in fork:
+                                fork[_key] = nd[_key]
                         out.pop(k)
                         break
         return out, spans
@@ -6368,6 +7634,25 @@ def build_story_segments(doc, var_gates=None):
                                 mgt["timer_ms"] = "20000"
                                 mgt["setup"]["timer_ms"] = "20000"
                             break
+                # An action (0x47) minigame carries its own play-point content --
+                # the prompt and the pipe-delimited option groups folded in when
+                # the fork absorbed the flat node. Carry those onto the emitted
+                # node so it names the actual game, not just the fork skeleton.
+                # Platform variants (mobile pick_word / tablet build_word) are
+                # attached by the later scene-bank variant pass, which runs on
+                # every minigame node that has a playable minigame_type.
+                if nd.get("via") == "action":
+                    for _k in ("prompt", "options", "minigame_type", "variants"):
+                        if nd.get(_k) is not None:
+                            mgt[_k] = nd[_k]
+                    # The 0x47 action minigame's inline option groups (correct
+                    # vs decoys) ARE the mobile pick_word form, so name it that
+                    # when the fork skeleton left it generic. The later scene-bank
+                    # variant pass adds the tablet build_word form when a bank for
+                    # this scene exists.
+                    if mgt.get("minigame_type") in (None, "content_fork") \
+                            and mgt.get("options"):
+                        mgt["minigame_type"] = "pick_word"
                 term = {"minigame": mgt}
                 flush(term)
                 # bytecode after the fork is reached via dispatch, not fallthrough
@@ -6419,6 +7704,8 @@ def build_story_segments(doc, var_gates=None):
                         tail["next"] = else_f + ".json"
                 term = {"gate": {"var": nd["var"], "equals": nd["equals"],
                                  **({"op": nd["op"]} if nd.get("op") else {}),
+                                 **({"offset": nd["offset"]}
+                                    if nd.get("offset") is not None else {}),
                                  "then": then_f + ".json",
                                  **({"else": else_f + ".json"}
                                     if else_f else {})}}
@@ -6549,6 +7836,182 @@ def build_story_segments(doc, var_gates=None):
                     _cand.append((min(_os), _fn))
             if _cand:
                 entry = min(_cand)[1]
+        # Combat-walk scenes (e.g. Wrong Side of Town's town gauntlet) can have the
+        # shared combat/encounter code physically first, so the entry defaults to
+        # that combat dump instead of the walk. When the chosen entry segment is a
+        # combat dump AND the scene has a walk-hub segment (a choice whose options
+        # include walking, plus a time/distance status), start at the walk hub
+        # instead. General: only redirects when both conditions hold; other scenes
+        # are untouched.
+        def _is_combat_dump(bd):
+            txt = " ".join((n.get("text") or "") for n in bd.get("nodes", [])
+                           if isinstance(n, dict)).lower()
+            return ("still has %d life left" in txt or "goes down!" in txt) \
+                and "does %d damage" in txt
+
+        def _is_walk_hub(bd):
+            # The walk hub shows the countdown time/distance status. (The walk
+            # choice may be split into a following segment during emit, so the
+            # time status alone identifies the hub.)
+            for n in bd.get("nodes", []):
+                if not isinstance(n, dict):
+                    continue
+                t = (n.get("text") or "").lower()
+                if n.get("type") == "status" and ("before sunset" in t
+                                                  or "left before" in t):
+                    return True
+            return False
+
+        _entry_bd = files.get(entry)
+        if _entry_bd is not None and _is_combat_dump(_entry_bd):
+            # Prefer a walk hub (town-walk scenes). Otherwise, when the scene has a
+            # section dispatch whose first valid-value section sits past the combat
+            # dump, that section is the true opening (e.g. Wrong Side scene 5's
+            # arrival + Ryan confrontation). Use whichever applies.
+            _hub = next((_fn for _fn, _bd in files.items()
+                         if _bd.get("scene") == sc["scene"] and _is_walk_hub(_bd)),
+                        None)
+            if _hub is not None:
+                entry = _hub
+            else:
+                # dispatch's first valid-value section target
+                _valid = sd.get("valid_values") or []
+                _sect = None
+                for _b in sd.get("bindings", []):
+                    if _b.get("section_offset") is not None \
+                            and (not _valid or _b.get("value") in _valid):
+                        _sect = int(_b["section_offset"])
+                        break
+                if _sect is not None:
+                    _cand = []
+                    for _fn, _bd in files.items():
+                        if _bd.get("scene") != sc["scene"]:
+                            continue
+                        _os = [int(x["offset"]) for x in _bd.get("nodes", [])
+                               if isinstance(x, dict) and x.get("offset") is not None
+                               and str(x["offset"]).lstrip("-").isdigit()]
+                        if _os and min(_os) >= _sect - 4:
+                            _cand.append((min(_os), _fn))
+                    if _cand:
+                        entry = min(_cand)[1]
+        # END-OF-EPISODE SCORE SCREEN AT ENTRY.
+        # A scene whose header dispatches on the section register (var1001) is
+        # entered from the prior scene with the register set to the STORY case:
+        # byte-confirmed, the prior scene writes var1001=<case> immediately before
+        # its goto here, and a restart path inside this scene resets it. The
+        # bytecode-first section is the rank/score screen (the dispatch default),
+        # so the physical-first segment -- the default scene entry -- is the score
+        # screen, which would wrongly play before the story begins. When the chosen
+        # entry opens with the end screen (a score_tier) and its own continuation
+        # is a different story segment, replace the entry with a GATE that mirrors
+        # the bytecode dispatch: register==<case> -> story, else -> score screen.
+        # This keeps the score screen reachable (the else arm) -- no orphan -- and
+        # is exactly what the engine does, so it needs no per-episode special-case.
+        _entry_bd = files.get(entry)
+
+        def _opens_with_score_tier(bd):
+            # The score_tier collapse runs later (in build_segmented_doc), so at
+            # this point the entry may still carry the FLATTENED rank narrations.
+            # Accept either: a score_tier node, or a run of rank/grade narration
+            # lines, possibly preceded by framing narration/status.
+            _rank = 0
+            for nd in (bd.get("nodes") if bd else []):
+                if not isinstance(nd, dict):
+                    continue
+                if nd.get("type") == "score_tier":
+                    return True
+                t = (nd.get("text") or "").lower()
+                if "rank for this episode" in t or "grade for this episode" in t:
+                    _rank += 1
+                    if _rank >= 2:
+                        return True
+                    continue
+                if nd.get("type") in ("narration", "status", "notification"):
+                    continue
+                return _rank >= 2
+            return _rank >= 2
+
+        _case = None
+        if sd and sd.get("register") is not None:
+            _cases = sd.get("cases") or []
+            _vals = [c.get("value") for c in _cases if c.get("value") not in (None, 0)]
+            _case = _vals[0] if _vals else None
+
+        if (_case is not None and _entry_bd is not None
+                and _opens_with_score_tier(_entry_bd)):
+            # the story target is the earliest same-scene segment (by bytecode
+            # offset) that is not itself an end-screen fragment (the score screen /
+            # rank-tier block). Leading bookkeeping nodes (var writes, bg/music/
+            # sfx, control) are ignored when judging what a segment "opens" with.
+            def _first_content(bd):
+                for nd in bd.get("nodes", []):
+                    if not isinstance(nd, dict):
+                        continue
+                    if nd.get("type") in ("var_add", "var_set", "control",
+                                          "background", "music", "sfx", "sprite"):
+                        continue
+                    return nd.get("type")
+                return None
+
+            def _is_score_framing(bd):
+                # score screen, extra-credit rescore, or quiz-result recap -- all
+                # end-of-episode scoring UI, not the story opening.
+                if _opens_with_score_tier(bd):
+                    return True
+                _txt = " ".join((n.get("text") or "") for n in bd.get("nodes", [])
+                                if isinstance(n, dict))[:400].lower()
+                for _kw in ("you answered", "out of 100 points",
+                            "rank for this episode", "grade for this episode",
+                            "extra credit", "you got the `perfect` score",
+                            "points short of unlocking"):
+                    if _kw in _txt:
+                        return True
+                return False
+
+            _story, _best = None, None
+            for _fn, _bd in files.items():
+                if _bd.get("scene") != sc["scene"] or _fn == entry:
+                    continue
+                if _is_score_framing(_bd):
+                    continue
+                # skip choice-OPTION branch fragments (…_optN): these are the arms
+                # of a mid-scene choice and can sit at an earlier bytecode offset
+                # than the story spine, but entering on one drops the player into
+                # the middle of a conversation. The spine segments (…_after / _win
+                # / _lose / the scene head) are the real openings.
+                if re.search(r"_opt\d+$", _fn):
+                    continue
+                # must carry real playable content (dialogue or narration), not be
+                # a pure control/notification stub
+                if _first_content(_bd) not in ("dialogue", "narration", "status"):
+                    continue
+                _os = [int(x["offset"]) for x in _bd.get("nodes", [])
+                       if isinstance(x, dict) and x.get("offset") is not None
+                       and str(x["offset"]).lstrip("-").isdigit()]
+                if _os and (_best is None or min(_os) < _best):
+                    _best, _story = min(_os), _fn
+            _story_bd = files.get(_story) if _story else None
+            if (_story_bd is not None and _story != entry
+                    and _story_bd.get("scene") == sc["scene"]):
+                _reg = sd.get("register")
+                _gate_id = "s%s_dispatch" % sc["scene"]
+                files[_gate_id] = {
+                    "scene": sc["scene"],
+                    "nodes": [{
+                        "type": "gate",
+                        "var": str(_reg),
+                        "op": "eq",
+                        "equals": _case,
+                        "then": _story + ".json",
+                        "else": entry + ".json",
+                        "note": ("Scene-header section dispatch (byte-derived): the "
+                                 "prior scene sets var%s=%s before entering, so the "
+                                 "story plays first; the score screen (else) is the "
+                                 "dispatch fall-through reached at episode end when "
+                                 "the register is reset." % (_reg, _case)),
+                    }],
+                }
+                entry = _gate_id
         scene_entry[str(sc["scene"])] = entry + ".json"
 
     # resolve word-select minigame refs to the scene's pick/build bank, and
@@ -6910,9 +8373,11 @@ def build_story_segments(doc, var_gates=None):
     # The variable cross-reference is fully derivable from the segments, so it is
     # not emitted into the (lean) output. We still run its one useful check here:
     # a variable that is read by a gate but never written anywhere is either an
-    # engine-initialised value or a decode miss worth surfacing.
+    # engine-initialised value or a decode miss worth surfacing. "score" is the
+    # engine's running minigame score (op5f/op3f), not a variable-store slot, so
+    # it is expected to be gated without an explicit writer and is excluded.
     rbw = sorted(v for v, x in variables.items()
-                 if x["gated_in"] and not x["written_in"])
+                 if x["gated_in"] and not x["written_in"] and v.isdigit())
     if rbw:
         print("[!] %s: gated but never written: %s"
               % (doc.get("episode") or doc.get("title") or "episode",
@@ -6971,6 +8436,18 @@ def build_story_segments(doc, var_gates=None):
     for name, body in files.items():
         offs = [int(n["offset"]) for n in body["nodes"]
                 if isinstance(n, dict) and n.get("offset") is not None]
+        # A segment whose only content is a control TERMINAL (a gate/minigame that
+        # hasn't yet been folded into `nodes`) has no node offsets here, so it
+        # would get no byte range and be invisible to seg_for_section -- meaning a
+        # section-dispatch arm that should route to this gate lands on the next
+        # segment instead, skipping the gate (e.g. Halloween scene 4's var2002
+        # gate entry, whose else-arm is the twins-reunion scene). Fold the
+        # terminal's own offset into the range so the gate segment is routable.
+        for _tk in ("gate", "minigame"):
+            _t = body.get(_tk)
+            if isinstance(_t, dict) and _t.get("offset") is not None \
+                    and str(_t["offset"]).lstrip("-").isdigit():
+                offs.append(int(_t["offset"]))
         if offs:
             seg_ranges[name] = (min(offs), max(offs))
     bindings_by_scene = {}
@@ -7454,6 +8931,14 @@ def build_story_segments(doc, var_gates=None):
         if su and su.get("bank"):
             return su["bank"]
         k = mg.get("kind")
+        # A round with inline correct/decoy option groups is a pick-the-word game
+        # whether flat (kind=action) or carrying win/lose arms (content_fork). But
+        # NOT when a real question/answer quiz bank is attached -- that is a quiz.
+        opts = mg.get("options")
+        if isinstance(opts, list) and len(opts) >= 2 \
+                and k in ("action", "content_fork") \
+                and not (mg.get("setup") or {}).get("bank") == "quiz":
+            return "pick_word"
         if k == "action":
             return "action_tap"
         if k in ("prompt", "feedback"):
@@ -7465,6 +8950,16 @@ def build_story_segments(doc, var_gates=None):
         nodes = body["nodes"]
         for i, nd in enumerate(nodes):
             if isinstance(nd, dict) and nd.get("type") == "minigame":
+                # An action round with inline correct/decoy option groups is its own
+                # pick-the-word game; a quiz bank that got attached from elsewhere in
+                # the scene is not this game's data (The Tutors' "Concentrate!" round
+                # shares its scene with a vocabulary quiz). Drop that mis-attached
+                # bank so the round reads as the pick_word it is.
+                if (nd.get("kind") in ("action", "content_fork")
+                        and isinstance(nd.get("options"), list)
+                        and len(nd.get("options")) >= 2
+                        and (nd.get("setup") or {}).get("bank") == "quiz"):
+                    nd.pop("setup", None)
                 variety = _mg_variety(nd)
                 rebuilt = {"type": "minigame", "minigame_type": variety}
                 rebuilt.update({k: v for k, v in nd.items()
@@ -8242,6 +9737,67 @@ def build_story_segments(doc, var_gates=None):
         # the section order follows the roll offsets, and var2002 is the counter the
         # hub already tests for the "academic still available?" gate.
         _entry = files.get("s%s" % scn)
+        # Prefer the byte-derived section dispatch when the scene header actually
+        # reads a section register with multiple case bindings (Making Some Dough
+        # scene 2: `push 1001; VREAD; op5c(11,1); op5c(14,2); ...` -- a 9-case quiz
+        # selector). The roll-based var2002 selector below only recovers the 2-3
+        # sections that carry a question-draw roll, orphaning the other quiz-day
+        # sections (the President / sequence / Gatsby questions). Build the entry
+        # dispatch from the dispatch table's own value->section_offset bindings,
+        # mapping each offset to the same-scene segment that opens at it, exactly as
+        # resolve_section_dispatch derived them from the SEP case targets.
+        _sd_bindings = [b for b in (sd.get("bindings") or [])
+                        if b.get("section_offset") is not None]
+        if (_entry is not None and sd.get("register") is not None
+                and len(_sd_bindings) >= 3):
+            def _seg_opening_at(_off):
+                # the same-scene segment whose first node offset is at/just after
+                # the binding offset (snap-forward, matching the runtime's seek).
+                # Segments are identified by their s<scn>_ name prefix, since the
+                # `scene` field is not populated on file bodies at this stage.
+                _pref = "s%s" % scn
+                _best, _bd = None, None
+                for _fn, _b in files.items():
+                    if not (_fn == _pref or _fn.startswith(_pref + "_")):
+                        continue
+                    _os = [int(x["offset"]) for x in _b.get("nodes", [])
+                           if isinstance(x, dict) and x.get("offset") is not None
+                           and str(x["offset"]).lstrip("-").isdigit()]
+                    if not _os:
+                        continue
+                    _lo = min(_os)
+                    if _lo >= _off - 40 and (_bd is None or _lo < _bd):
+                        _bd, _best = _lo, _fn
+                return _best
+            _arms = []
+            _seen_seg = set()
+            for _b in sorted(_sd_bindings, key=lambda z: z["value"]):
+                _seg = _seg_opening_at(int(_b["section_offset"]))
+                if _seg is None or _seg == ("s%s" % scn):
+                    continue
+                _arms.append({"equals": str(_b["value"]),
+                              "scene": _seg + ".json"})
+                _seen_seg.add(_seg)
+            if len(_arms) >= 3:
+                _reg = sd.get("register")
+                _disp = {"type": "dispatch", "state_var": str(_reg),
+                         "arms": _arms[:-1],
+                         "default": _arms[-1]["scene"],
+                         "note": ("Quiz-section selector read from the scene header "
+                                  "(byte-derived): var%s is the section register the "
+                                  "hub sets per academic day; each value routes to "
+                                  "that day's quiz section (the op5c case targets in "
+                                  "the dispatch table). The final case is the "
+                                  "bytecode's fall-through default." % _reg)}
+                _enl = _entry.get("nodes") or []
+                if _enl and isinstance(_enl[-1], dict) \
+                        and _enl[-1].get("type") in ("next", "goto_scene",
+                                                     "dispatch"):
+                    _enl[-1] = _disp
+                else:
+                    _enl.append(_disp)
+                _entry["nodes"] = _enl
+                _entry = None  # suppress the roll-based var2002 selector below
         if _entry is not None and len(_section_owners) >= 2:
             _ordered = [nm for _off, nm in sorted(_section_owners)]
             # The bytecode tests var2002 against each value up to the last section
@@ -9207,8 +10763,11 @@ def build_story_segments(doc, var_gates=None):
         for _gn in files[_gnm].get("nodes") or []:
             if not (isinstance(_gn, dict) and _gn.get("type") == "gate"):
                 continue
-            _then = (_gn.get("then") or "").replace(".json", "")
-            _else = (_gn.get("else") or "").replace(".json", "")
+            _then_v, _else_v = _gn.get("then"), _gn.get("else")
+            if not isinstance(_then_v, str) or not isinstance(_else_v, str):
+                continue                       # inline (non-ref) arms: skip this pass
+            _then = _then_v.replace(".json", "")
+            _else = _else_v.replace(".json", "")
             if _then not in files or _else not in files:
                 continue
             # then-branch must be a short "bonus unlocked" card that dead-ends
@@ -9445,6 +11004,14 @@ def build_story_segments(doc, var_gates=None):
         # have no orphaned fail screen.
         if "fail_sections" in _ck:
             _ck.pop("fail_sections", None)
+        # If the checkpoints dict now carries no real 0x63 data (only the empty
+        # replays/sets stubs that the simulator-driven fail_sections attach adds),
+        # remove it so scenes without checkpoints keep their original null value.
+        _sd_here = _sc.get("section_dispatch")
+        if isinstance(_sd_here, dict) and isinstance(_sd_here.get("checkpoints"), dict) \
+                and not _sd_here["checkpoints"].get("replays") \
+                and not _sd_here["checkpoints"].get("sets"):
+            _sd_here.pop("checkpoints", None)
     if _fail_offs:
         def _norm2(x):
             return x.replace(".json", "") if isinstance(x, str) else x
@@ -9463,6 +11030,7 @@ def build_story_segments(doc, var_gates=None):
                     _o += [_norm2(_n.get("then")), _norm2(_n.get("else"))]
                 elif _t == "choice":
                     _o += [_norm2(o.get("next")) for o in _n.get("options") or []]
+                    _o.append(_norm2(_n.get("after")))
                 elif _t == "minigame":
                     _o += [_norm2(_n.get("win")), _norm2(_n.get("lose"))]
                 elif _t == "dispatch":
@@ -9476,22 +11044,47 @@ def build_story_segments(doc, var_gates=None):
         _incoming2 = set()
         for _b in files.values():
             _incoming2.update(_edges2(_b))
+        # Also treat sections already covered by an existing dispatch binding as
+        # reachable: those enter via the section register during normal play, so
+        # a resume-after-goto that lands on one is not a genuine orphan (this keeps
+        # the general simulator pass from adding redundant bindings to episodes
+        # whose sections a normal dispatch already reaches, e.g. As Time Goes By).
+        _already_bound = set()
+        for _sdv in (index.get("section_dispatch") or {}).values():
+            for _bb in _sdv.get("bindings") or []:
+                if _bb.get("section_offset") is not None:
+                    try:
+                        _already_bound.add(int(_bb["section_offset"]))
+                    except (TypeError, ValueError):
+                        pass
         for _scene_num, _off in _fail_offs:
-            # find the segment that starts at this fail offset and is orphaned
-            _seg = None
+            # find the CLOSEST orphaned segment that opens at this resume offset.
+            # Iterating by dict order can pick a farther segment (or one that is
+            # already reached); rank by distance and require the segment be
+            # orphaned (nothing in the graph routes to it).
+            _cands = []
             for _nm, _b in files.items():
                 _m = re.match(r"s(\d+)", _nm or "")
                 if not _m or _m.group(1) != str(_scene_num):
                     continue
+                if _nm in _incoming2:
+                    continue                # already reachable -> not a resume
                 _offs = [int(x["offset"]) for x in _b.get("nodes") or []
                          if isinstance(x, dict) and x.get("offset") is not None
                          and str(x["offset"]).lstrip("-").isdigit()]
-                if _offs and abs(min(_offs) - _off) <= 24 \
-                        and _nm not in _incoming2:
-                    _seg = (_nm, min(_offs))
-                    break
-            if _seg is None:
+                if not _offs:
+                    continue
+                _start = min(_offs)
+                # skip a segment that already opens at a dispatch-binding target
+                # (reachable via the section register during normal play)
+                if any(abs(_start - _bo) <= 24 for _bo in _already_bound):
+                    continue
+                if abs(_start - _off) <= 24:
+                    _cands.append((abs(_start - _off), _nm, _start))
+            if not _cands:
                 continue                    # already reachable, or not found
+            _cands.sort()
+            _seg = (_cands[0][1], _cands[0][2])
             # add an enter_at_section dispatch binding so the runtime (and the
             # reachability checker) treat this fail screen as a section entry
             _sd = index.setdefault("section_dispatch", {})
@@ -9746,7 +11339,7 @@ def build_story_segments(doc, var_gates=None):
                     _v = _n.get(_k)
                     if isinstance(_v, dict) and _v.get("type") == "gate":
                         _o += [_norm6(_v.get("then")), _norm6(_v.get("else"))]
-            return [x for x in _o if x]
+            return [x for x in _o if isinstance(x, str) and x]
 
         # segment offset ranges
         _rng6 = {}
@@ -9870,6 +11463,150 @@ def build_story_segments(doc, var_gates=None):
                           "loss branch. Registered as a runtime section entry "
                           "because it lands on an otherwise-unreachable block.")})
 
+    # Wire LINEAR-SEP section chains. Consecutive sections that fall through a
+    # bare SEP into the next section (no goto/branch) have no explicit edge, so
+    # the following section is orphaned even though the VM plays it next. For each
+    # recorded chain, add a `next` edge from the segment that ENDS at the SEP to
+    # the segment that BEGINS the next section -- but only when that target is
+    # otherwise unreachable, so episodes already wired by dispatch/branch edges
+    # (and their own linear chains, which normal flow already reaches) are byte-
+    # identical. Iterates to a fixpoint so a chain reached via an earlier link can
+    # carry flow into later ones.
+    _lsc_pairs = []
+    for _sc in doc["scenes"]:
+        for _a, _b in (_sc.get("_linear_sep_chains") or []):
+            _lsc_pairs.append((_sc.get("scene"), int(_a), int(_b)))
+        if "_linear_sep_chains" in _sc:
+            _sc.pop("_linear_sep_chains", None)
+    if _lsc_pairs:
+        def _norm7(x):
+            return x.replace(".json", "") if isinstance(x, str) else x
+
+        def _edges7(_b):
+            _o = []
+            for _n in _b.get("nodes") or []:
+                if not isinstance(_n, dict):
+                    continue
+                _t = _n.get("type")
+                if _t in ("next", "checkpoint_replay"):
+                    _o.append(_norm7(_n.get("next")))
+                elif _t == "goto_scene":
+                    _o += [_norm7(_n.get("file")), _norm7(_n.get("to_scene"))]
+                elif _t == "gate":
+                    _o += [_norm7(_n.get("then")), _norm7(_n.get("else"))]
+                elif _t == "choice":
+                    _o += [_norm7(o.get("next")) for o in _n.get("options") or []]
+                    _o.append(_norm7(_n.get("after")))
+                elif _t == "minigame":
+                    _o += [_norm7(_n.get("win")), _norm7(_n.get("lose"))]
+                elif _t == "dispatch":
+                    _o += [_norm7(a.get("scene")) for a in _n.get("arms") or []]
+                    _o.append(_norm7(_n.get("default")))
+                elif _t == "random":
+                    _o += [_norm7(o.get("scene")) for o in _n.get("options") or []]
+                    _o.append(_norm7(_n.get("exhausted")))
+            return [x for x in _o if x]
+
+        _rng7 = {}
+        for _nm, _b in files.items():
+            _os = [int(x["offset"]) for x in _b.get("nodes") or []
+                   if isinstance(x, dict) and x.get("offset") is not None
+                   and str(x["offset"]).lstrip("-").isdigit()]
+            if _os:
+                _rng7[_nm] = (min(_os), max(_os))
+
+        def _seg_start_at7(_off, _scn):
+            # segment whose FIRST node opens at (or just past) this body offset
+            _pref = re.compile(r"^s%s(_|$)" % _scn)
+            _best = _gap = None
+            for _nm, (_lo, _hi) in _rng7.items():
+                if not _pref.match(_nm):
+                    continue
+                if -8 <= _lo - _off <= 220 and (_gap is None or _lo < _best[1]):
+                    _best, _gap = (_nm, _lo), _lo
+            return _best[0] if _best else None
+
+        def _seg_end_before7(_off, _scn):
+            # segment whose LAST node sits just before this SEP/marker offset
+            _pref = re.compile(r"^s%s(_|$)" % _scn)
+            _best = _gap = None
+            for _nm, (_lo, _hi) in _rng7.items():
+                if not _pref.match(_nm):
+                    continue
+                if _hi < _off and 0 <= _off - _hi <= 60 \
+                        and (_gap is None or _off - _hi < _gap):
+                    _best, _gap = _nm, _off - _hi
+            return _best
+
+        def _reach7():
+            _roots = []
+            _e0 = _norm7(index.get("entry"))
+            if _e0:
+                _roots.append(_e0)
+            for _ev in (index.get("scene_entries") or {}).values():
+                _roots.append(_norm7(_ev))
+            for _scn, _sdv in (index.get("section_dispatch") or {}).items():
+                if not isinstance(_sdv, dict):
+                    continue
+                for _bb in _sdv.get("bindings") or []:
+                    if _bb.get("section_offset") is not None:
+                        _nm = _seg_start_at7(int(_bb["section_offset"]), _scn)
+                        if _nm:
+                            _roots.append(_nm)
+            _roots = [r for r in _roots if r in files]
+            _seen, _stk = set(), list(_roots)
+            while _stk:
+                _x = _stk.pop()
+                if _x in _seen:
+                    continue
+                _seen.add(_x)
+                _stk += [e for e in _edges7(files.get(_x, {})) if e in files]
+            return _seen
+
+        # apply to a fixpoint (a link can make a later chain's source reachable)
+        for _pass in range(6):
+            _reach = _reach7()
+            _changed = False
+            for _scn, _a, _b in _lsc_pairs:
+                # the source is the segment ENDING just before the target's
+                # section marker (b-4); the chain's own `a` offset may sit inside
+                # a larger segment (choices split a section into several segments,
+                # and it's the LAST of them that falls through).
+                _src = _seg_end_before7(_b - 4, _scn)
+                _dst = _seg_start_at7(_b, _scn)
+                if not _src or not _dst or _src == _dst:
+                    continue
+                if _dst in _reach:
+                    continue                # already reachable -> leave untouched
+                _sb = files.get(_src)
+                if not _sb:
+                    continue
+                _nodes = _sb.get("nodes") or []
+                # A section that falls through a bare SEP into the next section
+                # is often capped with a synthetic `end` (the segmenter read the
+                # SEP as a terminal). That `end` is the mis-inference we're here
+                # to correct: replace it with the fall-through `next`. But never
+                # override a REAL terminal (choice/gate/goto/next/minigame/etc.),
+                # so already-wired sections stay byte-identical.
+                _real_term = any(isinstance(_n, dict) and _n.get("type") in
+                                 ("next", "choice", "gate", "goto_scene",
+                                  "minigame", "dispatch", "random")
+                                 for _n in _nodes)
+                if _real_term:
+                    continue
+                _end_idx = next((_ix for _ix, _n in enumerate(_nodes)
+                                 if isinstance(_n, dict)
+                                 and _n.get("type") == "end"), None)
+                _edge = {"type": "next", "next": _dst, "source": "linear_sep"}
+                if _end_idx is not None:
+                    _nodes[_end_idx] = _edge
+                else:
+                    _nodes.append(_edge)
+                _sb["nodes"] = _nodes
+                _changed = True
+            if not _changed:
+                break
+
     return files, index
 
 
@@ -9992,7 +11729,7 @@ def annotate_pov(doc):
     return doc
 
 
-def build_segmented_doc(doc, var_gates=None):
+def build_segmented_doc(doc, var_gates=None, score_tier_thresholds=None):
     """Build the single-document equivalent of the story export: the index metadata
     plus a `segments` map of {segment_name: body}, where each body is one linear run
     of nodes ending in a terminal that names the next segment(s) (choice/gate/next/
@@ -10042,6 +11779,17 @@ def build_segmented_doc(doc, var_gates=None):
                         o["scene"] = strip(o["scene"])
                 if nd.get("exhausted"):
                     nd["exhausted"] = strip(nd["exhausted"])
+            # Content nodes (status/dialogue/narration/var_*/music/etc.) may still
+            # carry a vestigial `next` pointing to a normalize_graph node id in
+            # "<scene>.<index>" form (e.g. "1.8"). Inside a segment, nodes already
+            # play top-to-bottom, and node ids are stripped from the output, so
+            # such a pointer is unresolvable and meaningless -- drop it. Real
+            # inter-segment links live on the segment's terminal (a `next`-typed
+            # node, choice, gate, goto_scene, minigame, dispatch or random), which
+            # the branches above have already rewritten to segment names.
+            elif t not in ("next", "goto_scene") and isinstance(nd.get("next"), str) \
+                    and re.match(r"^\d+\.\d", nd["next"]):
+                nd.pop("next", None)
         segments[fname] = seg
 
     out = {k: v for k, v in index.items() if k != "files"}
@@ -10174,6 +11922,285 @@ def build_segmented_doc(doc, var_gates=None):
         for _name in _dead:
             del segments[_name]
     out["segments"] = segments
+
+    # DANGLING CHOICE `after` REPAIR.
+    # A choice's `after` is its shared post-merge continuation. Occasionally the
+    # emitted `after` segment name does not correspond to a real segment (the
+    # continuation was empty or got folded into the options' own convergence), so
+    # the choice carries an `after` pointing nowhere. When every option instead
+    # converges on a single existing segment, repoint `after` there; otherwise drop
+    # the stale field. The options keep their own `next`, so playable flow is
+    # unaffected either way -- this only removes a broken edge. (A Float Is Born
+    # scene 3's second choice pointed `after` at a non-existent `s3_07_after` while
+    # both options merged at `s3_01_after`.)
+    def _seg_succ_next(_sid):
+        for _n in segments.get(_sid, {}).get("nodes", []):
+            if isinstance(_n, dict) and isinstance(_n.get("next"), str):
+                return _n["next"].replace(".json", "")
+        return None
+
+    for _sid, _seg in segments.items():
+        for _n in _seg.get("nodes", []):
+            if not isinstance(_n, dict) or _n.get("type") != "choice":
+                continue
+            _aft = _n.get("after")
+            if not isinstance(_aft, str):
+                continue
+            _aftk = _aft.replace(".json", "")
+            if _aftk in segments:
+                continue
+            # the after target is missing -- find where the options converge
+            _conv = set()
+            for _o in _n.get("options", []) or []:
+                if not isinstance(_o, dict):
+                    continue
+                _nx = _o.get("next")
+                if isinstance(_nx, str):
+                    _c = _seg_succ_next(_nx.replace(".json", "")) or _nx.replace(".json", "")
+                    _conv.add(_c)
+            _conv = {c for c in _conv if c in segments}
+            if len(_conv) == 1:
+                _n["after"] = next(iter(_conv)) + ".json"
+            else:
+                _n.pop("after", None)
+
+    # The end-of-episode rank screen is a chain of score comparisons in bytecode,
+    # each JMPF-guarding one rank narration so the VM shows exactly ONE. The linear
+    # decoder emits all of them in a row. Detect a run of 3+ consecutive
+    # rank/grade narrations and replace it with a single mutually-exclusive
+    # `score_tier` node the runtime evaluates against the score, rather than a
+    # flat list the runtime would show all of. (The Tutors / Swim Retreat /
+    # Halloween Dance end screens are the cases this repairs.) The rank texts are
+    # taken in order from the already-decoded nodes; they are mutually exclusive,
+    # the last being the top/default tier shown when no lower tier's test passes.
+    def _is_rank_line(nd):
+        if not isinstance(nd, dict) or nd.get("type") not in ("narration", "status"):
+            return False
+        t = (nd.get("text") or "").lower()
+        return "rank for this episode" in t or "grade for this episode" in t
+
+    def _is_perfect_line(nd):
+        # the "You got the `perfect` score!" banner accompanying the top grade
+        if not isinstance(nd, dict) or nd.get("type") not in ("narration", "status"):
+            return False
+        return "perfect` score" in (nd.get("text") or "").lower() \
+            or "perfect score" in (nd.get("text") or "").lower()
+
+    _thr = score_tier_thresholds or {}
+    for _sid, _seg in segments.items():
+        _nodes = _seg.get("nodes") or []
+        _i = 0
+        while _i < len(_nodes):
+            if _is_rank_line(_nodes[_i]):
+                # extend over consecutive rank lines and the interleaved perfect-
+                # score banner that belongs to the top grade
+                _j = _i
+                while _j < len(_nodes) and (_is_rank_line(_nodes[_j])
+                                            or _is_perfect_line(_nodes[_j])):
+                    _j += 1
+                _run = _nodes[_i:_j]
+                _ranks = [n for n in _run if _is_rank_line(n)]
+                if len(_ranks) >= 3:
+                    # A rank with a byte-derived threshold is a gated tier; the
+                    # rank(s) without one are the fall-through top grade (default),
+                    # shown when no lower tier's score test passed. The perfect-
+                    # score banner rides along with the default.
+                    _tiers, _default_ranks = [], []
+                    for nd in _ranks:
+                        _txt = nd.get("text") or ""
+                        if _txt in _thr:
+                            _tiers.append({
+                                "rank": _txt,
+                                "op": _thr[_txt]["op"],
+                                "threshold": _thr[_txt]["threshold"]})
+                        else:
+                            _default_ranks.append(_txt)
+                    _perfect = [n.get("text") for n in _run if _is_perfect_line(n)]
+                    _default = {}
+                    if _perfect:
+                        _default["banner"] = _perfect[0]
+                    if _default_ranks:
+                        _default["rank"] = _default_ranks[-1]
+                    _tier_node = {
+                        "type": "score_tier",
+                        "var": "2000",
+                        "tiers": _tiers,
+                        "default": _default,
+                        "note": ("Mutually-exclusive end-of-episode rank. In "
+                                 "bytecode each tier is a score comparison whose "
+                                 "JMPF skips the other ranks, so the engine shows "
+                                 "exactly one -- the first tier whose test passes, "
+                                 "else the default (top grade). The linear decode "
+                                 "emitted every rank; this restores the single "
+                                 "gated choice."),
+                    }
+                    _off = _run[0].get("offset")
+                    if _off is not None:
+                        _tier_node["offset"] = _off
+                    _nodes[_i:_j] = [_tier_node]
+                    _i += 1
+                    continue
+            _i += 1
+
+
+    # A word-match minigame whose data block sits at the very top of a scene (its
+    # 0x47 play-point precedes the scene's first dialogue) is surfaced by the
+    # decoder as a standalone segment at the scene boundary. When that segment
+    # ends up unreferenced -- nothing in the flow routes to it -- it is a detached
+    # scene-opening minigame, not dead content: the game plays first, then the
+    # scene proper begins. Reconnect it as the scene entry, flowing into the
+    # segment that was previously the entry. (A Float Is Born's scene 3 paint
+    # minigame is the case this repairs; its "Paint the right colors" round plays
+    # before the "Well, I guess I need to get to class" opening line.)
+    _entries = out.get("scene_entries") or {}
+    _referenced_seg = set()
+    for _s in segments.values():
+        for _n in _s.get("nodes", []):
+            if not isinstance(_n, dict):
+                continue
+            for _k in ("next", "then", "else", "win", "lose", "after", "default"):
+                if isinstance(_n.get(_k), str):
+                    _referenced_seg.add(_n[_k].replace(".json", ""))
+            for _o in _n.get("options", []) or []:
+                if isinstance(_o, dict) and isinstance(_o.get("next"), str):
+                    _referenced_seg.add(_o["next"].replace(".json", ""))
+    for _nm, _s in list(segments.items()):
+        _nodes = [_n for _n in _s.get("nodes", []) if isinstance(_n, dict)]
+        # shape: a lone minigame node followed by a `next` (the detached opener)
+        if not (len(_nodes) == 2 and _nodes[0].get("type") == "minigame"
+                and _nodes[1].get("type") == "next"):
+            continue
+        if _nm in _referenced_seg:
+            continue                    # already in the flow -> leave alone
+        _scn = None
+        _m = re.match(r"s(\d+)", _nm)
+        if _m:
+            _scn = _m.group(1)
+        _entry = (_entries.get(_scn) or "").replace(".json", "") if _scn else ""
+        if not _entry or _entry == _nm or _entry not in segments:
+            continue
+        # The opener plays before the scene's first line. Rather than rewire every
+        # goto that targets the entry, splice the minigame node to the FRONT of the
+        # entry segment so anything that reaches the scene plays it first. Then drop
+        # the now-empty detached segment.
+        _mg_node = dict(_nodes[0])
+        _entry_nodes = segments[_entry].get("nodes", [])
+        if _entry_nodes and isinstance(_entry_nodes[0], dict) \
+                and _entry_nodes[0].get("type") == "minigame":
+            continue                    # already has an opening minigame
+        segments[_entry]["nodes"] = [_mg_node] + _entry_nodes
+        del segments[_nm]
+
+    # next episode") is a hard terminal: in the bytecode it is followed by an
+    # unconditional jump that skips PAST the rest of the scene's gate cascade to
+    # the episode terminator, so nothing plays after it. When such an arm was
+    # instead linked by physical adjacency to a LATER gate branch (a sibling arm
+    # it should never reach -- e.g. A Float Is Born's perfect-score bonus scene,
+    # gated on var2000 == 14, must not fall through into the var2000 >= 6 "downer"
+    # ending), replace that fall-through with a clean end. Scoped tightly: only
+    # when the trailing `next` points at a gate-arm target (a then/else branch),
+    # never a normal continuation such as a shared survey segment.
+    _gate_arm_targets = set()
+    for _s in segments.values():
+        for _n in _s.get("nodes", []):
+            if isinstance(_n, dict) and _n.get("type") == "gate":
+                for _k in ("then", "else"):
+                    _t = _n.get(_k)
+                    if isinstance(_t, str):
+                        _gate_arm_targets.add(_t.replace(".json", ""))
+    for _nm, _s in segments.items():
+        _nodes = [_n for _n in _s.get("nodes", []) if isinstance(_n, dict)]
+        if len(_nodes) >= 2 and _nodes[-1].get("type") == "next" \
+                and _nodes[-2].get("type") == "end_card":
+            _tgt = (_nodes[-1].get("next") or "").replace(".json", "")
+            if _tgt in _gate_arm_targets and _tgt != _nm:
+                _s["nodes"][-1] = {"type": "end", "source": "credit_card_terminal"}
+
+    # name the bank it draws from. Resolve it to a REAL minigame type from the
+    # scene's bank ("build_word" / "pick_word" -- the only playable kinds) and
+    # attach that bank's rounds as `setup`, matching the shape used by the
+    # already-resolved play points. `kind` stays the fork classification
+    # (content_fork / outcome_fork); it is not a minigame type.
+    _banks = out.get("scene_minigame_banks") or {}
+
+    def _scene_of_seg(_sid):
+        _m = re.match(r"s(\d+)", _sid or "")
+        return _m.group(1) if _m else None
+
+    # Word minigames ship in TWO platform variants drawn from the scene's banks:
+    # pick_word = mobile, build_word = tablet. A trigger that has both should carry
+    # both, with pick_word as the default (mobile). Only one bank present -> single
+    # variant. `kind` remains the fork classification, never a minigame type.
+    _PLAYABLE = ("build_word", "pick_word")
+    _PLATFORM = {"pick_word": "mobile", "build_word": "tablet"}
+
+    def _variants_for(_scene):
+        _b = _banks.get(str(_scene)) or {}
+        return [{"platform": _PLATFORM[k], "bank": k, "rounds": _b[k]}
+                for k in ("pick_word", "build_word") if _b.get(k)]
+
+    for _sid, _body in segments.items():
+        _nodes = _body.get("nodes") or []
+        for _i, _nd in enumerate(_nodes):
+            if not isinstance(_nd, dict) or _nd.get("type") != "minigame":
+                continue
+            _scene = _scene_of_seg(_sid)
+            _vars = _variants_for(_scene)
+            _is_fork = _nd.get("via") == "word_bank" and not _nd.get("minigame_type")
+            _is_flat = bool(_nd.get("words")) and \
+                _nd.get("minigame_type") not in _PLAYABLE
+            _is_word = _nd.get("minigame_type") in _PLAYABLE
+            if not (_is_fork or _is_flat or _is_word) or not _vars:
+                continue
+            # default variant = mobile (pick_word) when present, else the other
+            _default = _vars[0]
+            if not _nd.get("minigame_type") or _is_flat:
+                _nd["minigame_type"] = _default["bank"]
+                _nd["setup"] = {"bank": _default["bank"],
+                                "rounds": _default["rounds"]}
+                _nd.pop("words", None)   # flat dump superseded by the rounds
+            if len(_vars) > 1:
+                _nd["variants"] = _vars
+
+    # Some scenes open with a word minigame whose 0x47 play-point precedes the
+    # first line, but whose round strings are pushed as 0x1b pairs -- the inline
+    # 0x47 handler only reads plain (0x1a) value pushes, so no minigame line is
+    # emitted and the scene's bank never gets attached to a node (A Float Is Born
+    # scene 2's "Rewire the car!" round). When a scene has a playable bank yet no
+    # minigame node anywhere in its segments, synthesize one from the bank and
+    # splice it to the front of the scene's entry segment, so it plays first --
+    # exactly the shape the pair-decoding produces for the scenes that emit
+    # normally. Guarded to scenes with zero existing minigame node, so scenes
+    # already covered by the gate / word-bank path are untouched.
+    _mg_scenes = set()
+    for _sid, _body in segments.items():
+        if any(isinstance(_n, dict) and _n.get("type") == "minigame"
+               for _n in _body.get("nodes") or []):
+            _sc = _scene_of_seg(_sid)
+            if _sc:
+                _mg_scenes.add(_sc)
+    _entries = out.get("scene_entries") or {}
+    for _scene, _b in _banks.items():
+        if _scene in _mg_scenes:
+            continue
+        _vars = _variants_for(_scene)
+        if not _vars:
+            continue
+        _entry = (_entries.get(_scene) or "").replace(".json", "")
+        if not _entry or _entry not in segments:
+            continue
+        _default = _vars[0]
+        _mg = {"type": "minigame", "minigame_type": _default["bank"],
+               "kind": "word-match",
+               "setup": {"bank": _default["bank"], "rounds": _default["rounds"]}}
+        if len(_vars) > 1:
+            _mg["variants"] = _vars
+        _enodes = segments[_entry].get("nodes") or []
+        if _enodes and isinstance(_enodes[0], dict) \
+                and _enodes[0].get("type") == "minigame":
+            continue
+        segments[_entry]["nodes"] = [_mg] + _enodes
+
     out["note"] = ("Story as named segments (the single-file form of the story-export "
                    "folder). Each segment is one linear run of nodes walked in order; "
                    "the final node is a typed control node naming the next segment(s): "
@@ -10354,18 +12381,21 @@ def main(argv=None):
     # lives in the first scene and is shared by the rest.
     episode = None
     scripts = []  # (label, bytes)
-    script_ids, image_ids = set(), set()
+    script_ids, image_ids, audio_ids = set(), set(), set()
     if raw[:5] == ExpArchive.MAGIC:
         arc = ExpArchive(raw)
         out_dir = Path(args.extract_dir) if args.extract_dir else Path(args.input).with_suffix("")
         arc.extract(out_dir)
         episode = arc.episode_title()
+        _ep_meta = arc.episode_meta()
         for eid, payload, kind in arc.chunks():
             if kind == "script":
                 scripts.append((f"0x{eid:04x}", payload))
                 script_ids.add(eid)
             elif kind == "image":
                 image_ids.add(eid)
+            elif payload[:3] == b"ID3" or payload[:2] == b"\xff\xfb":
+                audio_ids.add(eid)      # episode-packaged MP3 track
         print(f"[+] extracted {len(arc.entries)} chunks to {out_dir} "
               f"({len(scripts)} script scene(s))", file=sys.stderr)
         if not scripts:
@@ -10395,6 +12425,30 @@ def main(argv=None):
                          for i in range(hi + 1)]
             sprites_by_idx = [by_idx[i]["asset"] if i in by_idx else None
                               for i in range(hi + 1)]
+            # A character can occupy TWO rows: a global sprite base and an
+            # EPISODE-PACKAGED one (>= EPISODE_ASSET_BASE, a PNG chunk shipped in
+            # this .exp -- e.g. Halloween's costumed Kay/Kel at 26000/26005).
+            # Speaker lookup resolves a name to its FIRST cast index, which would
+            # pick the global row and lose the episode art.
+            # Only upgrade when the pairing is UNAMBIGUOUS: exactly one global row
+            # and exactly one packaged row for that name. A name with several
+            # rows (e.g. As Time Goes By's Matt, who also has the packaged
+            # personas "Mr. Hotpants"/"Sir Smoothness") is a costume set, where
+            # the packaged art is worn contextually rather than always.
+            _glob, _pack = {}, {}
+            for _r in rows:
+                _nm = _r.get("name")
+                if not _nm:
+                    continue
+                (_pack if _r["asset"] >= EPISODE_ASSET_BASE else _glob)\
+                    .setdefault(_nm, []).append(_r["asset"])
+            _upgrade = {nm: _pack[nm][0] for nm in _pack
+                        if len(_pack[nm]) == 1 and len(_glob.get(nm, [])) == 1}
+            for _i, _nm in enumerate(base_cast):
+                _cur = sprites_by_idx[_i] if _i < len(sprites_by_idx) else None
+                if _nm in _upgrade and _cur is not None \
+                        and _cur < EPISODE_ASSET_BASE:
+                    sprites_by_idx[_i] = _upgrade[_nm]
     if base_cast is None:
         base_cast = read_cast(scripts[0][1])
     genders = read_genders(scripts[0][1], base_cast)
@@ -10407,6 +12461,30 @@ def main(argv=None):
     _renames = {}
     for _lbl, _scdata in scripts:
         _renames.update(_name_renames(_scdata, _costume_rows))
+    # Text-template substitutions (1f2e filling $Token placeholders in text). Some
+    # tokens are STABLE (bound once -> substitute directly, e.g. $MAN1 -> "Ice
+    # Cream Jim", $Player -> protagonist), others are REBOUND runtime variables
+    # (e.g. $Antagonist, rebound to 14 different opponents across the fights). A
+    # token that is rebound in ANY scene is treated as a runtime variable
+    # EVERYWHERE (so a shared combat template is never baked to one name); its
+    # per-scene binding schedule is emitted as metadata for the engine.
+    _per_scene = {}      # label -> (stable, schedule)
+    _label_to_scene = {}  # script label -> scene number (1-indexed, enum order)
+    _rebound_tokens = set()
+    for _i, (_lbl, _scdata) in enumerate(scripts, 1):
+        _label_to_scene[_lbl] = _i
+        _st, _sch = _text_substitutions(_scdata, _costume_rows)
+        _per_scene[_lbl] = (_st, _sch)
+        _rebound_tokens.update(_sch.keys())
+    # A token stable in one scene but rebound in another is globally rebound.
+    for _lbl, (_st, _sch) in _per_scene.items():
+        for _tok in list(_st):
+            if _tok in _rebound_tokens:
+                _sch.setdefault(_tok, []).append((0, _st.pop(_tok)))
+    # Global stable map (safe: these tokens are bound to one value everywhere).
+    _text_subs = {}
+    for _lbl, (_st, _sch) in _per_scene.items():
+        _text_subs.update(_st)
 
     # Diagnostic disassembly: print the annotated bytecode listing and stop,
     # before the (much heavier) full segment decode. Handles one or many scenes.
@@ -10460,18 +12538,41 @@ def main(argv=None):
     buildword_scoring = {}
     merge_jumps = {}
     choice_forks = {}
+    score_tier_thresholds = {}
     random_selectors = {}
     status_vars = {}
     for i, (label, sc) in enumerate(scripts, 1):
         lines, _ = decode_script(sc, cast=base_cast, episode_title=episode,
                                  script_ids=script_ids, image_ids=image_ids,
+                                 audio_ids=audio_ids,
                                  sprites_by_idx=sprites_by_idx,
                                  costume_rows=_costume_rows,
-                                 name_renames=_renames)
+                                 name_renames=_renames,
+                                 text_subs=_text_subs)
         scene_controls[label] = scan_control_flow(sc)
+        # Score-tier rank cascade: scan the scene for the end-of-episode rank
+        # screen (a chain of score comparisons each JMPF-guarding one rank line)
+        # and record each rank text's threshold/op, so the builder can collapse
+        # the flattened narrations into one mutually-exclusive gated node.
+        _casc = resolve_score_tier_cascade(sc)
+        if _casc:
+            for _ti in _casc["tiers"]:
+                score_tier_thresholds[_ti["text"]] = {
+                    "op": _ti["op"], "threshold": _ti["threshold"]}
+            # also fold in bindings from any rescore cascade in the scene
+            for _rt, _rb in (_casc.get("all_thresholds") or {}).items():
+                score_tier_thresholds.setdefault(_rt, _rb)
         _s63 = _scan_sep63_terminals(sc)
         if _s63:
             scene_controls[label]["_sep63_terminals"] = _s63
+        # Linear SEP section chains: consecutive sections that fall through a bare
+        # SEP into the next section (no goto/jump wiring). Recorded per scene; the
+        # final binding pass adds a `next` edge for each whose target is orphaned.
+        _bc_here = max((o + len(t) for o, t in find_strings(sc)
+                        if len(t) >= 12), default=0)
+        _lsc = resolve_linear_sep_chains(sc, _bc_here)
+        if _lsc:
+            scene_controls[label]["_linear_sep_chains"] = _lsc
         merge_jumps[label] = resolve_unconditional_jumps(sc)
         choice_forks[label] = resolve_choice_forks(sc)
         banks = extract_minigame_banks(sc)
@@ -10479,7 +12580,18 @@ def main(argv=None):
             minigame_banks[label] = banks
         choice_dispatch[label] = {c["choice"]: c
                                   for c in resolve_choice_branches(sc)}
-        var_gates[label] = resolve_var_gates(sc)
+        # Minigame gates already resolve their own win/fail scoring; collect their
+        # gate offsets so the score-gate splitter skips them and only picks up the
+        # win/fail gates nothing else handles (Fallon's intruder fight).
+        _mg_here = resolve_minigame_gates(sc)
+        _mg_offs = set()
+        for _m in (_mg_here or []):
+            if isinstance(_m, dict):
+                for _k in ("gate", "trigger", "pass_at", "fail_at"):
+                    if _m.get(_k) is not None:
+                        _mg_offs.add(_m[_k])
+        var_gates[label] = (resolve_var_gates(sc)
+                            + resolve_score_gates(sc, _mg_offs))
         _svars = resolve_dynamic_status_vars(sc)
         if _svars:
             status_vars[str(i)] = _svars
@@ -10540,7 +12652,7 @@ def main(argv=None):
         # because the target is a raw SEP instruction-count the jump resolver skips.
         # Stash the resolved targets + resets so segmentation can wire the stub.
         _ckpt = _scan_checkpoint_replays(sc)
-        if _ckpt["replays"] or _ckpt["sets"]:
+        if _ckpt["replays"] or _ckpt["sets"] or _ckpt.get("fail_sections"):
             _sd2 = section_dispatch.get(label)
             if _sd2 is None:
                 _sd2 = {"register": None, "valid_values": [], "cases": []}
@@ -10691,7 +12803,65 @@ def main(argv=None):
 
         for _sc in _predoc.get("scenes", []):
             _walk_nodes(_sc.get("nodes", []), _sc.get("scene"))
-        seg_doc = build_segmented_doc(_predoc, var_gates=var_gates)
+        seg_doc = build_segmented_doc(_predoc, var_gates=var_gates,
+                                      score_tier_thresholds=score_tier_thresholds)
+        # Preserve the pack/season identity from the metadata chunk: pack_id is the
+        # pack/season this episode belongs to and episode_id its number within that
+        # pack. These are otherwise discarded (only the title string was kept).
+        if _ep_meta:
+            if _ep_meta.get("pack_id") is not None:
+                seg_doc["pack_id"] = _ep_meta["pack_id"]
+            if _ep_meta.get("episode_id") is not None:
+                seg_doc["episode_id"] = _ep_meta["episode_id"]
+            _lt = [t for t in (_ep_meta.get("titles") or []) if t]
+            if len(set(_lt)) > 1:
+                seg_doc["localized_titles"] = _ep_meta["titles"]
+        # Runtime text variables: tokens like $Antagonist are rebound many times
+        # (once per fight) and their combat-HUD template is shared, so they cannot
+        # be baked into the text. Emit the per-scene binding SCHEDULE -- ordered
+        # (offset, name) pairs -- so the engine substitutes the name bound most
+        # recently (by bytecode offset) before the line it is rendering. Text
+        # nodes keep the literal "$Antagonist" placeholder and their `offset`.
+        _rtv = {}
+        for _lbl, (_st, _sch) in _per_scene.items():
+            if not _sch:
+                continue
+            _snum = _label_to_scene.get(_lbl)
+            if _snum is None:
+                continue
+            _rtv[str(_snum)] = {
+                _tok: [{"offset": _o, "name": _nm}
+                       for _o, _nm in sorted(_seq)]
+                for _tok, _seq in _sch.items()}
+        if _rtv:
+            seg_doc["runtime_text_vars"] = {
+                "note": ("Placeholders like $Antagonist are true runtime variables: "
+                         "the engine reassigns them as the story executes (a new "
+                         "opponent is bound before each fight via a 1f2e rename) and "
+                         "the combat-HUD template that reads the placeholder is "
+                         "SHARED -- every fight jumps into the same template, so the "
+                         "name is never baked in. Resolve it like a variable at "
+                         "RUNTIME: keep the current value of each token and update it "
+                         "whenever execution passes a binding; render the token with "
+                         "whatever value is current when a line is shown. The schedule "
+                         "below lists each binding as (bytecode offset, name) in "
+                         "bytecode order. Bytecode order is NOT execution order, so do "
+                         "not resolve by static offset; use the schedule to know the "
+                         "possible values and to set the variable when execution "
+                         "reaches each binding's offset. Text nodes keep the literal "
+                         "$Token and their own `offset`."),
+                "scenes": _rtv,
+            }
+        # Combat scenes: replace the flat combat dump with a playable turn-loop
+        # graph (byte-derived moves / damage rule / feedback; antagonist HP is a
+        # variable seeded by name). Runs AFTER runtime_text_vars so the fight's
+        # antagonist name is available for the HP lookup. General -- only fires on
+        # scenes detect_combat() recognises; non-combat episodes are untouched.
+        try:
+            import combat_decode
+            combat_decode.integrate_combat(seg_doc, scripts)
+        except Exception as _ce:
+            print(f"[!] combat integration skipped: {_ce}", file=sys.stderr)
         text = json.dumps(strip_notes(restore_int_values(stringify_numbers(seg_doc))),
                           indent=2, ensure_ascii=False)
     if args.output:
