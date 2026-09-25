@@ -1,0 +1,213 @@
+{
+ "title": "legacy",
+ "episode": "98: Legacy Test",
+ "main_characters": [
+  "Kim"
+ ],
+ "cast": [
+  "",
+  "Kim",
+  "Andy"
+ ],
+ "scenes": [
+  {
+   "scene": "1",
+   "script": "0x61a9",
+   "protagonist": "Kim",
+   "nodes": [
+    {
+     "type": "dialogue",
+     "speaker": "Kim",
+     "text": "Day one.",
+     "offset": "12000"
+    },
+    {
+     "type": "choice",
+     "prompt": "Help out?",
+     "offset": "12050",
+     "options": [
+      {
+       "index": "0",
+       "label": "Yes"
+      },
+      {
+       "index": "1",
+       "label": "No"
+      }
+     ],
+     "branch_dialogue": [
+      {
+       "type": "dialogue",
+       "speaker": "Andy",
+       "text": "Thanks!",
+       "offset": "12060"
+      },
+      {
+       "type": "narration",
+       "text": "Andy leaves.",
+       "offset": "12070"
+      }
+     ],
+     "note": "Dialogue for all options plays out in script order"
+    },
+    {
+     "type": "goto_scene",
+     "script": "0x61aa",
+     "to_scene": "2",
+     "offset": "12100"
+    }
+   ],
+   "control_flow": {
+    "branches": [
+     {
+      "offset": "12080",
+      "op": "0x2b",
+      "operand": "12",
+      "compared": [
+       "3"
+      ]
+     }
+    ],
+    "var_reads": [
+     {
+      "offset": "12090",
+      "value": "2001"
+     }
+    ]
+   }
+  },
+  {
+   "scene": "6",
+   "script": "0x61a9",
+   "name": "andy_encounter",
+   "protagonist": "Kim",
+   "source": "observed",
+   "region": [
+    "12183",
+    "12576"
+   ],
+   "gate": {
+    "event": "end_of_day",
+    "day": "5",
+    "once": true
+   },
+   "nodes": [
+    {
+     "type": "dialogue",
+     "speaker": "Andy",
+     "text": "Spare ten bucks?",
+     "offset": "12390"
+    },
+    {
+     "type": "choice",
+     "prompt": null,
+     "offset": "12396",
+     "options": [
+      {
+       "index": "0",
+       "label": "Give",
+       "effects": [
+        {
+         "var": "money",
+         "delta": "-10"
+        }
+       ]
+      },
+      {
+       "index": "1",
+       "label": "Refuse"
+      }
+     ],
+     "branch_dialogue": [
+      {
+       "index": "0",
+       "lines": [
+        {
+         "type": "dialogue",
+         "speaker": "Andy",
+         "text": "You're the best.",
+         "offset": "12450"
+        }
+       ]
+      },
+      {
+       "index": "1",
+       "lines": [
+        {
+         "type": "dialogue",
+         "speaker": "Kim",
+         "text": "Sorry, Andy.",
+         "offset": "12520"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "goto_scene",
+     "to_scene": "5"
+    }
+   ]
+  },
+  {
+   "scene": "2",
+   "script": "0x61aa",
+   "protagonist": "Kim",
+   "nodes": [
+    {
+     "type": "narration",
+     "text": "Scene two.",
+     "offset": "50"
+    }
+   ]
+  },
+  {
+   "scene": "5",
+   "script": "0x61ad",
+   "protagonist": "Kim",
+   "nodes": [
+    {
+     "type": "narration",
+     "text": "Day hub.",
+     "offset": "60"
+    },
+    {
+     "type": "choice",
+     "prompt": "Which ending?",
+     "options": [
+      {
+       "index": "0",
+       "label": "A"
+      },
+      {
+       "index": "1",
+       "label": "B"
+      }
+     ],
+     "outcomes": [
+      {
+       "index": "0",
+       "ends_with_retry_prompt": true,
+       "lines": [
+        {
+         "type": "narration",
+         "text": "Bad end. Try again..."
+        }
+       ]
+      },
+      {
+       "index": "1",
+       "ends_with_retry_prompt": false,
+       "lines": [
+        {
+         "type": "narration",
+         "text": "Good end."
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
