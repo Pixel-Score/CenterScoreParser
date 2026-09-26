@@ -59,6 +59,7 @@ sprite frame (portrait = sprite_base + code). No verbal labels are assigned.
 """
 
 import argparse
+import os
 import json
 import lzma
 import re
@@ -116,11 +117,12 @@ class _KiwiInstr:
 class _KiwiProgram:
     """Decoded header counts plus the instruction stream. Only the fields the
     decoder actually consumes are kept (no re-encoder)."""
-    __slots__ = ("main_words", "extra_words", "code_start", "instructions")
+    __slots__ = ("main_words", "extra_words", "code_start", "instructions", "gap_count")
 
-    def __init__(self, main_words, extra_words, code_start, instructions):
+    def __init__(self, main_words, extra_words, code_start, instructions, gap_count=0):
         self.main_words = main_words
         self.extra_words = extra_words
+        self.gap_count = gap_count
         self.code_start = code_start
         self.instructions = instructions
 
@@ -167,7 +169,7 @@ def _kiwi_decode(data):
         instructions.append(_KiwiInstr(base_pc + index, offset, opcode, operand))
     if pos != n:
         raise _KiwiFormatError("%d trailing bytes at byte 0x%x" % (n - pos, pos))
-    return _KiwiProgram(main_words, extra_words, code_start, tuple(instructions))
+    return _KiwiProgram(main_words, extra_words, code_start, tuple(instructions), _gap)
 
 
 _kiwi_cache = {}
@@ -281,6 +283,9 @@ TEXT_EQUAL = 0x18         # 1f 18 -> compare two strings, push bool (yield 24, n
 COPY_LAST_INPUT = 0x1c    # 1f 1c -> copy the last text input into a string slot (yield 28)
 TEXT_INPUT = 0x28         # 1f 28 -> prompt the player to type text (yield 40, need 3:
                           #          title, prompt, destination string slot)
+GET_STRING_DEFAULT = 0x2f # 1f 2f -> string with default [key_ref, default_ref, ~slot] (yield
+                          #          47): the engine STORES the default under the key when
+                          #          the key is unset -- a substitution side effect ($ALLISON)
 SET_STRING = 0x2e         # 1f 2e -> string variable write [key_ref, value_ref] (yield 46).
                           #          NOTE: 0x2e is also the $token rename; a write with two
                           #          NON-$ string refs is a set_string, a $Token first ref is
@@ -355,14 +360,15 @@ KNOWN_BG = {}
 #   1f 1b  RANDOM: pushes abs(rand() % operand) in [0, operand); operand is the
 #          range (a 0 operand yields 0). Consumed on the stack by the following
 #          arithmetic -- e.g. combat damage is RANDOM(0..attack)+1 = [1, attack].
-#          Already reconstructed inside combat_decode.py, not emitted standalone.
+#          Routines that compute with it are lifted exactly (the lifter / lowered
+#          routines); elsewhere it becomes var_random.
 #   1f 1c  frame string fetch into a scratch buffer.
 #   1f 1d  load a frame-local slot value onto the stack.
 #   1f 1e  virtual call through the scene object's vtable (engine-internal).
 #   1f 21  build a UI widget object (operator_new; no story text).
 #   1f 2e  RENAME: bind a $token to a display name (two name-slot operands).
-#          Handled at decode time via _name_renames / runtime_text_vars, so no
-#          node is emitted here.
+#          Emitted as a set_string node where it happens (the VM keeps the
+#          current binding).
 #   1f 2f/31  frame-driven widget construction (FUN_0009f420 value fetch + build).
 #   1f 48  frame variable WRITE (array-indexed store into scene state).
 #   1f 49  frame variable READ (array-indexed load from scene state).
@@ -516,10 +522,12 @@ class ExpArchive:
 # --------------------------------------------------------------------------- #
 class Line:
     __slots__ = ("text", "speaker", "emotion", "sprite", "off", "bc_off",
-                 "section_start", "section_jump", "threshold")
+                 "section_start", "section_jump", "threshold", "when", "vm_args")
 
     def __init__(self, text, speaker, emotion, sprite=None, off=None, bc_off=None,
                  section_start=False, section_jump=None, threshold=None):
+        self.when = None          # builder-menu option conditions (per option)
+        self.vm_args = None       # the display yield's exact argument values
         self.text = text          # the line of text
         self.speaker = speaker    # cast name, None=narration, or a __TAG__ sentinel
         self.emotion = emotion    # raw emotion code, or card kind for sentinels
@@ -1799,6 +1807,343 @@ def scan_control_flow(data):
             "degenerate_exits": exits}
 
 
+def _reachable_offsets(ins):
+    """Byte offsets of instructions that can execute. KiWi control flow is static
+    except RET, which resumes right after its call (0x42 pushes the 0x29's pc;
+    RET continues one past it). Branches whose condition is a constant pushed
+    immediately before (`push1 ; JMPF` -- never taken) are folded, so arms that
+    can never run are excluded (From Europe With Love's leftover alternative
+    "IT WOULD BE BORING!!!", skipped by the JMP after the always-taken arm)."""
+    by_pc = {x.pc: k for k, x in enumerate(ins)}
+    seen, work = set(), [0] if ins else []
+    while work:
+        k = work.pop()
+        if k in seen or not 0 <= k < len(ins):
+            continue
+        seen.add(k)
+        y = ins[k]
+        op = y.opcode
+        succ = []
+        if op in (0x33, 0x32, 0x43):
+            pass
+        elif op == 0x28:
+            t = y.branch_target()
+            succ = [by_pc.get(t)]
+        elif op == 0x29:
+            t = y.branch_target()
+            succ = [by_pc.get(t)]
+            if k > 0 and ins[k - 1].opcode == 0x42:
+                succ.append(k + 1)                 # a call returns here
+        elif op in (0x2a, 0x2b, 0x2c, 0x2d, 0x2e):
+            t = by_pc.get(y.branch_target())
+            prev = ins[k - 1] if k > 0 else None
+            const = None
+            if op in (0x2a, 0x2b) and prev is not None:
+                if prev.opcode in (0x5a, 0x5b):
+                    const = prev.opcode - 0x5a
+                elif prev.opcode == 0x1a:
+                    const = prev.operand
+            if const is None:
+                succ = [t, k + 1]
+            else:
+                take = (const != 0) if op == 0x2a else (const == 0)
+                succ = [t] if take else [k + 1]
+        elif op == 0x5c:
+            succ = [by_pc.get(y.pc + (y.operand >> 8)), k + 1]
+        else:
+            succ = [k + 1]
+        for s in succ:
+            if s is not None and s not in seen:
+                work.append(s)
+    return {ins[k].byte_offset for k in seen}
+
+
+def resolve_action_gates_exact(data):
+    """Action minigames (0x47) whose score is stored to a local and tested
+    right after: `1f47 ; 21 ; 3e ; 15 ; <local load> ; <T> ; >= ; 2b fail`
+    (The Tutors' "Concentrate!"). Read on the exact instruction stream; the
+    legacy byte-walk gate finder missed some of these."""
+    try:
+        ins = _kiwi_program(data).instructions
+    except Exception:
+        return []
+    by_pc = {x.pc: k for k, x in enumerate(ins)}
+    out = []
+    for i, y in enumerate(ins[:-8]):
+        if not (y.opcode == 0x1f and (y.operand or 0) >> 8 == 0x47):
+            continue
+        a = ins[i + 1:i + 9]
+        if not (a[0].opcode == 0x21 and a[1].opcode == 0x3e and a[2].opcode == 0x15):
+            continue
+        if 0x5f <= a[3].opcode <= 0x62 and a[4].opcode == 0x3f:
+            c_i = i + 6
+        elif a[3].opcode == 0x41:
+            c_i = i + 5
+        else:
+            continue
+        c = ins[c_i]
+        if c.opcode == 0x1a:
+            thr = c.operand
+        elif c.opcode in (0x5a, 0x5b):
+            thr = c.opcode - 0x5a
+        else:
+            continue
+        if ins[c_i + 1].opcode not in (0x0c, 0x0d) or ins[c_i + 2].opcode != 0x2b:
+            continue
+        g = ins[c_i + 2]
+        t = by_pc.get(g.branch_target())
+        if t is None or t <= c_i + 3:
+            continue
+        # a routine that hands the result back in B (`04`) is a call-wrapped
+        # game: its caller's test owns the fork
+        _q = i
+        while _q < len(ins) and ins[_q].opcode != 0x43:
+            if ins[_q].opcode == 0x04:
+                break
+            _q += 1
+        if _q < len(ins) and ins[_q].opcode == 0x04:
+            continue
+        out.append({"trigger": y.byte_offset, "gate": g.byte_offset,
+                    "pass_at": ins[c_i + 3].byte_offset,
+                    "fail_at": ins[t].byte_offset,
+                    "win_threshold": thr + (1 if ins[c_i + 1].opcode == 0x0c else 0),
+                    "kind": "content_fork", "via": "action", "minigame_id": None})
+    return out
+
+
+def resolve_call_minigames(data):
+    """Minigames wrapped in a helper ROUTINE that returns pass/fail in register B:
+
+        caller:   0x42 ; 0x29 <R> ; 0x08 (push B) ; <const> ; <cmp> ; 0x2b <fail>
+        R:        0x48 0x4a ... 1f 47 (action minigame) ; result -> @fp0 ;
+                  @fp0 LOAD ; <T> ; <cmp> ; JMPF L ; <X> ; 0x04 (B=X) ; ... ;
+                  L: <Y> ; 0x04 (B=Y) ; POPFRAME ; RET
+
+    (New Girl's "Try to catch Sam!", 21 such calls across the corpus.) The
+    decoder handled only inline minigames, so these rounds vanished and both
+    caller outcomes played in sequence. Composes the routine's score->B mapping
+    with the caller's B test (reference-VM semantics) to find which caller block
+    is the WIN arm. Returns [{call, gate, pass_at, fail_at, win_threshold,
+    prompts, groups}] (byte offsets), only where the win arm is the fall-through
+    (pass_at < fail_at), which is every case in the corpus."""
+    try:
+        ins = _kiwi_program(data).instructions
+    except _KiwiFormatError:
+        return []
+    smap = {o: t for o, t in find_strings(data)}
+    by_pc = {x.pc: k for k, x in enumerate(ins)}
+
+    def const_at(y):
+        if y.opcode == 0x1a:
+            return y.operand - 0x10000 if y.operand >= 0x8000 else y.operand
+        if y.opcode in (0x5a, 0x5b):
+            return y.opcode - 0x5a
+        return None
+
+    def cmp(op, l, r):
+        return {0x0a: l == r, 0x0b: l != r, 0x0c: l > r, 0x0d: l >= r,
+                0x0e: l < r, 0x0f: l <= r}.get(op)
+
+    def run_b(k, score):
+        # evaluate the whole routine (from after its 0x48 0x4a prologue) with the
+        # minigame's result = score; returns the value left in register B
+        st, loc, b, steps, res = [], {}, None, 0, None
+        while 0 <= k < len(ins) and steps < 120:
+            y = ins[k]; op = y.opcode; steps += 1; nk = k + 1
+            c = const_at(y)
+            if c is not None:
+                st.append(c)
+            elif op == 0x1b:
+                st.append(y.operand & 0xFF); st.append(y.operand >> 8)
+            elif op == 0x1f:
+                argc = y.operand & 0xFF
+                if len(st) < argc:
+                    return None
+                del st[len(st) - argc:]
+                res = score if (y.operand >> 8) == 0x47 else 0
+            elif op == 0x21:
+                if res is None:
+                    return None
+                st.append(res)
+            elif 0x5f <= op <= 0x62:
+                st.append(("a", op - 0x5f))
+            elif op == 0x3e:
+                if len(st) < 2 or not isinstance(st[-2], tuple):
+                    return None
+                v = st.pop(); a = st.pop(); loc[a[1]] = v; st.append(v)
+            elif op == 0x3f:
+                if not st or not isinstance(st[-1], tuple):
+                    return None
+                st.append(loc.get(st.pop()[1]))
+            elif 0x15 <= op <= 0x18:
+                del st[-(op - 0x14):]
+            elif op in (0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f):
+                if len(st) < 2:
+                    return None
+                r = st.pop(); l = st.pop()
+                if not isinstance(l, int) or not isinstance(r, int):
+                    return None
+                st.append(int(cmp(op, l, r)))
+            elif op in (0x2a, 0x2b):
+                if not st:
+                    return None
+                v = st.pop()
+                take = (v != 0) if op == 0x2a else (v == 0)
+                if take:
+                    nk = by_pc.get(y.branch_target())
+            elif op == 0x28:
+                nk = by_pc.get(y.branch_target())
+            elif op == 0x04:
+                if not st:
+                    return None
+                b = st.pop()
+            elif op in (0x22, 0x43):
+                return b
+            else:
+                return None
+            if nk is None:
+                return None
+            k = nk
+        return None
+
+    out = []
+    for k in range(len(ins) - 6):
+        if not (ins[k].opcode == 0x42 and ins[k + 1].opcode == 0x29
+                and ins[k + 2].opcode == 0x08):
+            continue
+        c = const_at(ins[k + 3])
+        if c is None or ins[k + 4].opcode not in (0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f) \
+                or ins[k + 5].opcode != 0x2b:
+            continue
+        r = by_pc.get(ins[k + 1].branch_target())
+        if r is None or ins[r].opcode != 0x48:
+            continue
+        mg = None
+        for q in range(r, min(r + 80, len(ins))):
+            y = ins[q]
+            if y.opcode == 0x43:
+                break
+            if y.opcode == 0x1f and y.operand is not None:
+                sel = y.operand >> 8
+                if sel == 0x47:
+                    if mg is not None:
+                        mg = None; break
+                    mg = q
+                elif sel in (0x0d, 0x41, 0x0f, 0x01, 0x04, 0x60):
+                    mg = None; break           # other content: not this shape
+        if mg is None:
+            continue
+        ev = _eval_yield_args(ins, mg, ins[mg].operand & 0xFF)
+        if not ev or len(ev) < 4:
+            continue
+        def txt(a):
+            return smap.get(a * 2 + STRING_BASE) if isinstance(a, int) and a >= 0 else None
+        prompt, good, bad = txt(ev[1]), txt(ev[2]), txt(ev[3])
+        if not (good and bad and "|" in good + bad):
+            continue
+        b_win, b_lose = run_b(r + 2, 30000), run_b(r + 2, 0)
+        if b_win is None or b_lose is None:
+            continue
+        cw, cl = cmp(ins[k + 4].opcode, b_win, c), cmp(ins[k + 4].opcode, b_lose, c)
+        fall = ins[k + 6].byte_offset if k + 6 < len(ins) else None
+        tgt = by_pc.get(ins[k + 5].branch_target())
+        if fall is None or tgt is None or cw == cl or not cw:
+            continue                         # win must be the fall-through
+        # the pass arm must play something itself; when both arms only assign
+        # a routine local (Dough/Float/ATGB/Europe: `L = passed ? 6 : other()`)
+        # the real fork is the later gate on L, which resolve_minigame_gates owns
+        if not any(ins[q].opcode in (0x1f, 0x42)
+                   for q in range(k + 6, tgt)):
+            continue
+        # threshold: the constant the routine compares the stored score against
+        thr = None
+        for q in range(mg + 1, min(mg + 12, len(ins) - 2)):
+            if ins[q].opcode == 0x3f and const_at(ins[q + 1]) is not None \
+                    and ins[q + 2].opcode in (0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f):
+                thr = const_at(ins[q + 1]); break
+        out.append({"call": ins[k].byte_offset, "gate": ins[k + 5].byte_offset,
+                    "pass_at": fall, "fail_at": ins[tgt].byte_offset,
+                    "win_threshold": thr,
+                    "prompts": [prompt] if prompt and "|" not in prompt else [],
+                    "groups": [good, bad]})
+    # A resolved inline gate right after the call (Dough's bakery / Help Ads,
+    # ATGB, Europe: the routine's result only feeds a flag and the real fork
+    # is the by_id / word-bank gate that follows) owns that game already.
+    try:
+        _own = [int(g["trigger"]) for g in (resolve_minigame_gates(data) or [])
+                if g.get("trigger") is not None]
+    except Exception:
+        _own = []
+    return [c for c in out
+            if not any(c["call"] - 16 <= t <= c["call"] + 80 for t in _own)]
+
+
+def _builder_option_guards(data):
+    """Builder-menu options added under a condition (New Girl's class menu:
+    `if var1500 != 1: add "English."`; `if var1550 == 1 && var1500 != 3: add
+    "Algebra."`). For each option-add yield (1f 03) whose block is skipped by a
+    JMPF, parse the guard (var reads, constants, comparisons, AND) that decides
+    it. Returns {byte offset of the 1f03: [{"var", "op", "value"}, ...]}."""
+    try:
+        ins = _kiwi_program(data).instructions
+    except Exception:
+        return {}
+    ops = {0x0a: "eq", 0x0b: "ne", 0x0c: "gt", 0x0d: "gte", 0x0e: "lt", 0x0f: "lte"}
+    out = {}
+    start = None
+    for k, y in enumerate(ins):
+        if y.opcode != 0x1f or y.operand is None:
+            continue
+        sel = y.operand >> 8
+        if sel == 0x02:
+            start = k + 1
+            continue
+        if sel == 0x04:
+            start = None
+            continue
+        if sel != 0x03 or start is None:
+            continue
+        blk_start, start = start, k + 1
+        # the option push block: <text> ; <pair|pushes> ; 1f03 -- find the JMPF
+        # right before its first push that skips to just after this 1f03
+        j = next((q for q in range(k - 1, max(blk_start - 1, k - 6), -1)
+                  if ins[q].opcode == 0x2b), None)
+        if j is None or k + 1 >= len(ins) or ins[j].branch_target() != ins[k + 1].pc:
+            continue
+        st, conds, ok = [], [], True
+        q = blk_start
+        while q < j and ok:
+            x = ins[q]
+            if x.opcode == 0x1a and q + 2 < j and ins[q + 1].opcode == 0x1f \
+                    and (ins[q + 1].operand or 0) >> 8 == 0x2d and ins[q + 2].opcode == 0x21:
+                st.append(("var", x.operand)); q += 3; continue
+            if x.opcode == 0x1a:
+                st.append(x.operand - 0x10000 if x.operand >= 0x8000 else x.operand)
+            elif x.opcode in (0x5a, 0x5b):
+                st.append(x.opcode - 0x5a)
+            elif x.opcode in ops:
+                if len(st) < 2:
+                    ok = False; break
+                r, l = st.pop(), st.pop()
+                if isinstance(l, tuple) and isinstance(r, int):
+                    conds.append({"var": str(l[1]), "op": ops[x.opcode], "value": r})
+                    st.append("c")
+                else:
+                    ok = False
+            elif x.opcode in (0x2c, 0x2d):
+                pass                     # short-circuit jump of an AND/OR chain
+            elif x.opcode == 0x12:
+                if len(st) < 2 or st[-1] != "c" or st[-2] != "c":
+                    ok = False; break
+                st.pop()
+            else:
+                ok = False
+            q += 1
+        if ok and conds and st == ["c"]:
+            out[ins[k].byte_offset] = conds
+    return out
+
+
 def decode_script(data: bytes, cast=None, episode_title=None,
                   script_ids=None, image_ids=None, audio_ids=None,
                   sprites_by_idx=None,
@@ -1810,6 +2155,9 @@ def decode_script(data: bytes, cast=None, episode_title=None,
     0x23 custom-background operand must be one of its image chunk ids -- the
     archive itself defines the valid values, so no numeric range is assumed.
     """
+    script_ids = script_ids if script_ids is not None else set()
+    image_ids = image_ids if image_ids is not None else set()
+    audio_ids = audio_ids if audio_ids is not None else set()
     if data[:4] != b"kiwi":
         raise ValueError("Not a kiwi (.kiw) script")
     strings = normalize_strings(find_strings(data))
@@ -1844,6 +2192,13 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                 caption_partner[(o - STRING_BASE) // 2] = nm
 
     lines = []
+    # Authoritative argument evaluation (reference-VM stack semantics), used to
+    # read a yield's real arguments instead of inferring them from layout.
+    try:
+        _dprog = _kiwi_program(data).instructions
+        _dpos = {x.byte_offset: k for k, x in enumerate(_dprog)}
+    except _KiwiFormatError:
+        _dprog, _dpos = None, {}
     emitted_titles = set()   # title strings shown via the 0x08 opcode
     p, n = bc_start, len(data)
     # A title card immediately preceded by a 0x42 SEP (with no content line
@@ -1884,6 +2239,133 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                        # Ben = row 1.)
     tchoice = None     # accumulator for a timed text choice being built across
                        # 1f02 (setup) / 1f03 (options) / 1f04 (resolve).
+    # Reference engine: yield 0x00 is FORMAT_STRING -- it builds a dynamic string
+    # and shows nothing. It becomes a visible line only when its result is handed
+    # to a display call (narration 0x41 / dialogue 0x0d / named speaker 0x0f).
+    # Results fed to a menu option (0x03) or a name setter (0x2e) are data: The
+    # New Girl's name entry formats "$ZOE" for the name setter, fight menus format
+    # their option labels. Those format calls emit no line.
+    _fmt_hidden = set()
+    try:
+        _fi = _kiwi_program(data).instructions
+        for _k, _z in enumerate(_fi):
+            if _z.opcode == 0x1f and _z.operand is not None and (_z.operand >> 8) == 0x00:
+                _nx = next(((y.operand >> 8) for y in _fi[_k + 1:_k + 8]
+                            if y.opcode == 0x1f and y.operand is not None), None)
+                if _nx is not None and _nx not in (0x41, 0x0d, 0x0f):
+                    _fmt_hidden.add(_z.byte_offset)
+    except _KiwiFormatError:
+        pass
+    # Step by the AUTHORITATIVE instruction stream (the reference VM / codkiwi
+    # model: an opcode takes a 2-byte operand iff it is in the operand table).
+    # The old hard-coded steps (yield = 2 bytes, 0x42 = 4, unknown = 1) read
+    # ~11k operand bytes as opcodes corpus-wide and skipped ~550 real
+    # instructions; handlers still peek at operand bytes, which sit where they did.
+    try:
+        _starts = [z.byte_offset for z in _kiwi_program(data).instructions]
+    except _KiwiFormatError:
+        _starts = []
+    _nx_map = {s0: s1 for s0, s1 in zip(_starts, _starts[1:])}
+    if _starts:
+        _nx_map[_starts[-1]] = n
+        import bisect as _bisect
+        _k0 = _bisect.bisect_left(_starts, p)
+        p = _starts[_k0] if _k0 < len(_starts) else n
+
+    def _NX(q):
+        if _nx_map:
+            nq = _nx_map.get(q)
+            if nq is not None:
+                return nq
+            k2 = _bisect.bisect_right(_starts, q)
+            return _starts[k2] if k2 < len(_starts) else n
+        return q + 1
+
+    try:
+        _bguard = _builder_option_guards(data)
+    except Exception:
+        _bguard = {}
+    _local_incr = {}
+    try:
+        _li = _kiwi_program(data).instructions
+        _alias = {}
+        for _k, _y in enumerate(_li):
+            if _y.opcode == 0x48:
+                _alias = {}
+            elif 0x5f <= _y.opcode <= 0x62 and _k + 5 < len(_li) \
+                    and _li[_k + 1].opcode == 0x1a and _li[_k + 2].opcode == 0x1f \
+                    and (_li[_k + 2].operand or 0) == 0x2d01 and _li[_k + 4].opcode == 0x3e:
+                _alias[_y.opcode - 0x5f] = _li[_k + 1].operand
+            elif _y.opcode == 0x1f and (_y.operand or 0) == 0x2c02 and _k >= 5:
+                _z = _li[_k - 5:_k]
+                if _z[0].opcode == 0x1a and 0x5f <= _z[1].opcode <= 0x62 \
+                        and _z[2].opcode == 0x3f and _z[4].opcode == 0x50 \
+                        and _z[3].opcode in (0x1a, 0x5a, 0x5b) \
+                        and _alias.get(_z[1].opcode - 0x5f) == _z[0].operand:
+                    _c = (_z[3].opcode - 0x5a) if _z[3].opcode != 0x1a else _z[3].operand
+                    _local_incr[_y.byte_offset] = (_z[0].operand, _c)
+    except Exception:
+        _local_incr = {}
+    _exact_dlg = {}
+    _exact_args = {}      # display yield offset -> its evaluated arguments
+    try:
+        _xins = _kiwi_program(data).instructions
+        for _xi, _xy in enumerate(_xins):
+            if _xy.opcode == 0x1f and _xy.operand and (_xy.operand >> 8) in (
+                    0x0d, 0x41, 0x0f, 10, 80, 81, 5, 8, 11, 35, 86, 79, 1, 2):
+                _xa = _eval_yield_args(_xins, _xi, _xy.operand & 0xFF)
+                _yy = _xy.operand >> 8
+                # a text argument may be a run-time value (a formatted string);
+                # everything else must be known
+                _tp = {0x0d: (0, 1), 0x41: (1,), 0x0f: (1,), 8: (0, 1), 1: (0, 1, 2), 2: (0, 1)}.get(_yy, ())
+                if _xa and all(v is not None or k in _tp for k, v in enumerate(_xa)):
+                    _exact_args[_xy.byte_offset] = (_yy, list(_xa))
+            if _xy.opcode == 0x1f and _xy.operand and (_xy.operand >> 8) == 0x0d:
+                _xa = _eval_yield_args(_xins, _xi, _xy.operand & 0xFF)
+                if not _xa or len(_xa) < 2 or _xa[0] is None:
+                    continue
+                _xr = _xa[1] if _xa[0] < 0 else _xa[0]
+                if _xr is None or _xr < 0:
+                    continue
+                _xs = smap.get(_xr * 2 + STRING_BASE)
+                if _xs:
+                    _exact_dlg[_xy.byte_offset] = normalize_strings([(0, _xs)])[0][1]
+        # a formatted status line (yield 0) is shown by the display yield that
+        # follows it: remember that yield's arguments for the status node
+        _next_show = {}
+        for _xi, _xy in enumerate(_xins):
+            if _xy.opcode == 0x1f and _xy.operand and (_xy.operand >> 8) == 0:
+                for _xj in range(_xi + 1, min(_xi + 12, len(_xins))):
+                    _z = _xins[_xj]
+                    if _z.opcode == 0x1f and _z.operand and (_z.operand >> 8) in (0x0d, 0x41):
+                        if _z.byte_offset in _exact_args:
+                            _next_show[_xy.byte_offset] = _exact_args[_z.byte_offset]
+                        break
+                    if _z.opcode == 0x1f and _z.operand and (_z.operand >> 8) not in (0,):
+                        break
+    except Exception:
+        _exact_dlg = {}
+        _exact_args = {}
+        _next_show = {}
+    # Calls into routines that will be lowered (the lifter) are real content:
+    # keep a placeholder line at each call so segmentation keeps the branch it
+    # sits in; _vm_lowered_routines fills it with the exact call.
+    _low_calls = {}
+    try:
+        _lins = _kiwi_program(data).instructions
+        _lplan = plan_lowering(_lins)
+        for _i in range(len(_lins) - 1):
+            if _lins[_i].opcode == 0x42 and _lins[_i + 1].opcode == 0x29 \
+                    and _lins[_i + 1].operand in _lplan["lowered"]:
+                _low_calls[_lins[_i].byte_offset] = _lins[_i + 1].operand
+    except Exception:
+        _low_calls = {}
+    _call_mg = {}
+    try:
+        for _cm in resolve_call_minigames(data):
+            _call_mg[_cm["call"]] = _cm
+    except Exception:
+        _call_mg = {}
     while p < n - 1:
         op = data[p]
         if op in (0x5a, 0x5b):                               # push 0 / push 1
@@ -1893,15 +2375,23 @@ def decode_script(data: bytes, cast=None, episode_title=None,
             # text-candidate scans ignore it.
             marker_row = 0 if op == 0x5a else 1
             pushes.append(("m", marker_row))
-            p += 1
+            p = _NX(p)
             continue
         if op == 0x50:                                       # arithmetic ADD byte
             saw_add = True                                   # (NOT the 1f 50 music call)
-            p += 1
+            p = _NX(p)
             continue
-        if op in (0x1a, 0x41) and p + 2 < n:                 # push uint16be
+        if op == 0x41 and p + 2 < n:
+            # FRAME LOAD (reference VM: push read_word(fp + arg)): a runtime
+            # value, never a constant text / speaker reference. Tagged "x" so
+            # text and speaker scans ignore it (it used to be read as a constant
+            # push, planting bogus text such as the survey's "Kim"/"Ms. Rose").
+            pushes.append(("x", (data[p + 1] << 8) | data[p + 2]))
+            p = _NX(p)
+            continue
+        if op == 0x1a and p + 2 < n:                         # push uint16be
             pushes.append(("v", (data[p + 1] << 8) | data[p + 2]))
-            p += 3
+            p = _NX(p)
             continue
         if op == 0x1b and p + 2 < n:                          # push (emo, spk)
             pushes.append(("pair", data[p + 1], data[p + 2]))
@@ -1926,7 +2416,7 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                 and _displayable(_b2_txt)
             if not _is_textref:
                 last_spk = _b2
-            p += 3
+            p = _NX(p)
             continue
         if op == 0x1f and p + 1 < n:                          # call builtin <sel>
             sel = data[p + 1]
@@ -1934,26 +2424,42 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                 seen_dispatch = True
             _before = len(lines)
             if sel == DISPLAY_DIALOGUE:                       # 0x0d -> spoken line
-                lines.append(_emit(pushes, smap, cast, resources,
-                                   narration=False, last_spk=last_spk,
-                                   speaker_row=marker_row,
-                                   sprites=sprites_by_idx,
-                                   content_min=content_min,
-                                   caption_partner=caption_partner))
+                _dl = _emit(pushes, smap, cast, resources,
+                            narration=False, last_spk=last_spk,
+                            speaker_row=marker_row,
+                            sprites=sprites_by_idx,
+                            content_min=content_min,
+                            caption_partner=caption_partner)
+                # engine-exact text ref (args[0] < 0 is a display mode -- -2 a
+                # thought -- and the text moves to args[1]); the operand-buffer
+                # heuristics can pick the wrong small ref (New Girl's
+                # "(What?! Sam's resorting to cookies...)" read as "At lunch...")
+                _xt = _exact_dlg.get(p)
+                if _dl is not None and _xt and getattr(_dl, "text", None) \
+                        and _xt != _dl.text and "$" not in _xt and "%" not in _xt \
+                        and _xt.strip() != _dl.text.strip():
+                    _dl.text = _xt
+                if _dl is not None:
+                    _dl.vm_args = _exact_args.get(p)
+                lines.append(_dl)
                 sep_pending = False   # content between a SEP and a later title
                                       # card means that title is not a boundary
-            elif sel == SET_SPEAKER:                          # 0x05 -> stage setup
-                # The operand pair names two resource rows (the characters put
-                # on screen, e.g. (Kim, Andy)); it does NOT set the speaker --
-                # speaker-less lines are resolved by the 0x5a/0x5b row markers.
-                pass
+            elif sel == SET_SPEAKER:                          # 0x05 -> set_character_expression
+                # [character, expression]: the expression later lines of that
+                # character show unless they override it (reference engine)
+                _xe = _exact_args.get(p)
+                if _xe and len(_xe[1]) >= 2:
+                    _el = Line(None, "__EXPR__", (_xe[1][0], _xe[1][1]))
+                    lines.append(_el)
             elif sel == CUSTOM_SPEAKER:                       # 0x0f -> one-off named speaker
                 sp = [smap[pk[1] * 2 + STRING_BASE] for pk in pushes
                       if pk[0] == "v" and (pk[1] * 2 + STRING_BASE) in smap]
                 if len(sp) >= 2:
                     emo = next((pk[1] for pk in pushes if pk[0] == "pair"), None)
                     emo = None if emo in (None, 0xff) else emo
-                    lines.append(Line(sp[-1], sp[0], emo))
+                    _cl = Line(sp[-1], sp[0], emo)
+                    _cl.vm_args = _exact_args.get(p)
+                    lines.append(_cl)
                 elif sp:
                     lines.append(Line(sp[0], None, None))
                 else:
@@ -1977,24 +2483,41 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                 strs = [smap[pk[1] * 2 + STRING_BASE] for pk in pushes
                         if pk[0] == "v" and (pk[1] * 2 + STRING_BASE) in smap
                         and len(smap[pk[1] * 2 + STRING_BASE]) >= 4]
+                if not strs:
+                    # PAIR form (New Girl's day cards): `1b <title> <subtitle> ;
+                    # 1a <asset> ; 5a ; 1f 08` -- both string refs in one pair.
+                    for pk in pushes:
+                        if pk[0] == "pair":
+                            # 1b pushes its LOW byte first: that is the title
+                            _pt = [smap.get(r * 2 + STRING_BASE) for r in (pk[2], pk[1])]
+                            if _pt[0] and len(_pt[0]) >= 3:
+                                strs = [t for t in _pt if t]
+                                break
                 if strs:
                     # a title card pushes the title then (optionally) a subtitle;
                     # emit ONE node carrying both (subtitle in the sprite slot).
                     subtitle = strs[1] if len(strs) > 1 else None
                     _ss = has_dispatch and sep_pending and seen_dispatch
-                    lines.append(Line(strs[0], "__CARD__", "title", sprite=subtitle,
-                                      bc_off=p, section_start=_ss,
-                                      section_jump=(sep_section_target if _ss
-                                                    else None)))
+                    _tl = Line(strs[0], "__CARD__", "title", sprite=subtitle,
+                               bc_off=p, section_start=_ss,
+                               section_jump=(sep_section_target if _ss
+                                             else None))
+                    _tl.vm_args = _exact_args.get(p)
+                    lines.append(_tl)
                     for t in strs:
                         emitted_titles.add(t)
                 sep_pending = False
                 sep_section_target = None
             elif sel == DISPLAY_NARRATION:                    # 0x41 -> narration card
-                lines.append(_emit(pushes, smap, cast, resources, narration=True,
-                                   sprites=sprites_by_idx,
-                                   content_min=content_min))
+                _nl = _emit(pushes, smap, cast, resources, narration=True,
+                            sprites=sprites_by_idx,
+                            content_min=content_min)
+                if _nl is not None:
+                    _nl.vm_args = _exact_args.get(p)
+                lines.append(_nl)
                 sep_pending = False
+            elif sel == DISPLAY_STATUS and p in _fmt_hidden:
+                pass                                          # format for a non-display use
             elif sel == DISPLAY_STATUS:                       # 0x00 -> status / HUD line
                 txts = [smap[pk[1] * 2 + STRING_BASE] for pk in pushes
                         if pk[0] == "v" and (pk[1] * 2 + STRING_BASE) in smap
@@ -2008,12 +2531,15 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                     # are data, not a static status line. Emit nothing.
                     pass
                 elif txts:
-                    lines.append(Line(txts[-1], "__STATUS__", None))
+                    _sl = Line(txts[-1], "__STATUS__", None)
+                    _sl.vm_args = _next_show.get(p)
+                    lines.append(_sl)
                 else:
                     ln = _emit(pushes, smap, cast, resources, narration=True,
                                last_spk=last_spk, sprites=sprites_by_idx,
                                content_min=content_min)
                     if ln and ln.text:            # end-screen results line (ref in 1b 1st byte)
+                        ln.vm_args = _next_show.get(p)
                         lines.append(ln)
             elif sel == SET_BACKGROUND:                       # 0x0b -> background image
                 # Operands are [layer_flag(0/1), base_asset(1000-1200), 0xffff].
@@ -2027,15 +2553,26 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                     if pk[0] == "v" and 1000 <= pk[1] <= 1200:
                         base_i = i
                 if base_i is not None:
-                    lines.append(Line(None, "__BG__", ("standard", pushes[base_i][1])))
+                    _bl = Line(None, "__BG__", ("standard", pushes[base_i][1]))
+                    _bl.vm_args = _exact_args.get(p)
+                    lines.append(_bl)
             elif sel == SET_BG_CUSTOM:                        # 0x23 -> packaged PNG background
+                # Custom backgrounds reference a packaged-art asset id. These are
+                # usually a bundled PNG chunk (in image_ids), but some episodes use
+                # a separate art-asset numbering (>= EPISODE_ASSET_BASE) that does
+                # not line up 1:1 with chunk ids. Accept either: a real image chunk,
+                # OR any id in the packaged-art range, so custom bgs aren't dropped.
                 ids = [pk[1] for pk in pushes if pk[0] == "v" and pk[1] != 0xffff
-                       and (pk[1] in image_ids if image_ids else True)]
+                       and (pk[1] in image_ids
+                            or pk[1] >= EPISODE_ASSET_BASE
+                            or 1000 <= pk[1] <= 1200)]
                 if ids:
-                    # with archive validation there is one candidate; without,
-                    # fall back to the largest (chunk ids sit above operands)
-                    lines.append(Line(None, "__BG__", ("custom", ids[-1] if image_ids
-                                                       else max(ids))))
+                    cid = ids[-1]
+                    style = "custom" if cid >= EPISODE_ASSET_BASE or cid in image_ids \
+                        else "standard"
+                    _bl = Line(None, "__BG__", (style, cid))
+                    _bl.vm_args = _exact_args.get(p)
+                    lines.append(_bl)
             elif sel == SET_MUSIC:                            # 0x50 -> background music change
                 # A track is either a GLOBAL library id -- the native engine
                 # validates these against a fixed band (`param_2 - 0x2009U < 0x20`
@@ -2050,9 +2587,13 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                          and (MUSIC_ID_MIN <= pk[1] <= MUSIC_ID_MAX
                               or (audio_ids and pk[1] in audio_ids))]
                 if codes:
-                    lines.append(Line(None, "__MUSIC__", codes[-1]))
+                    _ml = Line(None, "__MUSIC__", codes[-1])
+                    _ml.vm_args = _exact_args.get(p)
+                    lines.append(_ml)
             elif sel == STOP_MUSIC:                           # 0x51 -> stop / fade out music
-                lines.append(Line(None, "__MUSIC__", "stop"))
+                _ml = Line(None, "__MUSIC__", "stop")
+                _ml.vm_args = _exact_args.get(p)
+                lines.append(_ml)
             elif sel == VIBRATE:                              # 0x52 -> haptic buzz
                 lines.append(Line(None, "__VIBRATE__", None))
             elif sel == PRESENT_CHOICE:                       # 0x01 -> choice menu / QTE
@@ -2069,6 +2610,20 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                                 if t and len(t) > 3 and t not in texts:
                                     texts.append(t)
                 opts = next((t for t in texts if "|" in t), None)
+                if opts is None and _dprog is not None and p in _dpos:
+                    # The engine's rule (yield 1): options = args[1].split('|'). A
+                    # SINGLE option has no '|', but it is still a choice -- a
+                    # one-button QTE ("Tackle him!", "Duck!") or a forced pick
+                    # ("Empty your bag."). Read args[1] directly rather than keying
+                    # on the separator, which mis-decoded these as action/quiz
+                    # minigames or even notifications.
+                    _ev = _eval_yield_args(_dprog, _dpos[p], (data[p + 2] if p + 2 < len(data) else 8))
+                    if _ev and len(_ev) > 1 and _ev[1] is not None and _ev[1] >= 0:
+                        _ot = smap.get(_ev[1] * 2 + STRING_BASE)
+                        if _ot and _displayable(_ot) and not _is_system(_ot):
+                            opts = _ot
+                            if _ot not in texts:
+                                texts.append(_ot)
                 if opts:                                      # story choice (a|b|c)
                     # Choice prompts like "What do you do?" / "What do you say?" are
                     # flagged by _is_system (so they don't leak into spoken dialogue),
@@ -2086,7 +2641,19 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                                         if t.rstrip().endswith("?")), None))
                               or (decision[0] if decision else None)
                               or (nonopt[0] if nonopt else None))
-                    lines.append(Line(opts, "__CHOICE__", prompt))
+                    _chl = Line(opts, "__CHOICE__", prompt)
+                    _xc = _exact_args.get(p)
+                    if _xc and _xc[0] == 1 and len(_xc[1]) >= 8 and None not in _xc[1][:3]:
+                        # yield 1 [title, options, text, timeout, timeout result,
+                        # character, reserved, portrait mode], resolved
+                        _a = _xc[1]
+                        _chl.vm_args = (1, {"title": smap.get(_a[0] * 2 + STRING_BASE, ""),
+                                            "text": (smap.get(_a[2] * 2 + STRING_BASE)
+                                                     if _a[2] >= 0 else None),
+                                            "timeout_ms": _a[3], "timeout_result": _a[4],
+                                            "character_id": _a[5], "reserved": _a[6],
+                                            "portrait_mode": _a[7]})
+                    lines.append(_chl)
                 elif len(texts) >= 2 and all(t.rstrip().endswith(("!", "?")) for t in texts):
                     prompt = " ".join(t for t in texts if t.rstrip().endswith("?"))
                     options = [t for t in texts if not t.rstrip().endswith("?")]
@@ -2106,9 +2673,25 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                 timer = next((pk[1] for pk in pushes
                               if pk[0] == "v" and 1000 <= pk[1] <= 60000
                               and (pk[1] * 2 + STRING_BASE) not in smap), None)
-                if timer is not None and txts:
+                # an untimed builder menu (timeout -1) is real too when option
+                # adds follow (New Girl's "What class should I go to?")
+                # (only a CONDITIONAL-option menu: the plain untimed menus are
+                # combat HUDs / minigame reuse, handled elsewhere)
+                _has_opts = any(q in _bguard for q in range(p + 2, min(n - 1, p + 160)))
+                if txts and (timer is not None
+                             or (_has_opts and any(_is_system(t) for t in txts)
+                                 and any(not _is_system(t) for t in txts))):
                     tchoice = {"timer_ms": timer, "prompt": None,
-                               "setup": None, "options": []}
+                               "setup": None, "options": [], "when": []}
+                    _xc = _exact_args.get(p)
+                    if _xc and _xc[0] == 2 and len(_xc[1]) >= 6 and None not in _xc[1][:2]:
+                        # yield 2 [title, text, timeout, default, character, portrait mode]
+                        _a = _xc[1]
+                        tchoice["vm_args"] = (2, {"title": smap.get(_a[0] * 2 + STRING_BASE, ""),
+                                                  "text": (smap.get(_a[1] * 2 + STRING_BASE)
+                                                           if _a[1] >= 0 else None),
+                                                  "timeout_ms": _a[2], "timeout_result": _a[3],
+                                                  "character_id": _a[4], "portrait_mode": _a[5]})
                     # prompt is a system banner ("Make your choice!"); the other
                     # text is the setup / lead-in line spoken by the wooer. The
                     # options come exclusively from the 1f03 calls that follow;
@@ -2126,16 +2709,21 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                           and smap[pk[1] * 2 + STRING_BASE]]
                     if ot:
                         tchoice["options"].append(ot[-1])
+                        tchoice.setdefault("when", []).append(_bguard.get(p))
             elif sel == TCHOICE_RESOLVE:                      # 0x04 -> resolve choice
                 if tchoice is not None and tchoice["options"]:
-                    if tchoice["setup"]:                      # emit the lead-in line
-                        lines.append(_emit([("v", None)], smap, cast, resources,
-                                           narration=False, last_spk=last_spk)
-                                     if False else Line(tchoice["setup"], None, None))
+                    # The 0x02 builder's text is the MENU BODY (reference engine:
+                    # choice_builder text = args[1], shown with the options), not
+                    # a separate line before it -- carried on the choice as `text`.
                     packed = "§".join(
                         ([tchoice["prompt"]] if tchoice["prompt"] else [])
-                        + ["|".join(tchoice["options"])])
-                    lines.append(Line(packed, "__TCHOICE__", tchoice["timer_ms"]))
+                        + ["|".join(tchoice["options"])]
+                        + (["\x01" + tchoice["setup"]] if tchoice["setup"] else []))
+                    _tl = Line(packed, "__TCHOICE__", tchoice["timer_ms"], bc_off=p)
+                    _tl.vm_args = tchoice.get("vm_args")
+                    if any(tchoice.get("when") or []):
+                        _tl.when = list(tchoice["when"])
+                    lines.append(_tl)
                     tchoice = None
             elif sel == SCORE_FEEDBACK:                       # 0x58 -> score / feedback banner
                 texts = [smap[pk[1] * 2 + STRING_BASE] for pk in pushes
@@ -2148,7 +2736,12 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                     last_var_read = vals[-1]
             elif sel == VAR_WRITE:                            # 0x2c -> write variable
                 vals = [pk[1] for pk in pushes if pk[0] in ("v", "m")]
-                if computed_write:
+                if computed_write and p in _local_incr:
+                    # `var V = local + c`, the local loaded from V at the
+                    # routine start (New Girl's visit counters)
+                    _lv, _lc = _local_incr[p]
+                    lines.append(Line(None, "__VAR__", ("add", _lv, _lc)))
+                elif computed_write:
                     # value came from a LOAD/SLOT (score-table lookup); it is not a
                     # static constant, so emit no var node rather than a spurious
                     # set/add built from the leftover index / var-id operands.
@@ -2159,18 +2752,30 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                     lines.append(Line(None, "__VAR__", ("add", last_var_read, delta)))
                 elif len(vals) >= 2:
                     lines.append(Line(None, "__VAR__", ("set", vals[-2], vals[-1])))
-            elif sel == PLAY_SFX:                             # 0x4f -> play sound effect
-                # Engine-validated SFX band (`param_2 - 0x1f41U < 0x71`) = 8001..8113.
-                vals = [pk[1] for pk in pushes
-                        if pk[0] == "v" and SFX_ID_MIN <= pk[1] <= SFX_ID_MAX]
-                if vals:
-                    lines.append(Line(None, "__SFX__", vals[-1]))
+            elif sel == PLAY_SFX:                             # 0x4f -> request_audio (yield 79)
+                # reference engine: the id plays as music when it is in the
+                # library music band (8201..8232), else as a sound -- library
+                # sound band 8001..8113 or an episode-packaged audio chunk
+                _xa = _exact_args.get(p)
+                if _xa and _xa[0] == 79 and _xa[1] and _xa[1][0] is not None:
+                    _aid = _xa[1][0]
+                    if MUSIC_ID_MIN <= _aid <= MUSIC_ID_MAX:
+                        lines.append(Line(None, "__MUSIC__", _aid))
+                    else:
+                        lines.append(Line(None, "__SFX__", _aid))
+                else:
+                    vals = [pk[1] for pk in pushes
+                            if pk[0] == "v" and SFX_ID_MIN <= pk[1] <= SFX_ID_MAX]
+                    if vals:
+                        lines.append(Line(None, "__SFX__", vals[-1]))
             elif sel == SCENE_GOTO:                           # 0x0a -> jump to another scene
                 tgt = [pk[1] for pk in pushes if pk[0] == "v"
                        and (pk[1] in script_ids if script_ids
                             else 25000 <= pk[1] < 26000)]
                 if tgt:
-                    lines.append(Line(None, "__GOTO__", tgt[-1]))
+                    _gl = Line(None, "__GOTO__", tgt[-1])
+                    _gl.vm_args = _exact_args.get(p)
+                    lines.append(_gl)
             elif sel == ACTION_MINIGAME:                      # 0x47 -> action / word minigame
                 texts = [smap[pk[1] * 2 + STRING_BASE] for pk in pushes
                          if pk[0] == "v" and (pk[1] * 2 + STRING_BASE) in smap]
@@ -2253,16 +2858,43 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                 if val is not None:
                     lines.append(Line(None, "__UIDEFAULT__", val))
             elif sel == SET_STRING:                           # 0x2e -> string var write
-                # [key_ref, value_ref]. A $Token first ref is a rename (handled by
-                # _name_renames), so only emit set_string when the key is a plain
-                # (non-$) string.
-                refs = [pk[1] for pk in pushes if pk[0] == "v"]
-                if len(refs) >= 2:
-                    ktext = smap.get(refs[-2] * 2 + STRING_BASE, "")
-                    vtext = smap.get(refs[-1] * 2 + STRING_BASE, "")
-                    if ktext and not ktext.startswith("$"):
+                # [key_ref, value_ref]. A $Token key is a rename the engine
+                # substitutes into every later text (resolve_text); it is emitted
+                # where it happens, like any other string write.
+                ktext = vtext = None
+                try:
+                    _ins_ss = _kiwi_program(data).instructions
+                    _k_ss = next((i_ for i_, y_ in enumerate(_ins_ss)
+                                  if y_.byte_offset == p), None)
+                    _a_ss = _eval_yield_args(_ins_ss, _k_ss, 2) if _k_ss is not None else None
+                    if _a_ss and all(isinstance(a_, int) for a_ in _a_ss):
+                        _cs_ss = _ChunkStrings(data)
+                        if _a_ss[0] in _cs_ss and _a_ss[1] in _cs_ss:
+                            ktext, vtext = _cs_ss[_a_ss[0]], _cs_ss[_a_ss[1]]
+                except Exception:
+                    ktext = None
+                if ktext is None:
+                    refs = [pk[1] for pk in pushes if pk[0] == "v"]
+                    if len(refs) >= 2:
+                        ktext = smap.get(refs[-2] * 2 + STRING_BASE, "")
+                        vtext = smap.get(refs[-1] * 2 + STRING_BASE, "")
+                if True:
+                    if ktext:
                         lines.append(Line("%s\x1f%s" % (ktext, vtext),
                                           "__SETSTR__", None))
+            elif sel == GET_STRING_DEFAULT:                   # 0x2f -> key default binding
+                try:
+                    _ins_gd = _kiwi_program(data).instructions
+                    _k_gd = next((i_ for i_, y_ in enumerate(_ins_gd)
+                                  if y_.byte_offset == p), None)
+                    _a_gd = _eval_yield_args(_ins_gd, _k_gd, 3) if _k_gd is not None else None
+                    _cs_gd = _ChunkStrings(data)
+                    if _a_gd and all(isinstance(a_, int) for a_ in _a_gd) \
+                            and _a_gd[0] in _cs_gd and _a_gd[1] in _cs_gd:
+                        lines.append(Line("%s\x1f%s\x1f%d" % (_cs_gd[_a_gd[0]], _cs_gd[_a_gd[1]],
+                                                            _a_gd[2]), "__STRDEF__", None))
+                except Exception:
+                    pass
             elif sel == TEXT_INPUT:                           # 0x28 -> player types text
                 texts = [smap.get(pk[1] * 2 + STRING_BASE, "") for pk in pushes
                          if pk[0] == "v"]
@@ -2285,28 +2917,27 @@ def decode_script(data: bytes, cast=None, episode_title=None,
             saw_add = False
             computed_write = False
             slot_display = False
-            p += 2
+            p = _NX(p)
             continue
         if op in (0x2b, 0x28) and p + 2 < n:  # conditional jump (3 bytes); a
             pushes = []                         # control boundary, so reset operands
             saw_add = False
             computed_write = False
             slot_display = False
-            p += 3
+            p = _NX(p)
             continue
+        if op == 0x42 and p in _call_mg:
+            # a minigame wrapped in a helper routine returning pass/fail in B:
+            # the round plays HERE (see resolve_call_minigames)
+            _cm = _call_mg[p]
+            lines.append(Line("§".join(_cm["prompts"] + _cm["groups"]), "__MINIGAME__",
+                              "action", threshold=_cm["win_threshold"], bc_off=p))
         if op == 0x42 and p + 3 < n:  # branch separator (42 29 00 NN) — used by
-            # The episode's final credits card (episode title + "Thanks for playing
-            # ...! See you in another episode") is pushed just before this end-screen
-            # separator and rendered by the host UI, NOT by a 1f display op -- so it
-            # never reaches the dialogue/narration path and the thank-you screen is
-            # lost. Surface it as an end card. Matched on the credits text (byte-
-            # present), so ordinary mid-scene separators are unaffected.
-            for _pk in pushes:
-                if _pk[0] == "v":
-                    _t = smap.get(_pk[1] * 2 + STRING_BASE)
-                    if _t and ("thanks for playing" in _t.lower()
-                               or "see you in another" in _t.lower()):
-                        lines.append(Line(_t, "__CARD__", "end", bc_off=p))
+            # (The end-of-episode credits card is shown by a call to a routine
+            # that performs host-card yields; that routine is lowered and the
+            # call reproduced exactly -- see _vm_lowered_routines.)
+            if p in _low_calls:
+                lines.append(Line(None, "__CALL__", _low_calls[p], bc_off=p))
             lines.append(Line(None, "__SEP__", None))   # branches mode only
             sep_pending = True   # a following title card (with no content between)
                                  # opens a new dispatch-section body
@@ -2323,7 +2954,7 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                 if _hit is not None:
                     sep_section_target = _hit[0]
             pushes = []
-            p += 4
+            p = _NX(p)
             continue
         if op in (0x3e, 0x15, 0x3f, 0x60, 0x61, 0x62):
             # INDEX / STORE / LOAD / SLOT0-2: array & slot-table machinery. A 0x50
@@ -2346,11 +2977,19 @@ def decode_script(data: bytes, cast=None, episode_title=None,
                 # Drop the consumed operands so the display sees only its template.
                 pushes = []
                 slot_display = True
-            p += 1
+            p = _NX(p)
             continue
-        p += 1  # any other opcode (e.g. 0x5a marker): ignore, keep operands
+        p = _NX(p)  # any other opcode (e.g. 0x5a marker): ignore, keep operands
 
     lines = [ln for ln in lines if ln is not None]
+    # drop lines emitted from instructions that can never execute (dead arms
+    # behind a constant branch) -- see _reachable_offsets
+    try:
+        _reach = _reachable_offsets(_kiwi_program(data).instructions)
+        lines = [ln for ln in lines
+                 if getattr(ln, "bc_off", None) is None or ln.bc_off in _reach]
+    except _KiwiFormatError:
+        pass
 
     # CONVERSATIONAL-PARTNER ATTRIBUTION. Compact-form lines (1b <emotion>
     # <textref> ; 1f 0d) carry no speaker index -- the engine shows whichever
@@ -2367,7 +3006,8 @@ def decode_script(data: bytes, cast=None, episode_title=None,
              "__MUSIC__", "__SFX__", "__GOTO__", "__STATUS__", "__SEP__",
              "__POV__", "__VAR__", "__TCHOICE__", "__NOTIFY__", "__VIBRATE__",
              "__WOBBLE__", "__LOADING__", "__SCENEVAL__", "__UIDEFAULT__",
-             "__SETSTR__", "__TEXTINPUT__", "__PICKCHAR__")
+             "__SETSTR__", "__STRDEF__", "__TEXTINPUT__", "__PICKCHAR__", "__CALL__",
+             "__EXPR__")
     # Iterate to a fixed point: a compact-form line adjacent only to other
     # compact-form lines can be resolved once its neighbour is, so repeat until no
     # further line changes (bounded by the number of lines).
@@ -2482,7 +3122,10 @@ def decode_script(data: bytes, cast=None, episode_title=None,
              and t not in mg_operand_text]
     if minigame_words:
         head.append(Line(" | ".join(minigame_words), "__MINIGAME__", "word-match"))
-    tail = [Line(t, "__CARD__", "end") for t in end_cards if t not in op_texts]
+    # Strings after the last displayed line are not synthesised into cards: what
+    # the episode shows at its end comes from executed code (lowered where the
+    # story graph has no node for it), never from string-table layout.
+    tail = []
     all_cards = head + lines + tail
 
     # Year-banner inheritance. A year's sections share one banner ("Sophomore
@@ -2546,7 +3189,7 @@ def decode_script(data: bytes, cast=None, episode_title=None,
     # in every line's visible text, using the episode-wide 1f2e text bindings.
     if text_subs:
         for ln in all_cards:
-            if ln.text and "$" in ln.text:
+            if ln.text and "$" in ln.text and ln.speaker not in ("__SETSTR__", "__STRDEF__"):
                 ln.text = _apply_text_subs(ln.text, text_subs)
     return all_cards, cast
 
@@ -2921,11 +3564,17 @@ def line_to_dict(ln):
         return {"type": "pov_change", "character": ln.text, "index": ln.emotion}
     if ln.speaker in ("__SEP__", "__SCENE__", "__CHOICE__"):
         return None
+    if ln.speaker == "__CALL__":
+        # placeholder for a call into a lowered routine (filled later)
+        return {"type": "_lcall", "callee": ln.emotion}
     if ln.speaker == "__CARD__":
         if ln.emotion == "title":
             d = {"type": "title_card", "title": ln.text}
             if ln.sprite:                # subtitle carried in the sprite slot
                 d["subtitle"] = ln.sprite
+            va = getattr(ln, "vm_args", None)
+            if va and va[0] == 8 and len(va[1]) >= 4:
+                d["asset_id"], d["flag"] = va[1][2], va[1][3]   # yield 8 [title, sub, asset, flag]
             if getattr(ln, "section_start", False):
                 d["section_start"] = True
                 if getattr(ln, "section_jump", None) is not None:
@@ -2959,12 +3608,12 @@ def line_to_dict(ln):
         parts = ln.text.split("§")
         prompt = next((p for p in parts if "|" not in p), None)
         opts = next((p.split("|") for p in parts if "|" in p), [])
-        return {"type": "choice", "timed": True, "timer_ms": ln.emotion,
+        return _choice_exact({"type": "choice", "timed": True, "timer_ms": ln.emotion,
                 "prompt": prompt,
                 "options": [{"index": i, "label": o} for i, o in enumerate(opts)],
                 "note": ("Timed choice (1f02/1f03/1f04): the player must pick "
                          "before the timer expires. The picked index is tested "
-                         "against the correct answer to branch win/lose.")}
+                         "against the correct answer to branch win/lose.")}, ln)
     if ln.speaker == "__VAR__":
         kind, var, val = ln.emotion
         if kind == "set":
@@ -2972,10 +3621,20 @@ def line_to_dict(ln):
         return {"type": "var_add", "var": var, "value": val}
     if ln.speaker == "__SFX__":
         return {"type": "sfx", "sfx_id": ln.emotion}
+    if ln.speaker == "__EXPR__":
+        return {"type": "set_expression", "character_id": ln.emotion[0],
+                "expression": ln.emotion[1]}
     if ln.speaker == "__MUSIC__":
+        va = getattr(ln, "vm_args", None)
         if ln.emotion == "stop":
-            return {"type": "music", "action": "stop"}
-        return {"type": "music", "track_id": ln.emotion}
+            d = {"type": "music", "action": "stop"}
+            if va and va[0] == 81 and va[1]:
+                d["fade_ms"] = va[1][0]          # yield 81 [fade duration]
+            return d
+        d = {"type": "music", "track_id": ln.emotion}
+        if va and va[0] == 80 and len(va[1]) >= 2:
+            d["loop"] = bool(va[1][1])           # yield 80 [track, loop]
+        return d
     if ln.speaker == "__VIBRATE__":
         return {"type": "vibrate"}
     if ln.speaker == "__WOBBLE__":
@@ -2989,20 +3648,54 @@ def line_to_dict(ln):
     if ln.speaker == "__SETSTR__":
         _k, _, _v = (ln.text or "").partition("\x1f")
         return {"type": "set_string", "key": _k, "value": _v}
+    if ln.speaker == "__STRDEF__":
+        _k, _d, _s = (ln.text or "").split("\x1f")
+        return {"type": "string_default", "key": _k, "default": _d, "slot": int(_s)}
     if ln.speaker == "__TEXTINPUT__":
         _t, _, _p = (ln.text or "").partition("\x1f")
         return {"type": "text_input", "title": _t, "prompt": _p}
     if ln.speaker == "__PICKCHAR__":
         return {"type": "character_picker", "prompt": ln.text or ""}
     if ln.speaker == "__GOTO__":
-        return {"type": "goto_scene", "script": "0x%04x" % ln.emotion}
+        d = {"type": "goto_scene", "script": "0x%04x" % ln.emotion}
+        va = getattr(ln, "vm_args", None)
+        if va and va[0] == 10 and len(va[1]) >= 2 and va[1][1]:
+            d["flag"] = va[1][1]                 # yield 10 [script, flag]
+        return d
     if ln.speaker == "__STATUS__":
         if not _displayable(ln.text):
             return None
-        return {"type": "status", "text": ln.text, "dynamic": bool(_FMT_RE.search(ln.text))}
+        d = {"type": "status", "text": ln.text, "dynamic": bool(_FMT_RE.search(ln.text))}
+        va = getattr(ln, "vm_args", None)
+        if va and va[0] == 0x41 and len(va[1]) >= 3:
+            d["character_id"] = va[1][0]         # shown by yield 65 [character, text, expr]
+            if va[1][2] != -1:
+                d["expression"] = va[1][2]
+        elif va and va[0] == 0x0d and len(va[1]) >= 2:
+            a = va[1]
+            ti = 1 if isinstance(a[0], int) and a[0] < 0 else 0
+            if ti:
+                d["mode"] = a[0]
+            if len(a) > ti + 1 and a[ti + 1] is not None:
+                d["character_id"] = a[ti + 1]
+            if len(a) > ti + 2 and a[ti + 2] not in (-1, None):
+                d["expression"] = a[ti + 2]
+            d["via"] = 13
+        return d
     if ln.speaker == "__BG__":
         kind, code = ln.emotion
         d = {"type": "background", "style": kind, "asset_id": code}
+        va = getattr(ln, "vm_args", None)
+        if va and va[0] == 11 and len(va[1]) >= 2:
+            d["variant"] = va[1][0]              # yield 11 [variant, base, ...]
+        elif va and va[0] == 35 and len(va[1]) >= 4:
+            # yield 35 [character, variant, base, expression]: also sets the
+            # panel's character and expression
+            d["variant"], d["character_id"], d["expression"] = va[1][1], va[1][0], va[1][3]
+            d["via"] = 35
+        elif va and va[0] == 86 and len(va[1]) >= 2:
+            d["variant"] = va[1][1]
+            d["via"] = 86
         if kind == "custom" and code in KNOWN_BG:
             d["name"] = KNOWN_BG[code]       # observed label, from the overlay
         return d
@@ -3018,10 +3711,49 @@ def line_to_dict(ln):
             # placeholder or value_from, so it is ordinary narration -- typing it
             # as status would send the engine looking for a value_from that isn't
             # there.
-            return {"type": "status", "text": ln.text, "dynamic": True}
-        return {"type": "narration", "text": ln.text}
-    return {"type": "dialogue", "speaker": ln.speaker,
-            "emotion_code": ln.emotion, "image": ln.sprite, "text": ln.text}
+            d = {"type": "status", "text": ln.text, "dynamic": True}
+        else:
+            d = {"type": "narration", "text": ln.text}
+        va = getattr(ln, "vm_args", None)
+        if va and va[0] == 0x41 and len(va[1]) >= 3:
+            # yield 65 [character, text, expression override]
+            d["character_id"] = va[1][0]
+            if va[1][2] != -1:
+                d["expression"] = va[1][2]
+        elif va and va[0] == 0x0d and len(va[1]) >= 2:
+            a = va[1]
+            ti = 1 if isinstance(a[0], int) and a[0] < 0 else 0
+            if ti:
+                d["mode"] = a[0]
+            if len(a) > ti + 1 and a[ti + 1] is not None:
+                d["character_id"] = a[ti + 1]
+            if len(a) > ti + 2 and a[ti + 2] not in (-1, None):
+                d["expression"] = a[ti + 2]
+            d["via"] = 13
+        return d
+    d = {"type": "dialogue", "speaker": ln.speaker,
+         "emotion_code": ln.emotion, "image": ln.sprite, "text": ln.text}
+    va = getattr(ln, "vm_args", None)
+    if va and va[0] == 0x0d and len(va[1]) >= 2:
+        # yield 13 [mode?, text, character, expression override]: the exact
+        # presentation arguments (the engine's panel mode, speaker id and
+        # portrait expression), so a re-encode shows the line as the game does
+        a = va[1]
+        ti = 1 if isinstance(a[0], int) and a[0] < 0 else 0
+        if ti:
+            d["mode"] = a[0]
+        if len(a) > ti + 1 and a[ti + 1] is not None:
+            d["character_id"] = a[ti + 1]
+        if len(a) > ti + 2 and a[ti + 2] not in (-1, None):
+            d["expression"] = a[ti + 2]
+    elif va and va[0] == 0x0f and len(va[1]) >= 4:
+        # yield 15 [name, text, character, expression override]: a one-off
+        # named speaker
+        d["via"] = 15
+        d["character_id"] = va[1][2]
+        if va[1][3] != -1:
+            d["expression"] = va[1][3]
+    return d
 
 
 def strip_notes(obj):
@@ -3038,6 +3770,9 @@ def strip_notes(obj):
     return obj
 
 
+_IR_NODE_TYPES = ("let", "yield", "if", "ret", "pause")
+
+
 def stringify_numbers(obj):
     """Recursively convert every int/float in a JSON-ish structure to a string.
 
@@ -3049,6 +3784,11 @@ def stringify_numbers(obj):
     if isinstance(obj, (int, float)):
         return str(obj)
     if isinstance(obj, dict):
+        if obj.get("type") in _IR_NODE_TYPES or (obj.get("type") == "call" and "routine" in obj):
+            return obj                     # lowered-routine IR: native ints
+        if "expr" in obj or "format" in obj:   # expression trees keep native ints
+            return {k: (v if k in ("expr", "format") else stringify_numbers(v))
+                    for k, v in obj.items()}
         return {k: stringify_numbers(v) for k, v in obj.items()}
     if isinstance(obj, list):
         return [stringify_numbers(v) for v in obj]
@@ -3069,14 +3809,21 @@ def _to_int(v):
 def restore_int_values(obj):
     """Run after stringify_numbers to give the fields that hold actual variable
     VALUES (not ids/offsets/labels) real integer typing: the `value` of a
-    var_set/var_add node, and every entry of variable_defaults `values`.
+    var_set/var_add node, and a lowered routine's argument count.
     Everything else stays a string."""
     if isinstance(obj, dict):
         if obj.get("type") in ("var_set", "var_add") and "value" in obj:
             obj["value"] = _to_int(obj["value"])
         vd = obj.get("variable_defaults")
-        if isinstance(vd, dict) and isinstance(vd.get("values"), dict):
-            vd["values"] = {k: _to_int(v) for k, v in vd["values"].items()}
+        if isinstance(vd, dict):
+            for k in ("values", "owner_values"):
+                if isinstance(vd.get(k), dict):
+                    vd[k] = {a: _to_int(b) for a, b in vd[k].items()}
+        rt = obj.get("routines")
+        if isinstance(rt, dict):
+            for r in rt.values():
+                if isinstance(r, dict) and "params" in r:
+                    r["params"] = _to_int(r["params"])
         for v in obj.values():
             restore_int_values(v)
     elif isinstance(obj, list):
@@ -3088,68 +3835,6 @@ def restore_int_values(obj):
 _NAME_VAR_RE = re.compile(r'\$[A-Za-z][A-Za-z0-9_]{0,15}$')
 
 
-_BARE_NAME_RE = re.compile(r"[A-Z][A-Za-z.'-]{0,18}$")   # a name-var default
-
-
-def extract_name_vars(data: bytes):
-    """Parse the name-variable defaults from a script's head.
-
-    Dialogue text can contain '$VAR' placeholders the engine substitutes with a
-    (player-customisable) name. The defaults are stored as literal strings in
-    the zone between the cast table's 'Event' marker and the first prose line,
-    in two byte-verified forms:
-      * an explicit pair: the '$VAR' string immediately followed by its default
-        (e.g. '$USR' then 'John', '$ZOE' then 'Zoe');
-      * a bare name exactly equal to a cast '$'-variable's cleaned name
-        (e.g. cast '$Travis' -> a lone 'Travis'; '$ALLISON' -> 'Allison').
-    A '$VAR' must be a single token (no spaces/punctuation): dialogue lines that
-    merely START with a variable ("$ALLISON! Wait!") are text, not declarations.
-    Returns {'$VAR': default}. Cast '$'-vars with no stored default fall back
-    to their own cleaned name (which is what every stored default equals).
-    Scripts with no cast table (continuation scenes) contribute nothing.
-    """
-    if data[:4] != b"kiwi":
-        return {}
-    strings = find_strings(data)
-    bc_start = max((o + len(t) for o, t in strings if len(t) >= 12), default=0)
-    evt_off = next((o for o, t in strings if t == "Event"), None)
-    if evt_off is None:
-        return {}
-    cast_vars = {}            # cleaned name -> '$VAR' as written
-    for off, t in strings:
-        if off >= evt_off:
-            break
-        if off < CAST_START:
-            continue
-        raw = t[1:] if off == CAST_START else t       # de-glue the header byte
-        if _NAME_VAR_RE.match(raw):
-            cast_vars[_clean_name(raw)] = raw
-    # The defaults zone: after 'Event', before the bytecode, up to the first
-    # prose line (a real sentence ends the head data).
-    zone = []
-    for o, t in strings:
-        if o <= evt_off or o >= bc_start:
-            continue
-        if len(t) > 45 and " " in t and "|" not in t:
-            # A recap/prose line. Some episodes (e.g. Swim Team Retreat 2) open
-            # the head with a "Previously on..." recap BEFORE the name-variable
-            # declarations, so this must not end the zone -- skip it and keep
-            # scanning. The pair test below is tight enough that prose cannot be
-            # mistaken for a declaration.
-            continue
-        zone.append(t)
-    out = {}
-    for i, t in enumerate(zone):
-        if _NAME_VAR_RE.match(t) and i + 1 < len(zone):
-            nxt = zone[i + 1]
-            # a default is a BARE name: single token, capitalised, no spaces
-            if nxt and _BARE_NAME_RE.match(nxt):
-                out.setdefault(t, nxt)
-        elif t in cast_vars:
-            out.setdefault(cast_vars[t], t)
-    for clean, var in cast_vars.items():
-        out.setdefault(var, clean)
-    return out
 
 
 def resolve_buildword_scoring(data):
@@ -4267,6 +4952,133 @@ def resolve_var_gates(data):
             i = index[jmp] + 1
             continue
         i += 1
+    # The "store in a local, then reload it" idiom -- read var; push_res; STORE
+    # into @fpN; drop; @fpN; LOAD; <const>; <cmp>; JMPF -- is the same gate
+    # (New Girl's start-of-episode `var3500 >= N -> "Thanks for playing!"`
+    # guard). Detected on the authoritative instruction stream and merged by
+    # jump offset, so every gate found above is left untouched.
+    try:
+        _ins = _kiwi_program(data).instructions
+    except _KiwiFormatError:
+        return out
+    _by_pc = {x.pc: k for k, x in enumerate(_ins)}
+    _have = {g["at"] for g in out}
+    _OPS = {0x0b: "ne", 0x0c: "gt", 0x0d: "gte", 0x0e: "lt", 0x0f: "lte"}
+    for k, y in enumerate(_ins[:-9]):
+        if not (y.opcode == 0x1f and y.operand is not None and (y.operand >> 8) == VAR_READ):
+            continue
+        if k == 0 or _ins[k - 1].opcode != 0x1a:
+            continue
+        var = _ins[k - 1].operand
+        seq = _ins[k + 1:k + 10]
+        if not (seq[0].opcode == 0x21 and seq[1].opcode == 0x3e and seq[2].opcode == 0x15
+                and 0x5f <= seq[3].opcode <= 0x62 and seq[4].opcode == 0x3f):
+            continue
+        c = seq[5]
+        if c.opcode == 0x1a:
+            const = c.operand
+        elif c.opcode in (0x5a, 0x5b):
+            const = c.opcode - 0x5a
+        else:
+            continue
+        cmp_op, jmp = seq[6].opcode, seq[7]
+        if cmp_op not in (0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f) or jmp.opcode != 0x2b:
+            continue
+        t = jmp.branch_target()
+        if t not in _by_pc or _by_pc[t] <= k + 8 or jmp.byte_offset in _have:
+            continue
+        g = {"at": jmp.byte_offset, "var": var, "equals": const,
+             "then": [seq[8].byte_offset, _ins[_by_pc[t]].byte_offset]}
+        if cmp_op in _OPS:
+            g["op"] = _OPS[cmp_op]
+        out.append(g)
+        _have.add(jmp.byte_offset)
+    # ROUTINE LOCALS: `local N = var V` early in a routine, tested later
+    # (`0x41 N | @fpN LOAD ; <const> ; <cmp> ; JMPF`) after other content --
+    # New Girl's class routines keep the visit count var1600 in local 0 and
+    # branch first visit / return visit on it. The local stands for the var
+    # as long as nothing else stores to it (aliases reset at each routine).
+    alias = {}
+    _jt = set()
+    for x in _ins:
+        if x.opcode in (0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e):
+            _jt.add(x.branch_target())
+        elif x.opcode == 0x5c and x.operand is not None:
+            _jt.add(x.pc + (x.operand >> 8))
+    # slots stored exactly once in their routine (by the alias idiom) and
+    # never otherwise addressed stay valid across the routine's join points
+    _stable = {}
+    _rs = [k for k, x in enumerate(_ins) if x.opcode == 0x48] + [len(_ins)]
+    for _a, _b2 in zip(_rs, _rs[1:]):
+        uses = {}
+        for q in range(_a, _b2):
+            x = _ins[q]
+            if 0x5f <= x.opcode <= 0x62:
+                sl = x.opcode - 0x5f
+                if q + 1 < _b2 and _ins[q + 1].opcode == 0x3f:
+                    continue
+                uses[sl] = uses.get(sl, 0) + 1
+            elif x.opcode == 0x23:
+                uses[x.operand] = uses.get(x.operand, 0) + 2
+        _stable[_a] = {sl for sl, c in uses.items() if c == 1}
+    _cur_stable = set()
+    _mg_trig = None
+    for k, y in enumerate(_ins):
+        op = y.opcode
+        if op == 0x48:
+            alias = {}
+            _cur_stable = _stable.get(k, set())
+            continue
+        if y.pc in _jt:
+            alias = {sl: v for sl, v in alias.items() if sl in _cur_stable}
+        if op == 0x23:
+            alias.pop(y.operand, None)   # frame address taken
+            continue
+        if 0x5f <= op <= 0x62 and k + 5 < len(_ins):
+            s_ = _ins[k + 1:k + 6]
+            if s_[0].opcode == 0x1a and s_[1].opcode == 0x1f \
+                    and (s_[1].operand or 0) == 0x2d01 and s_[2].opcode == 0x21 \
+                    and s_[3].opcode == 0x3e and s_[4].opcode == 0x15:
+                alias[op - 0x5f] = s_[0].operand
+                continue
+            if not (k + 1 < len(_ins) and _ins[k + 1].opcode == 0x3f):
+                alias.pop(op - 0x5f, None)   # address taken: may be stored to
+                continue
+        slot, j = None, None
+        if op == 0x41 and y.operand is not None and y.operand < 8:
+            slot, j = y.operand, k + 1
+        elif 0x5f <= op <= 0x62 and k + 1 < len(_ins) and _ins[k + 1].opcode == 0x3f:
+            slot, j = op - 0x5f, k + 2
+        if slot is None or slot not in alias or j + 2 >= len(_ins):
+            continue
+        c = _ins[j]
+        if c.opcode == 0x1a:
+            const = c.operand
+        elif c.opcode in (0x5a, 0x5b):
+            const = c.opcode - 0x5a
+        else:
+            continue
+        cmp_op, jmp = _ins[j + 1].opcode, _ins[j + 2]
+        if cmp_op not in (0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f) or jmp.opcode != 0x2b:
+            continue
+        t = jmp.branch_target()
+        if t not in _by_pc or _by_pc[t] <= j + 3 or jmp.byte_offset in _have:
+            continue
+        _thn = [_ins[j + 3].byte_offset, _ins[_by_pc[t]].byte_offset]
+        if _mg_trig is None:
+            try:
+                _mg_trig = [int(m["trigger"]) for m in (resolve_minigame_gates(data) or [])
+                            if m.get("trigger") is not None]
+            except Exception:
+                _mg_trig = []
+        if any(_thn[0] <= mt < _thn[1] for mt in _mg_trig):
+            continue                     # the minigame fork machinery owns it
+        g = {"at": jmp.byte_offset, "var": alias[slot], "equals": const,
+             "then": _thn, "via_local": slot}
+        if cmp_op in _OPS:
+            g["op"] = _OPS[cmp_op]
+        out.append(g)
+        _have.add(jmp.byte_offset)
     return out
 
 
@@ -4413,6 +5225,418 @@ def resolve_sep_cascade_gates(data):
     return kept
 
 
+# No-op opcodes per the reference VM (shs-runtime vm.py NATIVE_NOPS).
+NATIVE_NOP_OPS = frozenset({0, 2, 6, 9, 0x10, 0x14, 0x1D, 0x27, 0x2F, 0x30, 0x31, *range(0x34, 0x3E), 0x44, 0x45, 0x47, 0x49, *range(0x4B, 0x50), *range(0x55, 0x5A), 0x5D, 0x5E,})
+
+
+_STACK_BARRIER = {0x1e, 0x1f, 0x22, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e,
+                  0x33, 0x43, 0x5c}
+
+
+class _MiniVMStop(Exception):
+    pass
+
+
+# Reference-VM no-op opcodes (shs_runtime vm.NATIVE_NOPS).
+_VM_NOPS = frozenset({0, 2, 6, 9, 0x10, 0x14, 0x1D, 0x27, 0x2F, 0x30, 0x31,
+                      *range(0x34, 0x3E), 0x44, 0x45, 0x47, 0x49,
+                      *range(0x4B, 0x50), *range(0x55, 0x5A), 0x5D, 0x5E})
+# Yields that put something in front of the player (a line, a choice, a title
+# card, a minigame / picker / text entry): execution "arrives" there.
+_VM_SHOW = frozenset({0x0d, 0x41, 0x0f, 0x01, 0x04, 0x08, 0x47, 0x4e, 0x5e, 0x60,
+                      0x11, 0x28})
+
+
+def _s16(v):
+    v &= 0xFFFF
+    return v - 0x10000 if v & 0x8000 else v
+
+
+def _vm_first_shown(prog, numbers, max_steps=200000, trace=None, yields=None,
+                    landings=None, default=0, reads=None, call_pc=None,
+                    stop_at=None):
+    """Run a script with the reference VM's semantics (shs_runtime/vm.py) until
+    the first yield that shows something, and return that yield's byte offset
+    (None if it halts or does anything not modelled first). `numbers` maps game
+    variable id -> value for get-number reads (yield 0x2d); writes (0x2c) update
+    it. Every other service completes with result 0 -- as the engine does for
+    bookkeeping services -- which is all a scene prologue needs."""
+    ins = prog.instructions
+    by_pc = {x.pc: k for k, x in enumerate(ins)}
+    cap = 0x400
+    base = 0x7FF5 - cap
+    data = [_s16(w) for w in prog.main_words] + [None] * (prog.gap_count or 0) \
+        + [_s16(w) for w in prog.extra_words]
+    stack = [None] * cap
+    st = {"sp": 0, "fp": 0, "a": None, "b": None, "res": None}
+    numbers = dict(numbers)
+
+    def known(v):
+        if v is None:
+            raise _MiniVMStop()
+        return v
+
+    def sw(i):
+        if not 0 <= i < cap:
+            raise _MiniVMStop()
+        return known(stack[i])
+
+    def rd(addr):
+        addr = _s16(addr)
+        if addr >= base:
+            return sw(addr - base)
+        if not 0 <= addr < len(data):
+            raise _MiniVMStop()
+        return known(data[addr])
+
+    def wr(addr, val):
+        addr = _s16(addr)
+        if base <= addr < base + cap:
+            stack[addr - base] = _s16(val)
+        elif 0 <= addr < len(data):
+            data[addr] = _s16(val)
+        else:
+            raise _MiniVMStop()
+
+    def push(v):
+        if st["sp"] >= cap:
+            raise _MiniVMStop()
+        stack[st["sp"]] = _s16(v)
+        st["sp"] += 1
+
+    def pop():
+        if not st["sp"]:
+            raise _MiniVMStop()
+        st["sp"] -= 1
+        return sw(st["sp"])
+
+    def top():
+        return sw(max(0, st["sp"] - 1))
+
+    pc = ins[0].pc if ins else 0
+    _SENT = -7777
+    if call_pc is not None:
+        # run ONE routine: enter it as a call with a sentinel return address;
+        # its RET back to the sentinel ends the run, returning ("B", value)
+        st["sp"] = 0
+        stack[0] = _SENT
+        st["sp"] = 1
+        pc = call_pc
+    try:
+        for _ in range(max_steps):
+            k = by_pc.get(pc)
+            if k is None:
+                return None
+            y = ins[k]
+            op, arg = y.opcode, y.operand
+            nxt = pc + 1
+            if stop_at is not None and y.byte_offset == stop_at:
+                return ("AT", [stack[st["fp"] + i] if 0 <= st["fp"] + i < cap else None
+                               for i in range(8)])
+            if op in _VM_NOPS:
+                pass
+            elif op == 0x01:
+                st["a"] = _s16(arg)
+            elif op == 0x03:
+                st["a"] = pop()
+            elif op == 0x04:
+                st["b"] = pop()
+            elif op == 0x05:
+                st["a"] = top()
+            elif op in (0x07, 0x08):
+                push(known(st["a"] if op == 7 else st["b"]))
+            elif op in (0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x11, 0x12,
+                        0x50, 0x51, 0x52, 0x53, 0x54):
+                r, l = pop(), pop()
+                if op == 0x0A: v = l == r
+                elif op == 0x0B: v = l != r
+                elif op == 0x0C: v = l > r
+                elif op == 0x0D: v = l >= r
+                elif op == 0x0E: v = l < r
+                elif op == 0x0F: v = l <= r
+                elif op == 0x11: v = bool(l or r)
+                elif op == 0x12: v = bool(l and r)
+                elif op == 0x50: v = l + r
+                elif op == 0x51: v = l - r
+                elif op == 0x52: v = l * r
+                else:
+                    if r == 0:
+                        return None
+                    q = abs(l) // abs(r)
+                    if (l < 0) != (r < 0):
+                        q = -q
+                    v = q if op == 0x53 else l - q * r
+                push(int(v))
+            elif op == 0x13:
+                push(int(not pop()))
+            elif 0x15 <= op <= 0x19:
+                n2 = arg if op == 0x19 else op - 0x14
+                if st["sp"] - n2 < 0:
+                    return None
+                st["sp"] -= n2
+            elif op == 0x1A:
+                push(arg)
+            elif op == 0x1B:
+                for byte in (arg & 0xFF, arg >> 8):
+                    push(byte - 0x100 if byte > 0x7F else byte)
+            elif op == 0x1C:
+                push(top())
+            elif op in (0x1E, 0x1F):
+                argc = (arg & 0xFF) if op == 0x1F else known(st["res"])
+                sel = (arg >> 8) if op == 0x1F else arg
+                if not 0 <= argc <= st["sp"]:
+                    return None
+                args = [sw(i) for i in range(st["sp"] - argc, st["sp"])]
+                if sel in _VM_SHOW and trace is None:
+                    return y.byte_offset
+                if yields is not None:
+                    yields.append(y.byte_offset)
+                res = 0
+                if sel == 0x2D and argc >= 1:
+                    res = numbers.get(args[0], default)
+                    if reads is not None:
+                        reads.append((args[0], len(yields) if yields is not None else 0,
+                                      len(landings) if landings is not None else 0))
+                elif sel == 0x2C and argc >= 2:
+                    numbers[args[0]] = args[1]
+                elif sel == 0x0A and argc >= 1 and trace is not None:
+                    trace.setdefault("schedules", []).append((y.byte_offset, args[0] & 0xFFFF))
+                st["sp"] -= argc                  # the engine's resume drops the args
+                st["res"] = _s16(res)
+            elif op == 0x20:
+                st["res"] = _s16(arg)
+            elif op == 0x21:
+                push(known(st["res"]))
+            elif op == 0x22:
+                old_fp = sw(st["fp"] - 1)
+                st["sp"] = st["fp"] - 1
+                st["fp"] = old_fp
+            elif op == 0x23:
+                push(base + st["fp"] + arg)
+            elif op == 0x24:
+                push(-pop())
+            elif op in (0x25, 0x26):
+                a_ = known(st["a"])
+                wr(a_, rd(a_) + (1 if op == 0x25 else -1))
+            elif op == 0x28:
+                nxt = pc + arg
+            elif op == 0x29:
+                nxt = arg
+                if landings is not None:
+                    _lk = by_pc.get(nxt & 0xFFFF)
+                    if _lk is not None:
+                        landings.append((ins[_lk].byte_offset,
+                                         len(yields) if yields is not None else 0))
+            elif 0x2A <= op <= 0x2E:
+                v = top() if op in (0x2C, 0x2D) else pop()
+                if op == 0x2E:
+                    take = v == known(st["a"])
+                else:
+                    take = (v != 0) if op in (0x2A, 0x2C) else (v == 0)
+                if take:
+                    nxt = pc + arg
+            elif op == 0x32:
+                return None
+            elif op == 0x33:
+                if trace is not None:
+                    trace["halted"] = True
+                    trace["numbers"] = dict(numbers)
+                return None                       # HALT before showing anything
+            elif op == 0x3E:
+                v, addr = pop(), pop()
+                wr(addr, v)
+                push(v)
+            elif op == 0x3F:
+                if not st["sp"]:
+                    return None
+                stack[st["sp"] - 1] = rd(top())
+            elif op == 0x40:
+                push(rd(arg))
+            elif op == 0x41:
+                push(rd(base + st["fp"] + arg))
+            elif op == 0x42:
+                push(pc + 1)
+            elif op == 0x43:
+                _ra = pop()
+                if call_pc is not None and _ra == _SENT:
+                    return ("B", st["b"])
+                nxt = _ra + 1
+            elif op == 0x46:
+                st["sp"] = top()
+            elif op == 0x48:
+                push(st["fp"])
+            elif op == 0x4A:
+                st["fp"] = st["sp"]
+            elif op in (0x5A, 0x5B):
+                push(op - 0x5A)
+            elif op == 0x5C:
+                if known(st["a"]) == (arg & 0xFF):
+                    nxt = pc + (arg >> 8)
+                    if landings is not None:
+                        _lk = by_pc.get(nxt & 0xFFFF)
+                        if _lk is not None:
+                            landings.append((ins[_lk].byte_offset,
+                                             len(yields) if yields is not None else 0))
+            elif 0x5F <= op <= 0x62:
+                push(base + st["fp"] + op - 0x5F)
+            else:
+                return None
+            pc = nxt & 0xFFFF
+    except _MiniVMStop:
+        return None
+    return None
+
+
+def _eval_yield_args(ins, idx, argc):
+    """The argument values a `1f`/`1e` yield at instruction index `idx` receives,
+    evaluated the way the reference VM does (shs-runtime vm.py stack semantics),
+    or None per argument when it is not a compile-time constant.
+
+    Simulates the straight-line setup code between the previous control transfer
+    / yield and this one, tracking a stack of known constants. Every opcode's
+    stack effect follows the reference interpreter; an opcode whose effect is
+    unknown aborts (returns None) rather than guessing. This replaces layout
+    heuristics ("a timed choice is titled 'Hurry!'") with the engine's own rule.
+    """
+    def s16(v):
+        return v - 0x10000 if v >= 0x8000 else v
+
+    def sb(v):
+        return v - 0x100 if v > 0x7F else v
+
+    U = None                                  # unknown value
+    j = idx - 1
+    # a preceding yield is not a barrier: it pops its own arguments and leaves
+    # what was pushed before them (a character id pushed before a format call
+    # is the display call's first argument), so walk back through 1f/1e calls
+    # up to the nearest control transfer
+    while j >= 0 and (ins[j].opcode not in _STACK_BARRIER or ins[j].opcode in (0x1e, 0x1f)):
+        j -= 1
+    st = []
+    for x in ins[j + 1:idx]:
+        op, arg = x.opcode, x.operand
+        if op == 0x1f:
+            n = (arg or 0) & 0xFF
+            del st[len(st) - min(n, len(st)):]
+            continue
+        if op == 0x1e:
+            return None                       # argument count in a register
+        if op == 0x1a:
+            st.append(s16(arg))
+        elif op == 0x1b:
+            st += [sb(arg & 0xFF), sb(arg >> 8)]
+        elif op in (0x5a, 0x5b):
+            st.append(op - 0x5a)
+        elif op in (0x07, 0x08, 0x21, 0x23, 0x40, 0x41, 0x42) or 0x5f <= op <= 0x62:
+            st.append(U)
+        elif op in (0x03, 0x04):
+            if st:
+                st.pop()
+        elif op in (0x05, 0x20, 0x25, 0x26, 0x48, 0x4a) or op in NATIVE_NOP_OPS:
+            pass
+        elif op in (0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x11, 0x12,
+                    0x50, 0x51, 0x52, 0x53, 0x54, 0x3e):
+            r = st.pop() if st else U
+            l = st.pop() if st else U
+            if op == 0x50 and None not in (l, r):
+                st.append(l + r)
+            elif op == 0x51 and None not in (l, r):
+                st.append(l - r)
+            elif op == 0x3e:
+                st.append(r)                  # STORE leaves the value
+            else:
+                st.append(U)
+        elif op in (0x13, 0x24, 0x3f):
+            v = st.pop() if st else U
+            st.append(-v if (op == 0x24 and v is not None) else U)
+        elif op == 0x1c:
+            st.append(st[-1] if st else U)
+        elif 0x15 <= op <= 0x19:
+            n = arg if op == 0x19 else op - 0x14
+            del st[len(st) - min(n, len(st)):]
+        else:
+            return None                       # unknown stack effect: don't guess
+    vals = st[-argc:] if argc else []
+    return [U] * (argc - len(vals)) + vals
+
+
+def _implicit_timeout_offset(data, choice_off, n_opts=None):
+    """Byte offset where a timed choice's TIMEOUT path begins when the bytecode
+    has no explicit `push 1000 ; == ; branch` test, or None.
+
+    Many timed choices route the answer as a chain of index tests --
+    `@fp0 ; LOAD ; push i ; == ; JMPF` for i = 0, 1, ... -- and put the timeout
+    outcome in the final fall-through: when the clock expires the result is the
+    sentinel 1000, which matches no option index, so control falls past the last
+    test into its own body (Spencer's Story: "Uh... I'll skip this for now...",
+    "Gah! Just gotta move on!"). That body is real, player-reachable content; it
+    only counts as a timeout path when it sits BEFORE the shared merge point the
+    option bodies jump to and actually displays something. Uses the authoritative
+    instruction model (logical-PC jump targets)."""
+    try:
+        ins = _kiwi_program(data).instructions
+    except _KiwiFormatError:
+        return None
+    pos = {x.byte_offset: k for k, x in enumerate(ins)}
+    k = pos.get(choice_off)
+    if k is None:
+        return None
+    by_pc = {x.pc: x for x in ins}
+    limit = n_opts if n_opts else 16
+
+    def _test_at(j):
+        """(index, JMPF) if an `@fp0 ; LOAD ; push i ; == ; JMPF` test starts at
+        instruction j, else None."""
+        if j is None or j + 4 >= len(ins):
+            return None
+        a, b, c, d, e = ins[j:j + 5]
+        if (a.opcode == 0x5f and b.opcode == 0x3f and c.opcode in (0x5a, 0x5b, 0x1a)
+                and d.opcode == 0x0a and e.opcode == 0x2b):
+            return (0 if c.opcode == 0x5a else 1 if c.opcode == 0x5b else c.operand), e
+        return None
+
+    # The first test sits just after the choice's store-the-answer prologue.
+    j = next((jj for jj in range(k + 1, min(k + 12, len(ins))) if _test_at(jj)), None)
+    # Follow the chain: each failed test's JMPF lands on the NEXT test. Walking the
+    # jump targets (rather than scanning a fixed window) finds every test no matter
+    # how long an option body is -- one body may inline the rest of the scene.
+    seen, last_jmpf = set(), None
+    while j is not None:
+        t = _test_at(j)
+        if t is None:
+            break
+        val, e = t
+        # each option index is tested once, in ANY order (Spencer's
+        # "Catches the books!" tests `== 1` before `== 0`)
+        if val in seen or not 0 <= val < limit:
+            break
+        seen.add(val)
+        last_jmpf = e
+        if n_opts and len(seen) >= n_opts:
+            break
+        nxt = by_pc.get(e.branch_target())
+        j = pos.get(nxt.byte_offset) if nxt is not None else None
+    if last_jmpf is None or (n_opts and len(seen) < n_opts):
+        return None
+    else_ins = by_pc.get(last_jmpf.branch_target())
+    if else_ins is None:
+        return None
+    ei = pos[else_ins.byte_offset]
+    prev = ins[ei - 1]
+    if prev.opcode != 0x28:                         # last option body must JMP to merge
+        return None
+    merge_pc = prev.branch_target()
+    if merge_pc is None or merge_pc <= else_ins.pc:
+        return None
+    for x in ins[ei:]:
+        if x.pc >= merge_pc:
+            break
+        if x.opcode == 0x1f and x.operand is not None \
+                and (x.operand >> 8) in (0x0d, 0x41, 0x0f):
+            return else_ins.byte_offset             # fall-through shows content
+    return None
+
+
 def _scan_timed_choices(data):
     """Return the timed (quick-time) choices in a scene's bytecode, by offset.
 
@@ -4440,6 +5664,12 @@ def _scan_timed_choices(data):
     bc = max((o + len(t) for o, t in strings if len(t) >= 12), default=0)
     smap = {o: t for o, t in strings}
     fo = _fold_instruction_offsets(data, bc)
+    try:
+        _prog_ins = _kiwi_program(data).instructions
+        _prog_pos = {x.byte_offset: k for k, x in enumerate(_prog_ins)}
+    except _KiwiFormatError:
+        _prog_ins, _prog_pos = None, {}
+    _rcb_by_off = {c["choice"]: c for c in resolve_choice_branches(data)}
     out = {}
     for idx, q in enumerate(fo):
         if not (data[q] == 0x1f and data[q + 1] == PRESENT_CHOICE):
@@ -4450,9 +5680,23 @@ def _scan_timed_choices(data):
             p = fo[j]
             if data[p] == 0x1a:
                 pushed.append((data[p + 1] << 8) | data[p + 2])
-        has_hurry = any(smap.get(v * 2 + STRING_BASE) == "Hurry!" for v in pushed)
-        if not has_hurry:
-            continue
+        # Authoritative rule (reference engine, yield 1): a choice is timed iff
+        # its args[3] (timeout_ms) > 0; args[4] is the timeout result. Evaluate
+        # the actual arguments instead of guessing from the layout.
+        ev = None
+        if _prog_ins is not None and q in _prog_pos:
+            ev = _eval_yield_args(_prog_ins, _prog_pos[q], 8)
+        if ev is not None and ev[3] is not None:
+            if ev[3] <= 0:
+                continue                      # untimed (-1 / 0)
+            timer = ev[3]
+            has_hurry = True
+        else:
+            # fallback to the layout heuristic only when args[3] can't be evaluated
+            has_hurry = any(smap.get(v * 2 + STRING_BASE) == "Hurry!" for v in pushed)
+            if not has_hurry:
+                continue
+            timer = None
         # timer = the number pushed immediately before the trailing constant 1000
         # (uniform layout: ...<options> <prompt> <TIMER_MS> <1000> 1b const1 1f01).
         # The slot POSITION defines the timer, so trust its value even when it also
@@ -4460,17 +5704,25 @@ def _scan_timed_choices(data):
         # e.g. Swim's "We're a team!" carries 4000 there, which is both the 4000 ms
         # countdown and, by chance, a string offset). Only reject it when the slot
         # value is out of the plausible countdown range.
-        timer = None
         for k in range(len(pushed) - 1, 0, -1):
+            if timer is not None:
+                break
             if pushed[k] == 1000:
                 prev = pushed[k - 1]
                 if 1000 < prev <= 20000:
                     timer = prev
                 break
+        # labels straight from the evaluated options argument (args[1]) when
+        # available -- works for single-option choices, which have no '|'
+        _ev_labels = None
+        if ev is not None and ev[1] is not None and ev[1] >= 0:
+            _ot = smap.get(ev[1] * 2 + STRING_BASE)
+            if _ot:
+                _ev_labels = _ot.split("|")
         # the option labels (from the "a|b|c" options string) for matching an
         # offset-less choice node back to this timed choice
-        labels = None
-        for v in pushed:
+        labels = _ev_labels
+        for v in ([] if labels else pushed):
             t = smap.get(v * 2 + STRING_BASE)
             if t and "|" in t:
                 labels = t.split("|")
@@ -4499,6 +5751,17 @@ def _scan_timed_choices(data):
             # stop if we run into the next choice/section marker
             if data[p] == 0x1f and data[p + 1] == PRESENT_CHOICE and p != q:
                 break
+        # Authoritative: the timeout outcome's entry as resolved by following the
+        # answer-test chain with answer = timeout_result (resolve_choice_branches).
+        _rc = _rcb_by_off.get(q)
+        if _rc is not None:
+            _t = _rc.get("timeout") or {}
+            timeout_offset = _t["region"][0] if "region" in _t else None
+        elif timeout_offset is None:
+            # fallback only when the chain couldn't be resolved: the timeout may
+            # be the fall-through past the last option-index test (implicit form)
+            timeout_offset = _implicit_timeout_offset(
+                data, q, len(labels) if labels else None)
         out[q] = {"timer_ms": timer, "labels": labels,
                   "timeout_offset": timeout_offset}
     return out
@@ -4521,8 +5784,8 @@ def _scan_checkpoint_replays(data):
 
     Returns {"sets": [{offset, target, resets:[var,...]}],
              "replays": [{offset, target}]}. Byte-derived; empty for scripts with
-    no 0x63 checkpoints. A REPLAY is distinguished from a SET by the absence of a
-    var2001 reset in the few instructions preceding the 1f63.
+    no 0x63 checkpoints. A REPLAY is distinguished from a SET by the absence of
+    any variable reset in the few instructions preceding the 1f63.
     """
     if data[:4] != b"kiwi":
         return {"sets": [], "replays": []}
@@ -4551,7 +5814,7 @@ def _scan_checkpoint_replays(data):
                     and data[fo[j + 1]] in (0x5a, 0x5b) \
                     and data[fo[j + 2]] == 0x1f and data[fo[j + 2] + 1] == 0x2c:
                 resets.append((data[p + 1] << 8) | data[p + 2])
-        if 2001 in resets:
+        if resets:
             sets.append({"offset": q, "target": target, "resets": resets})
         else:
             replays.append({"offset": q, "target": target})
@@ -4602,182 +5865,6 @@ def _scan_checkpoint_replays(data):
             "fail_sections": fail_sections}
 
 
-def _scan_ad_flag_writes(data):
-    """Return the per-ad done-flag writes (var2005/2006/2007) in bytecode order.
-
-    Each Help Ad marks itself done, on entry, by setting a per-ad-pair flag var
-    (2005, 2006, or 2007) to a distinguishing value (two ads share each var, one
-    using value 1 and the other value 2). The write is a small increment/const
-    store: `push VAR ; 1f2d (read) ; ... ; push V ; (0x50 ADD | const) ; 1f2c
-    (write)`. This surfaces them, in order, so segmentation can pair each with the
-    ad whose listing immediately follows it and emit a `done_when` guard. All
-    byte-derived; returns [] for scripts with no such flags.
-    """
-    if data[:4] != b"kiwi":
-        return []
-    strings = find_strings(data)
-    bc = max((o + len(t) for o, t in strings if len(t) >= 12), default=0)
-    fo = _fold_instruction_offsets(data, bc)
-    out = []
-    for idx, q in enumerate(fo):
-        if data[q] != 0x1a:
-            continue
-        var = (data[q + 1] << 8) | data[q + 2]
-        if var not in (2005, 2006, 2007):
-            continue
-        if idx + 1 >= len(fo) or data[fo[idx + 1]] != 0x1f \
-                or data[fo[idx + 1] + 1] != 0x2d:
-            continue                         # must be a read of the flag var
-        # the added/stored value and confirmation of a following write
-        val, saw_write = None, False
-        for j in range(idx + 2, min(idx + 9, len(fo))):
-            qq = fo[j]
-            if data[qq] == 0x1a and val is None:
-                val = (data[qq + 1] << 8) | data[qq + 2]
-            elif data[qq] == 0x5b and val is None:
-                val = 1
-            elif data[qq] == 0x5a and val is None:
-                val = 0
-            elif data[qq] == 0x1f and data[qq + 1] == 0x2c:
-                saw_write = True
-                break
-        if saw_write and val is not None and val < 100:
-            out.append({"offset": q, "var": str(var), "value": int(val)})
-    return out
-
-
-def resolve_random_selector(data):
-    """Detect a RANDOM section selector and return its option set.
-
-    Some scenes route to one of several sections by a runtime *random draw*
-    rather than a deterministic dispatch -- e.g. Making Some Dough's Help Ads,
-    which on each visit shows a randomly-chosen not-yet-completed helpee ad, and
-    falls through to a "no more ads" section once every ad is done. This can't be
-    represented as a single static `next` (there is no one correct target), so it
-    is emitted as a `random` node: the engine performs the draw at runtime.
-
-    Byte shape (verified in scene 3): a run of near-identical blocks, each
-
-        push STATE ; 1f2d (read) ; 0x21 <t> ; push K ; 0x0a ; 0x11   <- guard on
-                                                                        STATE (which
-                                                                        ads remain)
-        0x2b op=SKIP                                     <- guard fails -> next block
-        ... push m ; 0x1f 0x1b (RANDOM roll) ...        <- 1f1b = random draw
-        0x0a ; 0x2b op=SKIP2                             <- roll picks an arm
-            0x42 SEP -> option A body
-            0x28 ; 0x28
-            0x42 SEP -> option B body
-        (fall through to the next block)
-
-    After the last block, control falls through to the EXHAUSTED section (the
-    "no more ads" body). Everything the node carries is byte-derived: the state
-    var (the read var id), each option's target (the SEP fold-jump), and the
-    exhausted fall-through (the terminal 28/2b landing past the last block).
-
-    Returns a list of selectors:
-        [{"at": first_block_off, "state_var": v,
-          "options": [{"section_offset": off}, ...],
-          "exhausted_offset": off_or_None}]
-    or [] when no random selector is present.
-    """
-    if data[:4] != b"kiwi":
-        return []
-    strings = find_strings(data)
-    bc = max((o + len(t) for o, t in strings if len(t) >= 12), default=0)
-    n = len(data)
-    fo = _fold_instruction_offsets(data, bc)
-    fi = {o: i for i, o in enumerate(fo)}
-
-    def jtgt(joff, op):
-        i = fi.get(joff)
-        if i is None or i + op >= len(fo) or i + op < 0:
-            return None
-        return fo[i + op]
-
-    # Locate every RANDOM roll (1f 1b) that is followed, within a few folded
-    # instructions, by at least one SEP -- that pairing is the selector's
-    # per-block "roll then jump to a random arm" core.
-    roll_blocks = []
-    for idx, q in enumerate(fo):
-        if not (data[q] == 0x1f and data[q + 1] == 0x1b):
-            continue
-        seps = []
-        state_var = None
-        # SEP targets shortly after the roll (each block offers 2 random arms,
-        # the second sitting ~12 folded instructions out past a 28/28 skip pair).
-        for j in range(idx + 1, min(idx + 16, len(fo))):
-            qq = fo[j]
-            if data[qq] == 0x42:
-                t = jtgt(qq, (data[qq + 2] << 8) | data[qq + 3])
-                if t is not None:
-                    seps.append(t)
-            elif data[qq] == 0x1f and data[qq + 1] == 0x1b:
-                break                          # next roll block starts
-        # the STATE var guarding this block: the nearest preceding `push V;1f2d`
-        for j in range(idx - 1, max(0, idx - 12), -1):
-            qq = fo[j]
-            if data[qq] == 0x1f and data[qq + 1] == VAR_READ and j >= 1 \
-                    and data[fo[j - 1]] in (0x1a, 0x41):
-                pv = fo[j - 1]
-                state_var = (data[pv + 1] << 8) | data[pv + 2]
-                break
-        if seps:
-            roll_blocks.append({"roll_at": q, "state_var": state_var,
-                                "seps": seps})
-    if not roll_blocks:
-        return []
-
-    # A single selector is a contiguous run of roll blocks sharing one state var.
-    # Group by state var and adjacency (each block's roll is within a small
-    # instruction span of the previous).
-    roll_blocks.sort(key=lambda b: b["roll_at"])
-    selectors = []
-    cur = None
-    for b in roll_blocks:
-        if cur and b["state_var"] == cur["state_var"] \
-                and fi[b["roll_at"]] - fi[cur["_last_roll"]] <= 40:
-            cur["options"].extend(b["seps"])
-            cur["_last_roll"] = b["roll_at"]
-        else:
-            if cur:
-                selectors.append(cur)
-            cur = {"at": b["roll_at"], "state_var": b["state_var"],
-                   "options": list(b["seps"]), "_last_roll": b["roll_at"]}
-    if cur:
-        selectors.append(cur)
-
-    out = []
-    for sel in selectors:
-        opts = []
-        seen = set()
-        for off in sel["options"]:
-            if off in seen:
-                continue
-            seen.add(off)
-            opts.append({"section_offset": off})
-        if len(opts) < 2:
-            continue                           # a real random draw needs 2+ arms
-        # Exhausted fall-through: when the LAST block's availability guard fails
-        # (no un-done ad remains for that arm), control skips past the roll to
-        # the "no more ads" body. That landing is the target of the guard `2b`
-        # immediately preceding the last roll -- a backward-independent, byte-
-        # derived pointer (e.g. scene 3's @12671 2b -> @12717, the s3_alt head).
-        last_roll = sel["_last_roll"]
-        li = fi[last_roll]
-        exhausted = None
-        for j in range(li - 1, max(0, li - 10), -1):
-            qq = fo[j]
-            if data[qq] == 0x2b:
-                exhausted = jtgt(qq, (data[qq + 1] << 8) | data[qq + 2])
-                break
-        # Max draws are determined at node-build time from the number of guarded
-        # options (see build_story_segments): every option plays once, so the pool
-        # empties after len(options) draws. The counter-var equality test in the
-        # bytecode counts from a staged sub-structure and reads short of the true
-        # total, so it is NOT used as the cap.
-        out.append({"at": sel["at"], "state_var": sel["state_var"],
-                    "options": opts, "exhausted_offset": exhausted})
-    return out
 
 
 def resolve_dynamic_status_vars(data):
@@ -4838,100 +5925,543 @@ def resolve_dynamic_status_vars(data):
     return out
 
 
-def resolve_quiz_random(data):
-    """Detect the academic-quiz question rolls and return their question pools.
 
-    Unlike the Help Ads' random selector (which guards on a "which items remain"
-    state var so it never repeats an item), the quiz's per-section roll is a
-    plain 1-of-N draw with no availability tracking: each section (History,
-    Science, English) rolls once and shows one of a small pool of questions. The
-    byte shape (verified in Making Some Dough scene 2):
+def resolve_choice_branches(data):
+    """Resolve each choice's outcome regions from the ENGINE's semantics.
 
-        push N ; 1f 1b (RANDOM roll of N)
-        push 0 ; 0x0a ; 0x2b -> skip      <- roll == 0 ? fall through to question 0
-        <question 0 body ...>
-        push 1 ; 0x0a ; 0x2b -> skip      <- roll == 1 ? fall through to question 1
-        <question 1 body ...>
-        ...                               <- the last skip lands on the roll == N-1
-                                             question (the final fall-through arm)
+    A choice (yield 1) returns the picked option index, or `timeout_result`
+    (args[4], normally the sentinel 1000) when a timed choice's clock expires.
+    The script then runs a chain of test blocks on that answer:
+        [<5f|60|61> 3f] <const> <0a ==|0b !=> ; 0x2b JMPF <target>
+    JMPF jumps when the comparison is false. For EVERY possible answer -- each
+    option index and, for a timed choice, the timeout result -- this follows the
+    chain on the authoritative instruction stream (logical-PC jump targets) to the
+    instruction where control actually lands. That is the outcome's entry; its
+    region runs to the next outcome entry / test block, a trailing forward 0x28
+    being the exit to the common merge.
 
-    Each roll-compare is distinguished from a question's own answer-check by
-    sitting directly on the roll chain before any 0x01 CHOICE. Returns a list of
-        [{"at": roll_off, "options": [question_body_off, ...]}]
-    one per section, or [] when the scene has no such rolls.
+    Replaces a layout-matching walker (built on the pre-rewrite instruction model)
+    whose "impossible answer / phantom else" guards were really timeout outcomes
+    -- e.g. The Breakup's "Owen! / The bouncer!" QTE, whose timeout beat ("At no
+    one! ... Paige?! Are you okay?!") was merged into Owen's branch.
+
+    Returns [{"choice": off, "options": [{"index": i, "region": [lo, hi]}],
+              "merge": off, "timeout": {"region": [lo, hi]} | absent}].
     """
     if data[:4] != b"kiwi":
         return []
-    strings = find_strings(data)
-    bc = max((o + len(t) for o, t in strings if len(t) >= 12), default=0)
-    fo = _fold_instruction_offsets(data, bc)
-    fi = {o: i for i, o in enumerate(fo)}
+    try:
+        ins = _kiwi_program(data).instructions
+    except _KiwiFormatError:
+        return _resolve_choice_branches_legacy(data)
+    smap = {o: t for o, t in find_strings(data)}
+    by_pc = {x.pc: k for k, x in enumerate(ins)}
+    TEST_PRE = (0x5f, 0x60, 0x61)
 
-    def jtgt(joff):
-        i = fi.get(joff)
-        if i is None:
+    def test_at(j):
+        if j is None or j + 2 >= len(ins):
             return None
-        v = (data[joff + 1] << 8) | data[joff + 2]
-        ti = i + v
-        return fo[ti] if 0 <= ti < len(fo) else None
+        if ins[j].opcode in TEST_PRE and ins[j + 1].opcode == 0x3f:
+            k = j + 2                        # @fpN ; LOAD ; <const>
+            slot = ins[j].opcode - 0x5f
+        elif ins[j].opcode == 0x41:
+            k = j + 1                        # frame-slot load ; <const>
+            slot = ins[j].operand
+        else:
+            k = j
+            slot = None
+        # an answer test must read THIS choice's answer slot (Breakup's extra-
+        # credit prompt keeps its answer in slot 4; its quiz tests other slots)
+        if slot is not None and ans_slot[0] is not None and slot != ans_slot[0]:
+            return None
+        if k + 2 >= len(ins):
+            return None
+        c = ins[k]
+        if c.opcode == 0x5a:
+            const = 0
+        elif c.opcode == 0x5b:
+            const = 1
+        elif c.opcode == 0x1a:
+            const = c.operand - 0x10000 if c.operand >= 0x8000 else c.operand
+        else:
+            return None
+        if ins[k + 1].opcode not in (0x0a, 0x0b) or ins[k + 2].opcode != 0x2b:
+            return None
+        tgt = ins[k + 2].branch_target()
+        if tgt not in by_pc:
+            return None
+        return const, ins[k + 1].opcode == 0x0b, by_pc[tgt], k + 3
+
+    def route(j, v):
+        """Evaluate the condition starting at instruction j with the choice's
+        answer = v, using the reference VM's semantics (comparisons 0x0a-0x0f,
+        OR/AND 0x11/0x12, NOT 0x13, branches 0x2a/0x2b pop, 0x2c/0x2d keep the
+        top). Handles compound tests like Magic School's
+        `answer != 1 && answer != 2`. Returns the instruction index control
+        reaches once the condition is decided, or None when the code at j is not
+        a test on the answer (it reads anything else, yields, stores...)."""
+        if ans_slot[0] is None:
+            return None
+        st, k, used, steps = [], j, False, 0
+        while 0 <= k < len(ins) and steps < 48:
+            y = ins[k]
+            op = y.opcode
+            steps += 1
+            if 0x5f <= op <= 0x62:
+                st.append(("addr", op - 0x5f))
+            elif op == 0x3f:
+                if not st or not isinstance(st[-1], tuple) or st[-1][1] != ans_slot[0]:
+                    return None
+                st.pop()
+                st.append(v)
+                used = True
+            elif op == 0x41:
+                if y.operand != ans_slot[0]:
+                    return None
+                st.append(v)
+                used = True
+            elif op in (0x5a, 0x5b):
+                st.append(op - 0x5a)
+            elif op == 0x1a:
+                st.append(y.operand - 0x10000 if y.operand >= 0x8000 else y.operand)
+            elif op in (0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x11, 0x12):
+                if len(st) < 2 or any(isinstance(z, tuple) for z in st[-2:]):
+                    return None
+                r, l = st.pop(), st.pop()
+                st.append(int({0x0a: l == r, 0x0b: l != r, 0x0c: l > r,
+                               0x0d: l >= r, 0x0e: l < r, 0x0f: l <= r,
+                               0x11: bool(l or r), 0x12: bool(l and r)}[op]))
+            elif op == 0x13:
+                if not st or isinstance(st[-1], tuple):
+                    return None
+                st.append(int(not st.pop()))
+            elif op in (0x2a, 0x2b, 0x2c, 0x2d):
+                if not st or isinstance(st[-1], tuple) or not used:
+                    return None
+                val = st[-1] if op in (0x2c, 0x2d) else st.pop()
+                take = (val != 0) if op in (0x2a, 0x2c) else (val == 0)
+                t = y.branch_target()
+                if t not in by_pc:
+                    return None
+                nk = by_pc[t] if take else k + 1
+                if op in (0x2a, 0x2b) and not st:
+                    return nk                     # condition decided
+                k = nk
+                continue
+            elif 0x15 <= op <= 0x18:
+                n2 = op - 0x14
+                if len(st) < n2:
+                    return None
+                del st[-n2:]
+            else:
+                return None
+            k += 1
+        return None
 
     out = []
-    for idx, q in enumerate(fo):
-        if not (data[q] == 0x1f and data[q + 1] == 0x1b):
+    ans_slot = [None]
+    for i, x in enumerate(ins):
+        if not (x.opcode == 0x1f and x.operand is not None
+                and (x.operand >> 8) in (0x01, 0x04)):
             continue
-        options, last_skip = [], None
-        j, steps = idx + 1, 0
-        while j < len(fo) and steps < 160:
-            qq = fo[j]
-            # a roll-compare arm: <const> ; 0x0a ; 0x2b
-            if (data[qq] in (0x5a, 0x5b) or data[qq] == 0x1a) \
-                    and j + 2 < len(fo) and data[fo[j + 1]] == 0x0a \
-                    and data[fo[j + 2]] == 0x2b:
-                skip = jtgt(fo[j + 2])
-                fall = fo[j + 3] if j + 3 < len(fo) else None
-                if fall is not None:
-                    options.append(fall)
-                last_skip = skip
-                if skip is not None and fi.get(skip, j) > j:
-                    j = fi[skip]
-                    steps += 1
-                    continue
-            # a CHOICE without a preceding roll-compare -> we've left the roll chain
-            if data[qq] == 0x1f and data[qq + 1] == 0x01:
-                break
-            if data[qq] == 0x1f and data[qq + 1] == 0x1b:
-                break                              # next section's roll
-            j += 1
-            steps += 1
-        # the final skip lands on the last question (roll == N-1)
-        if last_skip is not None and last_skip not in options:
-            options.append(last_skip)
-        # A genuine quiz question roll is a SMALL pool (a handful of questions),
-        # and each arm leads to a player CHOICE (the answer options). Reject rolls
-        # that don't match: large fan-outs and choice-less arms are other 1f1b
-        # uses (e.g. The Tutors' 25-way visual/shuffle roll), not question draws.
-        if not (2 <= len(options) <= 6):
-            continue
-
-        def _arm_has_choice(start):
-            # a 0x01 CHOICE appears within a short span of the arm head, before the
-            # next arm's roll-compare
-            for k in range(fi.get(start, 0),
-                           min(fi.get(start, 0) + 60, len(fo))):
-                oq = fo[k]
-                if data[oq] == 0x1f and data[oq + 1] == 0x01:
-                    return True
-                if data[oq] == 0x1f and data[oq + 1] == 0x1b:
+        n_opts, vals, timed, tres = None, None, False, None
+        if (x.operand >> 8) == 0x01:
+            ev = _eval_yield_args(ins, i, x.operand & 0xFF)
+            if ev and len(ev) > 1 and ev[1] is not None and ev[1] >= 0:
+                ot = smap.get(ev[1] * 2 + STRING_BASE)
+                if ot:
+                    n_opts = len(ot.split("|"))
+            timed = bool(ev and len(ev) > 4 and ev[3] is not None and ev[3] > 0)
+            tres = ev[4] if timed else None
+            vals = list(range(n_opts)) if n_opts else None
+        else:
+            # BUILDER menu (reference engine yields 2/3/4): 0x02 begins it
+            # (timeout_ms = args[2], timeout_result = args[3]), each 0x03 adds an
+            # option whose RESULT VALUE is args[1] (-999 = its index), 0x04 shows
+            # it and returns the chosen option's value (Europe: "You're big and
+            # heavy..."). Rebuild the option values back to the 0x02.
+            opts3, b2 = [], None
+            for jj in range(i - 1, max(-1, i - 400), -1):
+                y = ins[jj]
+                if y.opcode == 0x1f and y.operand is not None:
+                    s_ = y.operand >> 8
+                    if s_ == 0x03:
+                        opts3.append(jj)
+                    elif s_ == 0x02:
+                        b2 = jj
+                        break
+                    elif s_ in (0x01, 0x04):
+                        break
+            if b2 is None or not opts3:
+                continue
+            vals = []
+            for kk, jj in enumerate(reversed(opts3)):
+                e3 = _eval_yield_args(ins, jj, ins[jj].operand & 0xFF)
+                if not e3 or len(e3) < 2 or e3[1] is None:
+                    vals = None
                     break
-            return False
-
-        if not all(_arm_has_choice(o) for o in options):
+                vals.append(kk if e3[1] == -999 else e3[1])
+            if not vals:
+                continue
+            n_opts = len(vals)
+            e2 = _eval_yield_args(ins, b2, ins[b2].operand & 0xFF)
+            timed = bool(e2 and len(e2) > 3 and e2[2] is not None and e2[2] > 0)
+            tres = e2[3] if timed else None
+        # The answer is stored to a frame slot right after the choice
+        # (`push_res ; STORE ; drop`); find the slot whose first test evaluates.
+        ans_slot[0] = None
+        start = None
+        # candidate positions after the choice, following unconditional jumps:
+        # a choice may store its answer and JMP to a dispatch it shares with
+        # another choice (Magic School: "Scream for help!/Take a step back!"
+        # jumps over the retry prompt "Scream for help!/Let go and fall!")
+        _cand, _j, _jumped = [], i + 1, False
+        while _j < len(ins) and len(_cand) < 12:
+            if ins[_j].opcode == 0x28:
+                _t = ins[_j].branch_target()
+                if _t not in by_pc or by_pc[_t] in _cand:
+                    break
+                _j, _jumped = by_pc[_t], True
+                continue
+            _cand.append(_j)
+            _j += 1
+        for j in _cand:
+            y = ins[j]
+            cands = []
+            if 0x5f <= y.opcode <= 0x62 and j + 1 < len(ins) and ins[j + 1].opcode == 0x3f:
+                cands = [y.opcode - 0x5f]
+            elif y.opcode == 0x41:
+                cands = [y.operand]
+            for s_ in cands:
+                ans_slot[0] = s_
+                if route(j, 0) is not None:
+                    start = j
+                    break
+                ans_slot[0] = None
+            if start is not None:
+                break
+        if start is None or not n_opts:
             continue
-        out.append({"at": q, "options": options})
+        _start_jumped = _jumped and start not in range(i + 1, i + 13)
+        tests = set()
+
+        def entry(v):
+            j, seen = start, set()
+            while j is not None and j not in seen:
+                seen.add(j)
+                nj = route(j, v)
+                if nj is None:
+                    return j
+                tests.add(j)
+                j = nj
+            return j
+
+        ents = {k: entry(vals[k]) for k in range(n_opts)}
+        tent = entry(tres) if tres is not None else None
+        stops = set(ents.values()) | tests | ({tent} if tent is not None else set())
+
+        exits = []
+
+        def region(e):
+            # a body that is just an exit jump (or a return) is empty
+            if ins[e].opcode == 0x28:
+                t = ins[e].branch_target()
+                if t in by_pc and by_pc[t] > e:
+                    exits.append(by_pc[t])
+                return e, e
+            if ins[e].opcode in (0x43, 0x33) or (ins[e].opcode == 0x22 and e + 1 < len(ins)
+                                                  and ins[e + 1].opcode == 0x43):
+                return e, e
+            j = e + 1
+            # ... and a body ends where it RETURNS (the choice sits in a subroutine:
+            # what follows the RET is other code, e.g. Breakup's quiz routine)
+            while j < len(ins) and j not in stops and j - e < 4000 \
+                    and ins[j].opcode not in (0x43, 0x33):
+                j += 1
+            if j < len(ins) and ins[j].opcode in (0x43, 0x33) and ins[j - 1].opcode == 0x22:
+                j -= 1
+            hi_i = j
+            last = ins[hi_i - 1] if hi_i - 1 >= e else None
+            if last is not None and last.opcode == 0x28 and hi_i - 1 > e:
+                t = last.branch_target()
+                if t in by_pc and by_pc[t] > hi_i - 1:
+                    exits.append(by_pc[t])
+                    exit_of[e] = by_pc[t]
+                    hi_i -= 1
+            return e, hi_i
+
+        exit_of = {}
+
+        regs = {v: region(e) for v, e in ents.items()}
+        treg = region(tent) if tent is not None else None
+        merge_i = max(exits) if exits else None
+        # an outcome whose region runs to the end of the chain extends to the merge
+        # (the last body usually falls straight into the merge)
+        def bound(lo_i, hi_i):
+            if merge_i is not None and hi_i >= len(ins) - 1 and lo_i < merge_i:
+                hi_i = merge_i
+            if merge_i is not None and hi_i > merge_i >= lo_i:
+                hi_i = merge_i
+            return lo_i, hi_i
+
+        def off(k):
+            return ins[k].byte_offset if k < len(ins) else len(data)
+
+        answers = list(vals) + ([tres] if tres is not None else [])
+
+        def spans_for(v, lo_i, hi_i):
+            """Trace answer `v` through ANSWER tests nested inside its region (e.g.
+            Breakup's tray QTE: shared bookkeeping, then `answer == 1000 ?` ->
+            freeze vs leap, then a shared tail). Each test is evaluated with the
+            VM's semantics (route); the other answers' destinations are the other
+            arms: reaching one, control either takes the preceding exit JMP to the
+            join or falls into it. Returns [(lo_i, hi_i), ...] pieces in execution
+            order; var-gates stay intact inside pieces."""
+            pieces, cur, guard = [], lo_i, 0
+            end = hi_i
+            barriers = set()
+            while cur is not None and cur < end and guard < 64:
+                guard += 1
+                j = cur
+                jumped = False
+                nk = None
+                while j < end:
+                    # a NESTED choice overwrites the answer slot with its own
+                    # result (Pumpkin: "Left!/Right!" inside "Run!"): tests after
+                    # it are that choice's, not ours -- the rest is one piece
+                    if ins[j].opcode == 0x1f and ins[j].operand is not None \
+                            and (ins[j].operand >> 8) == 0x01:
+                        pieces.append((cur, end))
+                        return [(a2, b2) for a2, b2 in pieces if b2 > a2]
+                    if j in barriers and j > cur:
+                        prev = ins[j - 1]
+                        if prev.opcode == 0x28 and j - 1 >= cur:
+                            tj = prev.branch_target()
+                            if tj in by_pc and by_pc[tj] > j - 1:
+                                pieces.append((cur, j - 1))
+                                cur = by_pc[tj]
+                                jumped = True
+                                break
+                        barriers.discard(j)     # falls into it: keeps running
+                    nk = route(j, v)
+                    if nk is not None:
+                        break
+                    j += 1
+                if jumped:
+                    continue
+                if nk is None:
+                    pieces.append((cur, end))
+                    break
+                if j > cur:
+                    pieces.append((cur, j))
+                others = {route(j, w) for w in answers if w != v}
+                others.discard(None)
+                others.discard(nk)
+                barriers |= {o for o in others if o > nk}
+                cur = nk
+            return [(a2, b2) for a2, b2 in pieces if b2 > a2]
+
+        # Shared post-choice code: anything the script runs AFTER the choice
+        # returns but BEFORE the first answer test executes for every answer
+        # (Fashionista: "I hope you're right, new girl." plays whichever clique is
+        # picked). When it does something (a yield), it is the first piece of
+        # every outcome's path.
+        prefix = None
+        if not _start_jumped and any(ins[j].opcode == 0x1f for j in range(i + 1, start)):
+            prefix = (i + 1, start)
+
+        def with_prefix(sp):
+            return ([prefix] + list(sp)) if prefix else list(sp)
+
+        def calls_in(sp):
+            # subroutine calls this outcome makes (0x42 PUSH_RET ; 0x29 JMPABS),
+            # by the 0x42's byte offset -- an option whose whole body is a call
+            # (Magic School's "Apex...": call the shared "stumble" routine) has
+            # no lines of its own, so the call must be placed by the resolver
+            out_c = []
+            for a, b in sp:
+                for q in range(a, min(b, len(ins) - 1)):
+                    if ins[q].opcode == 0x42 and ins[q + 1].opcode == 0x29:
+                        out_c.append(ins[q].byte_offset)
+            return out_c
+
+        # A merge that immediately TESTS THE ANSWER AGAIN has not really merged
+        # (From Europe With Love: the menu's arms rejoin, then `answer == 1 ?`
+        # picks success "Well, that's all I got..." vs "I... I do not
+        # understand..."). Extend every outcome through such tests up to where
+        # the arms truly rejoin, and move the merge there.
+        post_ext = []                              # [(lo_i, hi_i)] stages
+        _mi = merge_i
+        for _stage in range(3):
+            if _mi is None or _mi >= len(ins) or all(route(_mi, w) is None for w in answers):
+                break
+            jf = next((q for q in range(_mi, min(_mi + 16, len(ins)))
+                       if ins[q].opcode in (0x2a, 0x2b)), None)
+            if jf is None or ins[jf].branch_target() not in by_pc:
+                break
+            tgt = by_pc[ins[jf].branch_target()]
+            if tgt <= jf:
+                break
+            last = ins[tgt - 1]
+            J = tgt
+            if last.opcode == 0x28 and last.branch_target() in by_pc \
+                    and by_pc[last.branch_target()] >= tgt:
+                J = by_pc[last.branch_target()]
+            if J <= _mi:
+                break
+            post_ext.append((_mi, J))
+            _mi = J
+        if post_ext:
+            merge_i = _mi
+
+        def with_post(v_val, sp):
+            sp = list(sp)
+            for a_, b_ in post_ext:
+                sp += spans_for(v_val, a_, b_)
+            return sp
+
+        def join_tail(e, sp):
+            """An outcome whose exit jump lands INSIDE another outcome's region
+            (not at the merge) continues through that region's tail: Spencer's
+            "Catches the books!" shows one line, then JMPs into the shared
+            "Leaving Spencer to fall flat..." tail the timeout also falls into."""
+            sp = list(sp)
+            others = [bound(*r) for r in list(regs.values()) + ([treg] if treg else [])]
+            t, guard = exit_of.get(e), 0
+            while t is not None and guard < 4 and (merge_i is None or t < merge_i):
+                guard += 1
+                host = next(((lo2, hi2) for lo2, hi2 in others if lo2 < t < hi2), None)
+                if host is None:
+                    break
+                sp.append((t, host[1]))
+                t = exit_of.get(host[0])
+            return sp
+
+        options = []
+        for v in range(n_opts):
+            lo_i, hi_i = bound(*regs[v])
+            rec_o = {"index": v, "region": [off(lo_i), off(hi_i)]}
+            sp = with_post(vals[v], join_tail(ents[v], with_prefix(spans_for(vals[v], lo_i, hi_i))))
+            if post_ext and not sp:
+                sp = [(lo_i, lo_i)]
+            if sp and sp != [(lo_i, hi_i)]:
+                rec_o["spans"] = [[off(a), off(b)] for a, b in sp]
+            _c = calls_in(sp or [(lo_i, hi_i)])
+            if _c:
+                rec_o["calls"] = _c
+            options.append(rec_o)
+        # the outcomes meet at an unconditional jump: control continues at its
+        # target (The Fashionista's lunch pick jumps on to "After school...";
+        # what follows the jump in bytecode is another choice's outcome)
+        # an option's region ends at its own exit jump to the merge: code after
+        # that jump (still before the merge) is another outcome's -- Spencer's
+        # "Spencer freezes, wordless..." (an impossible third answer) followed
+        # option 1's exit and was swallowed into it
+        if merge_i is not None:
+            _mo = off(merge_i)
+            _bo2 = {xx.byte_offset: kk for kk, xx in enumerate(ins)}
+            for _o in options:
+                if _o.get("spans") or not _o.get("region"):
+                    continue
+                _lo, _hi = _o["region"]
+                _ka, _kb = _bo2.get(_lo), _bo2.get(_hi)
+                if _ka is None or _kb is None:
+                    continue
+                for _kk in range(_ka, _kb - 1):
+                    _yy = ins[_kk]
+                    if _yy.opcode in (0x2a, 0x2b, 0x2c, 0x2d, 0x2e):
+                        _t3 = by_pc.get(_yy.branch_target())
+                        if _t3 is not None and _t3 > _kk:
+                            break          # nested structure: leave it
+                    if _yy.opcode == 0x28 and by_pc.get(_yy.branch_target()) == merge_i:
+                        _o["region"] = [_lo, ins[_kk + 1].byte_offset]
+                        break
+        rec = {"choice": x.byte_offset, "options": options,
+               "merge": off(merge_i) if merge_i is not None else None}
+        _mg_i, _hops = merge_i, 0
+        while _mg_i is not None and _mg_i < len(ins) and ins[_mg_i].opcode == 0x28 \
+                and _hops < 4:
+            _mt = by_pc.get(ins[_mg_i].branch_target())
+            if _mt is None or _mt <= _mg_i:
+                break
+            _mg_i = _mt
+            _hops += 1
+        if _hops and _mg_i is not None and ins[_mg_i].opcode != 0x22:
+            rec["merge_goto"] = off(_mg_i)
+        if tres is not None:
+            if treg is not None and tent not in ents.values():
+                lo_i, hi_i = bound(*treg)
+            else:
+                # the timeout shares an option's entry; it may still diverge at an
+                # in-body answer test (then it gets its own spans)
+                share = next((v for v, e in ents.items() if e == tent), None)
+                lo_i, hi_i = bound(*regs[share]) if share is not None else (0, 0)
+            sp = spans_for(tres, lo_i, hi_i) if hi_i > lo_i else []
+            shared_v = next((v for v, e in ents.items() if e == tent), None)
+            same = (shared_v is not None and
+                    [list(p) for p in sp] == [list(p) for p in spans_for(vals[shared_v], lo_i, hi_i)])
+            if post_ext:
+                sp = with_post(tres, sp)
+                same = (shared_v is not None and
+                        [list(p) for p in sp] == [list(p) for p in
+                         with_post(vals[shared_v], spans_for(vals[shared_v], lo_i, hi_i))])
+            if sp and not same:
+                sp = with_prefix(sp)
+                rec["timeout"] = {"region": [off(sp[0][0]), off(sp[-1][1])],
+                                  "spans": [[off(a), off(b)] for a, b in sp]}
+                _c = calls_in(sp)
+                if _c:
+                    rec["timeout"]["calls"] = _c
+                # where the timeout block ends: straight into an option's entry,
+                # or into another answer test that routes it to one (Magic
+                # School: freeze, then the `answer == 1` test sends 1000 on to
+                # "Jump right!"'s body) -- the timeout then continues there
+                _end = by_pc.get(ins[sp[-1][1]].pc) if sp[-1][1] < len(ins) else None
+                _seen = set()
+                while _end is not None and _end in tests and _end not in _seen:
+                    _seen.add(_end)
+                    _end = route(_end, tres)
+                _into = next((w for w, e in ents.items() if e == _end), None)
+                if _into is not None:
+                    rec["timeout"]["into"] = _into
+            elif shared_v is not None:
+                # the timeout runs EXACTLY an option's path (it fails the same
+                # tests, e.g. Breakup's "Breakdown!" QTE) -- say so explicitly
+                rec["timeout"] = {"as_option": shared_v}
+        rec["_start"] = start
+        rec["_jumped"] = _start_jumped
+        # the outcomes meet at a RETURN: nothing after the dispatch is shared
+        # continuation (New Girl's class menu: each class is a called routine,
+        # then the menu routine returns; the next routine's body follows)
+        if merge_i is not None and merge_i < len(ins) and ins[merge_i].opcode == 0x22:
+            rec["merge_return"] = True
+        elif merge_i is not None:
+            # the routine's own end after the merge (22 43 opening the next
+            # routine): the shared continuation stops there
+            for _q in range(merge_i, min(len(ins) - 3, merge_i + 400)):
+                if ins[_q].opcode in (0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x5c):
+                    break
+                if ins[_q].opcode == 0x22 and ins[_q + 1].opcode == 0x43 \
+                        and ins[_q + 2].opcode == 0x48:
+                    rec["routine_end"] = ins[_q].byte_offset
+                    break
+        out.append(rec)
+    # choices sharing one dispatch: the one that JUMPS to it is an alias of the
+    # one the dispatch directly follows (their outcomes are identical)
+    by_start = {}
+    for r in out:
+        if not r["_jumped"]:
+            by_start.setdefault(r["_start"], r["choice"])
+    for r in out:
+        if r["_jumped"] and r["_start"] in by_start:
+            r["alias_of"] = by_start[r["_start"]]
+    for r in out:
+        r.pop("_start", None)
+        r.pop("_jumped", None)
     return out
 
 
-def resolve_choice_branches(data):
+def _resolve_choice_branches_legacy(data):
     """Resolve a script's choice DISPATCH structure from the bytecode.
 
     The jump encoding (verified against known branch boundaries in several
@@ -5505,7 +7035,11 @@ def resolve_unconditional_jumps(data):
         if data[q] == 0x28:
             v = (data[q + 1] << 8) | data[q + 2]
             ti = index[q] + v
-            if 0 <= ti < len(ins):
+            # a jump that lands on a RETURN (22 43) leaves the routine; it
+            # merges with nothing that follows in bytecode
+            if 0 <= ti < len(ins) and not (data[ins[ti]] == 0x22
+                                           and ins[ti] + 1 < n
+                                           and data[ins[ti] + 1] == 0x43):
                 out[q] = ins[ti]
     return out
 
@@ -5558,9 +7092,18 @@ def resolve_choice_forks(data):
     return forks
 
 
+def _choice_exact(node, ln):
+    """the menu yield's exact arguments (title, body text, timeout, default
+    result, character, portrait mode) on a choice node"""
+    va = getattr(ln, "vm_args", None)
+    if va and va[0] in (1, 2) and isinstance(va[1], dict):
+        node["menu"] = dict(va[1])
+    return node
+
+
 def build_episode_json(lines, cast, episode, title, main_characters=None,
                        scene_controls=None, genders=None, minigame_banks=None,
-                       name_vars=None, choice_dispatch=None, chapter_heads=None,
+                       choice_dispatch=None, chapter_heads=None,
                        var_gates=None, section_dispatch=None,
                        minigame_gates=None, buildword_scoring=None,
                        merge_jumps=None, choice_forks=None,
@@ -5700,6 +7243,276 @@ def build_episode_json(lines, cast, episode, title, main_characters=None,
 
 
     i, n = 0, len(lines)
+    def _build_choice(i, end_j=None):
+        """Build the choice at lines[i] (recursively, nested choices included);
+        returns (node, index of the first line past its scope)."""
+        ln = lines[i]
+        _tchoice = ln.speaker == "__TCHOICE__"
+        if _tchoice:
+            # builder menu (0x02/0x03/0x04): text packs "prompt§a|b|c", emotion
+            # carries the timer
+            _parts = ln.text.split("§")
+            _body = next((p[1:] for p in _parts if p.startswith("\x01")), None)
+            _parts = [p for p in _parts if not p.startswith("\x01")]
+            options = next((p for p in _parts if "|" in p), _parts[-1]).split("|")
+            _prompt = next((p for p in _parts if "|" not in p), None)
+        else:
+            options = ln.text.split("|")
+            _prompt = ln.emotion
+        j = i + 1
+        while j < n and lines[j].speaker not in ("__CHOICE__", "__TCHOICE__", "__SCENE__"):
+            j += 1
+        disp = (choice_dispatch or {}).get(scene_meta["script"], {}) \
+            .get(getattr(ln, "bc_off", None))
+        if disp and disp.get("alias_of") is not None:
+            # this choice shares its dispatch with another (it JUMPS to it): its
+            # outcomes are the twin's, linked after segmentation
+            _an = {"type": "choice", "prompt": _prompt,
+                   "options": [{"index": idx, "label": o} for idx, o in enumerate(options)],
+                   "_alias_of": disp["alias_of"]}
+            _choice_exact(_an, ln)
+            if getattr(ln, "bc_off", None) is not None:
+                _an["offset"] = ln.bc_off
+            return _an, i + 1
+        # SCOPE: a choice owns everything up to where its options rejoin (the
+        # merge). A later choice line BEFORE the merge is nested inside one of
+        # this choice's options (Pumpkin: "Left!/Right!" inside "Run!", with
+        # "Hesitate!"'s body after it), so extend the scope over it.
+        _merge = disp.get("merge") if disp else None
+        _me = getattr(ln, "bc_off", None)
+        if _merge is not None and _me is not None and _merge > _me:
+            if end_j is not None:
+                # nested: stop at our own merge -- what follows belongs to the
+                # parent option (or the parent's continuation)
+                k2 = i + 1
+                while k2 < end_j and lines[k2].speaker != "__SCENE__":
+                    _o = getattr(lines[k2], "bc_off", None)
+                    if _o is not None and _o >= _merge:
+                        break
+                    k2 += 1
+                j = k2
+            else:
+                while j < n and lines[j].speaker in ("__CHOICE__", "__TCHOICE__") \
+                        and getattr(lines[j], "bc_off", None) is not None \
+                        and lines[j].bc_off < _merge:
+                    j += 1
+                    while j < n and lines[j].speaker not in ("__CHOICE__", "__TCHOICE__", "__SCENE__"):
+                        j += 1
+        if end_j is not None:
+            j = min(j, end_j)
+        gates = (var_gates or {}).get(scene_meta["script"], [])
+
+        region = lines[i + 1:j]
+        # A dispatch option whose body lies entirely PAST the next sibling
+        # choice is a non-contiguous branch that jumps to a later section (e.g.
+        # the Sophie "too high maintenance" breakup, which the bytecode routes
+        # to a self-contained section after the following choice). We don't pull
+        # those lines in (the section has its own nested choices and exit goto);
+        # instead we record the jump offset so the option can be linked to that
+        # section's segment after segmentation.
+        next_choice_off = None
+        if j < n and lines[j].speaker in ("__CHOICE__", "__TCHOICE__"):
+            next_choice_off = getattr(lines[j], "bc_off", None)
+        far_targets = {}
+        if disp and next_choice_off is not None:
+            explicit = {o2["index"] for o2 in disp.get("options", [])
+                        if o2["index"] != "else"}
+            remaining = [k for k in range(len(options)) if k not in explicit]
+            for o2 in disp.get("options", []):
+                lo2, _hi2 = o2["region"]
+                if lo2 >= next_choice_off:
+                    idx2 = o2["index"]
+                    if idx2 == "else":
+                        if len(remaining) != 1:
+                            continue
+                        idx2 = remaining[0]
+                    far_targets[str(idx2)] = lo2
+        branch_dialogue = []
+        _k = i + 1
+        while _k < j:
+            r = lines[_k]
+            if r.speaker in ("__CHOICE__", "__TCHOICE__"):
+                # nested choice: built in place (recursively), owning its own scope
+                _nn, _k2 = _build_choice(_k, j)
+                branch_dialogue.append(_nn)
+                _k = max(_k2, _k + 1)
+                continue
+            d = to_node(r)
+            if d is not None:
+                branch_dialogue.append(d)
+                note_pov(d)
+            _k += 1
+        node = {
+            "type": "choice",
+            "prompt": _prompt,
+            "options": [{"index": idx, "label": o} for idx, o in enumerate(options)],
+        }
+        _choice_exact(node, ln)
+        _lw = getattr(ln, "when", None)
+        if _lw and len(_lw) == len(options):
+            # builder-menu option shown only when its condition holds
+            for _o, _w in zip(node["options"], _lw):
+                if _w:
+                    _o["when"] = _w
+        if getattr(ln, "bc_off", None) is not None:
+            node["offset"] = ln.bc_off
+        if _tchoice and ln.emotion:
+            node["timed"] = True
+            node["timer_ms"] = str(ln.emotion)
+        if _tchoice and _body:
+            node["text"] = _body
+        if far_targets:
+            # option index -> bytecode offset of a later section it jumps to
+            node["_far_targets"] = far_targets
+
+
+
+        def nest_gates(sel_lines, lo3, hi3):
+            """Nest var-gated blocks: a gate node wraps the lines of its
+            `then` region; siblings after it are the fall-through (else)
+            content. Recursive for gates inside a then-block."""
+            inner = [g for g in gates if lo3 <= g["at"] < hi3]
+            if not inner:
+                return sel_lines
+            inner.sort(key=lambda g: g["at"])
+            out3, used3 = [], set()
+            cursor = lo3
+            for g in inner:
+                if g["at"] < cursor:        # nested inside a handled gate
+                    continue
+                glo, ghi = g["then"]
+                pre = [x for x in sel_lines
+                       if cursor <= int(x["offset"]) < g["at"]
+                       and id(x) not in used3]
+                body = [x for x in sel_lines
+                        if glo <= int(x["offset"]) < ghi
+                        and id(x) not in used3]
+                for x in pre + body:
+                    used3.add(id(x))
+                out3.extend(pre)
+                _gate_nd = {"type": "gate", "var": g["var"],
+                             "equals": g["equals"],
+                             "then": nest_gates(body, glo, ghi),
+                             "offset": g["at"]}
+                if g.get("op"):
+                    _gate_nd["op"] = g["op"]
+                out3.append(_gate_nd)
+                cursor = ghi
+            out3.extend(x for x in sel_lines
+                        if id(x) not in used3 and int(x["offset"]) >= cursor)
+            return out3
+        if disp:
+            # BYTECODE-RESOLVED branches: the choice's dispatch (test blocks
+            # + resolved jumps) gives each option's byte region and the
+            # common merge point. Lines at/after the merge are shared
+            # continuation, kept in an "after the choice" segment.
+            merge = disp.get("merge")
+            explicit = {o2["index"] for o2 in disp["options"]
+                        if o2["index"] != "else"}
+            remaining = [k for k in range(len(options)) if k not in explicit]
+            branches, used = [], set()
+            import copy as _copy
+
+            def _in_spans(x, rec):
+                o = int(x["offset"])
+                for a, b in (rec.get("spans") or [rec["region"]]):
+                    if a <= o < b:
+                        return True
+                return False
+
+            def _take(rec):
+                # lines of this outcome, in execution (span) order; a line
+                # already claimed by another outcome is SHARED code that this
+                # outcome also runs -- copy it rather than steal it
+                order = {}
+                for si, (a, b) in enumerate(rec.get("spans") or [rec["region"]]):
+                    for x in branch_dialogue:
+                        if x.get("offset") is not None and a <= int(x["offset"]) < b \
+                                and id(x) not in order:
+                            order[id(x)] = (si, int(x["offset"]), x)
+                for _co in rec.get("calls") or []:
+                    _si = next((si for si, (a, b) in
+                                enumerate(rec.get("spans") or [rec["region"]])
+                                if a <= _co < b), 0)
+                    _mk = {"type": "_call_site", "offset": _co}
+                    order[id(_mk)] = (_si, _co, _mk)
+                picked = [v[2] for v in sorted(order.values(), key=lambda t: (t[0], t[1]))]
+                return [(_copy.deepcopy(x) if id(x) in used else x) for x in picked], picked
+
+            for o2 in disp["options"]:
+                lo2, hi2 = o2["region"]
+                sel, _orig = _take(o2)
+                used.update(id(x) for x in _orig)
+                idx2 = o2["index"]
+                if idx2 == "else":
+                    idx2 = remaining[0] if len(remaining) == 1 else remaining
+                branches.append({"index": idx2,
+                                 "lines": nest_gates(sel, lo2, hi2)})
+            # The TIMEOUT outcome (timed choice, clock expired): its own
+            # region, not part of any option nor of the shared continuation.
+            if disp.get("timeout") and "as_option" in disp["timeout"]:
+                node["timeout_as_option"] = disp["timeout"]["as_option"]
+            elif disp.get("timeout"):
+                tlo, thi = disp["timeout"]["region"]
+                if (disp["timeout"].get("spans") and len(disp["timeout"]["spans"]) > 1) \
+                        or disp["timeout"].get("calls"):
+                    tsel, _torig = _take(disp["timeout"])
+                else:
+                    tsel = [x for x in branch_dialogue
+                            if id(x) not in used and x.get("offset") is not None
+                            and tlo <= int(x["offset"]) < thi]
+                    _torig = tsel
+                if tsel:
+                    used.update(id(x) for x in _torig)
+                    node["timeout_dialogue"] = nest_gates(tsel, tlo, thi)
+                    # where the timeout block ENDS: if it falls straight into
+                    # an option's body (Breakup: "At no one!..." runs on into
+                    # Owen's "This is `your` fault, Owen!"), continue there;
+                    # otherwise it exits to the merge.
+                    if disp["timeout"].get("into") is not None:
+                        node["timeout_into"] = disp["timeout"]["into"]
+                    else:
+                        for o2 in disp["options"]:
+                            if o2["region"][0] == thi and o2["region"][1] > thi:
+                                node["timeout_into"] = o2["index"]
+                                break
+            after = [x for x in branch_dialogue if id(x) not in used]
+            node["branch_dialogue"] = branches
+            if merge is not None:
+                node["merge_offset"] = merge
+            if disp.get("merge_goto") is not None:
+                node["_after_goto"] = int(disp["merge_goto"])
+            if False and after and disp.get("routine_end") is not None:
+                _re = int(disp["routine_end"])
+                _in = [x for x in after if x.get("offset") is None
+                       or not str(x["offset"]).lstrip("-").isdigit()
+                       or int(x["offset"]) < _re]
+                if len(_in) < len(after) and _in:
+                    node["_after_spill"] = [x for x in after if x not in _in]
+                    after = _in
+                    node["_after_ends"] = True
+            if after:
+                node["after_choice"] = after
+                if disp.get("merge_return"):
+                    node["_after_detached"] = True
+            node["note"] = ("Per-option branches resolved from the bytecode "
+                            "dispatch (option tests + jump targets); "
+                            "after_choice is the shared continuation past "
+                            "the merge point.")
+            return node, j
+        outcomes = split_outcomes(branch_dialogue)
+        if outcomes:
+            node["outcomes"] = outcomes
+            node["note"] = ("Following dialogue is split into distinct outcomes at "
+                            "the game's replay/ending banners. A segment whose "
+                            "ends_with_retry_prompt is true is an alternate (non-ideal) "
+                            "ending the player is told to replay.")
+        else:
+            node["branch_dialogue"] = branch_dialogue
+            node["note"] = ("Dialogue for all options plays out in script order; "
+                            "exact per-option line boundaries are not recoverable "
+                            "from the bytecode.")
+        return node, j
     while i < n:
         ln = lines[i]
         if ln.speaker == "__SCENE__":
@@ -5711,142 +7524,12 @@ def build_episode_json(lines, cast, episode, title, main_characters=None,
                           "protagonist": pov_state["active"]}
             i += 1
             continue
-        if ln.speaker == "__CHOICE__":
-            options = ln.text.split("|")
-            j = i + 1
-            while j < n and lines[j].speaker not in ("__CHOICE__", "__SCENE__"):
-                j += 1
-            disp = (choice_dispatch or {}).get(scene_meta["script"], {}) \
-                .get(getattr(ln, "bc_off", None))
-            gates = (var_gates or {}).get(scene_meta["script"], [])
-
-            region = lines[i + 1:j]
-            # A dispatch option whose body lies entirely PAST the next sibling
-            # choice is a non-contiguous branch that jumps to a later section (e.g.
-            # the Sophie "too high maintenance" breakup, which the bytecode routes
-            # to a self-contained section after the following choice). We don't pull
-            # those lines in (the section has its own nested choices and exit goto);
-            # instead we record the jump offset so the option can be linked to that
-            # section's segment after segmentation.
-            next_choice_off = None
-            if j < n and lines[j].speaker == "__CHOICE__":
-                next_choice_off = getattr(lines[j], "bc_off", None)
-            far_targets = {}
-            if disp and next_choice_off is not None:
-                explicit = {o2["index"] for o2 in disp.get("options", [])
-                            if o2["index"] != "else"}
-                remaining = [k for k in range(len(options)) if k not in explicit]
-                for o2 in disp.get("options", []):
-                    lo2, _hi2 = o2["region"]
-                    if lo2 >= next_choice_off:
-                        idx2 = o2["index"]
-                        if idx2 == "else":
-                            if len(remaining) != 1:
-                                continue
-                            idx2 = remaining[0]
-                        far_targets[str(idx2)] = lo2
-            branch_dialogue = []
-            for r in region:
-                d = to_node(r)
-                if d is not None:
-                    branch_dialogue.append(d)
-                    note_pov(d)
-            node = {
-                "type": "choice",
-                "prompt": ln.emotion,
-                "options": [{"index": idx, "label": o} for idx, o in enumerate(options)],
-            }
-            if getattr(ln, "bc_off", None) is not None:
-                node["offset"] = ln.bc_off
-            if far_targets:
-                # option index -> bytecode offset of a later section it jumps to
-                node["_far_targets"] = far_targets
-
-
-
-            def nest_gates(sel_lines, lo3, hi3):
-                """Nest var-gated blocks: a gate node wraps the lines of its
-                `then` region; siblings after it are the fall-through (else)
-                content. Recursive for gates inside a then-block."""
-                inner = [g for g in gates if lo3 <= g["at"] < hi3]
-                if not inner:
-                    return sel_lines
-                inner.sort(key=lambda g: g["at"])
-                out3, used3 = [], set()
-                cursor = lo3
-                for g in inner:
-                    if g["at"] < cursor:        # nested inside a handled gate
-                        continue
-                    glo, ghi = g["then"]
-                    pre = [x for x in sel_lines
-                           if cursor <= int(x["offset"]) < g["at"]
-                           and id(x) not in used3]
-                    body = [x for x in sel_lines
-                            if glo <= int(x["offset"]) < ghi
-                            and id(x) not in used3]
-                    for x in pre + body:
-                        used3.add(id(x))
-                    out3.extend(pre)
-                    _gate_nd = {"type": "gate", "var": g["var"],
-                                 "equals": g["equals"],
-                                 "then": nest_gates(body, glo, ghi),
-                                 "offset": g["at"]}
-                    if g.get("op"):
-                        _gate_nd["op"] = g["op"]
-                    out3.append(_gate_nd)
-                    cursor = ghi
-                out3.extend(x for x in sel_lines
-                            if id(x) not in used3 and int(x["offset"]) >= cursor)
-                return out3
-            if disp:
-                # BYTECODE-RESOLVED branches: the choice's dispatch (test blocks
-                # + resolved jumps) gives each option's byte region and the
-                # common merge point. Lines at/after the merge are shared
-                # continuation, kept in an "after the choice" segment.
-                merge = disp.get("merge")
-                explicit = {o2["index"] for o2 in disp["options"]
-                            if o2["index"] != "else"}
-                remaining = [k for k in range(len(options)) if k not in explicit]
-                branches, used = [], set()
-                for o2 in disp["options"]:
-                    lo2, hi2 = o2["region"]
-                    sel = [x for x in branch_dialogue
-                           if x.get("offset") is not None
-                           and lo2 <= int(x["offset"]) < hi2]
-                    sel = [x for x in sel if x.get("offset") is not None]
-                    used.update(id(x) for x in sel)
-                    idx2 = o2["index"]
-                    if idx2 == "else":
-                        idx2 = remaining[0] if len(remaining) == 1 else remaining
-                    branches.append({"index": idx2,
-                                     "lines": nest_gates(sel, lo2, hi2)})
-                after = [x for x in branch_dialogue if id(x) not in used]
-                node["branch_dialogue"] = branches
-                if merge is not None:
-                    node["merge_offset"] = merge
-                if after:
-                    node["after_choice"] = after
-                node["note"] = ("Per-option branches resolved from the bytecode "
-                                "dispatch (option tests + jump targets); "
-                                "after_choice is the shared continuation past "
-                                "the merge point.")
-                cur_nodes.append(node)
-                i = j
-                continue
-            outcomes = split_outcomes(branch_dialogue)
-            if outcomes:
-                node["outcomes"] = outcomes
-                node["note"] = ("Following dialogue is split into distinct outcomes at "
-                                "the game's replay/ending banners. A segment whose "
-                                "ends_with_retry_prompt is true is an alternate (non-ideal) "
-                                "ending the player is told to replay.")
-            else:
-                node["branch_dialogue"] = branch_dialogue
-                node["note"] = ("Dialogue for all options plays out in script order; "
-                                "exact per-option line boundaries are not recoverable "
-                                "from the bytecode.")
+        if ln.speaker in ("__CHOICE__", "__TCHOICE__") and (
+                ln.speaker == "__CHOICE__" or (choice_dispatch or {}).get(
+                    scene_meta["script"], {}).get(getattr(ln, "bc_off", None))):
+            node, j = _build_choice(i)
             cur_nodes.append(node)
-            i = j
+            i = max(j, i + 1)
             continue
         d = to_node(ln)
         if d is not None:
@@ -5909,7 +7592,7 @@ def build_episode_json(lines, cast, episode, title, main_characters=None,
 
     return {"title": title, "episode": episode,
             "main_characters": mains_out, "cast": cast,
-            "genders": genders or {}, "name_vars": name_vars or {},
+            "genders": genders or {},
             "scenes": scenes}
 
 
@@ -6727,7 +8410,7 @@ def normalize_graph(doc):
     doc["provenance"] = {
         "byte_literal": ["text", "prompt", "speaker", "emotion_code", "options[].label",
                          "asset_id", "track_id", "sfx_id", "image", "offset", "script",
-                         "cast", "genders (name-table type field)", "name_vars",
+                         "cast", "genders (name-table type field)",
                          "minigames.* (subtitle/words/answers/letters/correct/decoys)",
                          "var_set/var_add (raw variable ids and values from the "
                          "0x2c write op; no variable is given a name)"],
@@ -6774,63 +8457,6 @@ def normalize_graph(doc):
             else:
                 flat.append(nd)
         s["nodes"] = flat
-
-    # Variable defaults: every state variable this episode references, each starting
-    # at 0. The engine zero-inits the whole variable store at episode load (no .kiw
-    # script writes a nonzero initial value -- the first touch of nearly every var is
-    # an `add`, which only makes sense from a known 0). At runtime they are changed by
-    # var_set (replace) and var_add (accumulate) nodes. The var ids are byte-literal
-    # (from the 0x2c write / 0x2d read ops); the 0 default is the engine's zero-init.
-    set_vars, add_vars, read_vars = set(), set(), set()
-
-    def collect_vars(nodes):
-        for nd in nodes:
-            if not isinstance(nd, dict):
-                continue
-            t = nd.get("type")
-            if t in ("var_set", "var_add") and nd.get("var") is not None:
-                (set_vars if t == "var_set" else add_vars).add(str(nd["var"]))
-            g = nd.get("gate")
-            if isinstance(g, dict) and g.get("var") is not None:
-                read_vars.add(str(g["var"]))
-            sd = nd.get("section_dispatch")
-            if isinstance(sd, dict) and sd.get("register") is not None:
-                read_vars.add(str(sd["register"]))
-            for b in (nd.get("branch_dialogue") or []):
-                if isinstance(b, dict) and "lines" in b:
-                    collect_vars(b["lines"])
-            for oc in (nd.get("outcomes") or []):
-                if isinstance(oc, dict) and "lines" in oc:
-                    collect_vars(oc["lines"])
-
-    for s in scenes:
-        collect_vars(s.get("nodes", []))
-        sd = s.get("section_dispatch")
-        if isinstance(sd, dict) and sd.get("register") is not None:
-            read_vars.add(str(sd["register"]))
-        for vg in (s.get("var_gates") or []):
-            if isinstance(vg, dict) and vg.get("var") is not None:
-                read_vars.add(str(vg["var"]))
-
-    # "score" is the engine's running minigame score (op5f/op3f), not a slot in
-    # the numeric variable store, so it must not become a variable_defaults entry
-    # (and would break the numeric sort below).
-    set_vars = {v for v in set_vars if v.isdigit()}
-    add_vars = {v for v in add_vars if v.isdigit()}
-    read_vars = {v for v in read_vars if v.isdigit()}
-
-    all_vars = set_vars | add_vars | read_vars
-    if all_vars:
-        doc["variable_defaults"] = {
-            "note": ("Every state variable this episode references. The engine "
-                     "zero-inits the variable store at load, so each starts at 0; "
-                     "no script sets a nonzero initial value. At runtime they are "
-                     "changed by var_set (replace) and var_add (accumulate) nodes. "
-                     "Variables in `set_only` are only ever assigned, never "
-                     "accumulated (1001 is the section/dispatch register)."),
-            "values": {v: 0 for v in sorted(all_vars, key=int)},
-            "set_only": sorted(set_vars - add_vars, key=int),
-        }
 
     return doc
 
@@ -6885,7 +8511,7 @@ def _render_branches_md(lines, md_line):
 
 def render(lines, cast, title="Decoded transcript", fmt="md", backgrounds=True,
            episode=None, branches=False, main_characters=None, scene_controls=None,
-           overlay=None, genders=None, minigame_banks=None, name_vars=None,
+           overlay=None, genders=None, minigame_banks=None,
            choice_dispatch=None, chapter_heads=None, var_gates=None,
            section_dispatch=None, minigame_gates=None, buildword_scoring=None,
            merge_jumps=None, choice_forks=None,
@@ -6901,7 +8527,7 @@ def render(lines, cast, title="Decoded transcript", fmt="md", backgrounds=True,
     if fmt == "json":
         doc = build_episode_json(lines, cast, episode, title, main_characters,
                                  scene_controls=scene_controls, genders=genders,
-                                 minigame_banks=minigame_banks, name_vars=name_vars,
+                                 minigame_banks=minigame_banks,
                                  choice_dispatch=choice_dispatch,
                                  chapter_heads=chapter_heads, var_gates=var_gates,
                                  section_dispatch=section_dispatch,
@@ -6947,6 +8573,8 @@ def render(lines, cast, title="Decoded transcript", fmt="md", backgrounds=True,
             if ln.emotion == "stop":
                 return "> 🎵 _music → stop_\n"
             return f"> 🎵 _music → track {ln.emotion}_\n"
+        if ln.speaker == "__EXPR__":
+            return ""
         if ln.speaker == "__VIBRATE__":
             return "> 📳 _vibrate_\n"
         if ln.speaker == "__WOBBLE__":
@@ -6958,6 +8586,9 @@ def render(lines, cast, title="Decoded transcript", fmt="md", backgrounds=True,
         if ln.speaker == "__SETSTR__":
             _k, _, _v = (ln.text or "").partition("\x1f")
             return f"> 🔤 _{_k} = {_v}_\n"
+        if ln.speaker == "__STRDEF__":
+            _k, _d, _s = (ln.text or "").split("\x1f")
+            return f"> 🔤 _{_k} defaults to {_d}_\n"
         if ln.speaker == "__TEXTINPUT__":
             _t, _, _p = (ln.text or "").partition("\x1f")
             return f"> ⌨️ _text input: {_p or _t}_\n"
@@ -7016,6 +8647,8 @@ def render(lines, cast, title="Decoded transcript", fmt="md", backgrounds=True,
                 out.append(f"[SFX -> {ln.emotion}]")
             elif ln.speaker == "__MUSIC__":
                 out.append(f"[MUSIC -> {ln.emotion}]")
+            elif ln.speaker == "__EXPR__":
+                pass
             elif ln.speaker == "__VIBRATE__":
                 out.append("[VIBRATE]")
             elif ln.speaker == "__GOTO__":
@@ -7040,6 +8673,20 @@ def render(lines, cast, title="Decoded transcript", fmt="md", backgrounds=True,
 # --------------------------------------------------------------------------- #
 # Story export: one JSON file per linear segment
 # --------------------------------------------------------------------------- #
+def _segref(value):
+    """Safely coerce a node link field (next/then/else/win/lose/after/file) to its
+    bare segment name. These fields are normally a string segment ref (possibly
+    with a .json suffix), but a gate/choice arm may instead hold an INLINE list of
+    nodes -- in which case there is no segment name, so return "". Guards every
+    `(x or "").replace(".json", "")` site against `AttributeError: 'list' object
+    has no attribute 'replace'` on episodes with inline branch bodies."""
+    if isinstance(value, str):
+        return value.replace(".json", "")
+    return ""
+
+
+
+
 def build_story_segments(doc, var_gates=None):
     """Build the episode as a set of small LINEAR story segments (the in-memory form
     behind both the story-export folder and the single-JSON `segments` map). Returns
@@ -7164,88 +8811,159 @@ def build_story_segments(doc, var_gates=None):
             o = nd.get("offset")
             return int(o) if o is not None else None
 
-        out = list(nodes)
-        spans = []
-        for g in sorted(gates, key=lambda x: int(x["pass_at"])):
-            pass_at, fail_at = int(g["pass_at"]), int(g["fail_at"])
-            win_start = next((i for i, n in enumerate(out)
-                              if offof(n) is not None and offof(n) >= pass_at),
-                             None)
-            if win_start is None:
-                # The gate's pass_at falls past the current node list -- the
-                # nodes between the trigger and the pass point were already
-                # consumed by an earlier fork (e.g. Making Some Dough scene 3
-                # has multiple by_id minigames; the first fork's run swallows
-                # the intermediate content and the second gate's pass_at now
-                # sits inside the folded-away range). Splice a marker at the
-                # trigger's insertion point so the runtime still sees this
-                # gate's threshold, id, and setup.
-                trig = int(g.get("trigger") or 0)
-                ins_at = next((i for i, n in enumerate(out)
-                               if offof(n) is not None and offof(n) >= trig),
-                              len(out))
-                marker = {"type": "minigame", "fork": True,
-                          "kind": g.get("kind"),
-                          "minigame_id": (str(g["minigame_id"])
-                                          if g.get("minigame_id") is not None
-                                          else None),
-                          "via": g.get("via"),
-                          "trigger": str(g.get("trigger")),
-                          "win_threshold": str(g.get("win_threshold")),
-                          "offset": str(g.get("gate"))}
-                if g.get("via") == "by_id":
-                    for k in range(ins_at - 1, -1, -1):
-                        nd = out[k]
-                        if not isinstance(nd, dict) or nd.get("fork"):
-                            continue
-                        if nd.get("type") == "minigame" and nd.get("offset") \
-                                and int(nd["offset"]) < trig:
-                            if nd.get("setup"):
-                                marker["setup"] = nd["setup"]
-                            if nd.get("minigame_type"):
-                                marker["minigame_type"] = nd["minigame_type"]
-                            out.pop(k)
-                            ins_at -= 1
-                            break
-                out = out[:ins_at] + [marker] + out[ins_at:]
-                continue
-            run_end, prev = len(out), None
-            for j in range(win_start, len(out)):
-                o = offof(out[j])
-                if o is None:
+        def _split(nodes, gates):
+            out = list(nodes)
+            spans = []
+            consumed = set()
+            for g in sorted(gates, key=lambda x: int(x["pass_at"])):
+                if id(g) in consumed:
                     continue
-                if prev is not None and o <= prev:
-                    run_end = j
-                    break
-                prev = o
-            lose_start = run_end
-            for j in range(win_start, run_end):
-                o = offof(out[j])
-                if o is not None and o >= fail_at:
-                    lose_start = j
-                    break
-            win_nodes = out[win_start:lose_start]
-            lose_nodes = out[lose_start:run_end]
-            if not win_nodes or not lose_nodes:
-                # The fork's lose arm isn't in this segment's node list -- the
-                # bytecode for the fail path lives past a goto_scene that jumps
-                # the runtime elsewhere (e.g. Making Some Dough's Andrew-writer
-                # Help Ads job: on a good pick the win arm ends with `goto s5`
-                # so the fail-arm bytes at fail_at sit orphaned). Rather than
-                # dropping the gate on the floor, splice a lightweight marker
-                # BEFORE the win-arm run so the runtime still sees the trigger,
-                # threshold, and (for by_id) the round setup at the play point.
-                # Fold in the section-header data-def node just like the full
-                # fork path does.
-                marker = {"type": "minigame", "fork": True,
-                          "kind": g.get("kind"),
-                          "minigame_id": (str(g["minigame_id"])
-                                          if g.get("minigame_id") is not None
-                                          else None),
-                          "via": g.get("via"),
-                          "trigger": str(g.get("trigger")),
-                          "win_threshold": str(g.get("win_threshold")),
-                          "offset": str(g.get("gate"))}
+                pass_at, fail_at = int(g["pass_at"]), int(g["fail_at"])
+                if __import__("os").environ.get("DBG_SPLIT") == str(pass_at):
+                    print("SPLITDBG", [(n.get("type"), n.get("offset")) for n in out
+                                       if isinstance(n, dict)][-60:], file=sys.stderr)
+                win_start = next((i for i, n in enumerate(out)
+                                  if offof(n) is not None and offof(n) >= pass_at),
+                                 None)
+                if win_start is None:
+                    # The gate's pass_at falls past the current node list -- the
+                    # nodes between the trigger and the pass point were already
+                    # consumed by an earlier fork (e.g. Making Some Dough scene 3
+                    # has multiple by_id minigames; the first fork's run swallows
+                    # the intermediate content and the second gate's pass_at now
+                    # sits inside the folded-away range). Splice a marker at the
+                    # trigger's insertion point so the runtime still sees this
+                    # gate's threshold, id, and setup.
+                    trig = int(g.get("trigger") or 0)
+                    ins_at = next((i for i, n in enumerate(out)
+                                   if offof(n) is not None and offof(n) >= trig),
+                                  len(out))
+                    marker = {"type": "minigame", "fork": True,
+                              "kind": g.get("kind"),
+                              "minigame_id": (str(g["minigame_id"])
+                                              if g.get("minigame_id") is not None
+                                              else None),
+                              "via": g.get("via"),
+                              "trigger": str(g.get("trigger")),
+                              "win_threshold": str(g.get("win_threshold")),
+                              "offset": str(g.get("gate"))}
+                    if g.get("via") == "by_id":
+                        for k in range(ins_at - 1, -1, -1):
+                            nd = out[k]
+                            if not isinstance(nd, dict) or nd.get("fork"):
+                                continue
+                            if nd.get("type") == "minigame" and nd.get("offset") \
+                                    and int(nd["offset"]) < trig:
+                                if nd.get("setup"):
+                                    marker["setup"] = nd["setup"]
+                                if nd.get("minigame_type"):
+                                    marker["minigame_type"] = nd["minigame_type"]
+                                out.pop(k)
+                                ins_at -= 1
+                                break
+                    out = out[:ins_at] + [marker] + out[ins_at:]
+                    continue
+                run_end, prev = len(out), None
+                for j in range(win_start, len(out)):
+                    o = offof(out[j])
+                    if o is None:
+                        continue
+                    if prev is not None and o <= prev:
+                        run_end = j
+                        break
+                    prev = o
+                lose_start = run_end
+                for j in range(win_start, run_end):
+                    o = offof(out[j])
+                    if o is not None and o >= fail_at:
+                        lose_start = j
+                        break
+                win_nodes = out[win_start:lose_start]
+                lose_nodes = out[lose_start:run_end]
+                if not win_nodes or not lose_nodes:
+                    # The fork's lose arm isn't in this segment's node list -- the
+                    # bytecode for the fail path lives past a goto_scene that jumps
+                    # the runtime elsewhere (e.g. Making Some Dough's Andrew-writer
+                    # Help Ads job: on a good pick the win arm ends with `goto s5`
+                    # so the fail-arm bytes at fail_at sit orphaned). Rather than
+                    # dropping the gate on the floor, splice a lightweight marker
+                    # BEFORE the win-arm run so the runtime still sees the trigger,
+                    # threshold, and (for by_id) the round setup at the play point.
+                    # Fold in the section-header data-def node just like the full
+                    # fork path does.
+                    marker = {"type": "minigame", "fork": True,
+                              "kind": g.get("kind"),
+                              "minigame_id": (str(g["minigame_id"])
+                                              if g.get("minigame_id") is not None
+                                              else None),
+                              "via": g.get("via"),
+                              "trigger": str(g.get("trigger")),
+                              "win_threshold": str(g.get("win_threshold")),
+                              "offset": str(g.get("gate"))}
+                    if g.get("via") == "by_id":
+                        trig = int(g.get("trigger") or 0)
+                        for k in range(win_start - 1, -1, -1):
+                            nd = out[k]
+                            if not isinstance(nd, dict) or nd.get("fork"):
+                                continue
+                            if nd.get("type") == "minigame" and nd.get("offset") \
+                                    and int(nd["offset"]) < trig:
+                                if nd.get("setup"):
+                                    marker["setup"] = nd["setup"]
+                                if nd.get("minigame_type"):
+                                    marker["minigame_type"] = nd["minigame_type"]
+                                out.pop(k)
+                                win_start -= 1     # index shifted after the pop
+                                break
+                    out = out[:win_start] + [marker] + out[win_start:]
+                    continue
+                arm_offs = [offof(n) for n in (win_nodes + lose_nodes)
+                            if offof(n) is not None]
+                spans.append((min(arm_offs), max(arm_offs) + 1))
+                # Later minigames whose play point lies INSIDE this fork's arms
+                # (New Girl: the football catch's lose arm runs on through the
+                # gelato "Be charming!" round and the arcade race) fork within
+                # that arm, not at the top level where their nodes no longer are.
+                _lo, _hi = min(arm_offs), max(arm_offs) + 1
+                _inner = [h for h in gates if h is not g and id(h) not in consumed
+                          and int(h["pass_at"]) > pass_at
+                          and ((pass_at <= int(h.get("trigger") or h["pass_at"])
+                                and int(h["fail_at"]) < fail_at)
+                               or fail_at <= int(h.get("trigger") or h["pass_at"]) < _hi)]
+                # (only under a call-wrapped fork, whose lose arm is the one
+                # that runs on; Wrong Side's chained combat rounds keep their
+                # established top-level handling)
+                if not g.get("call_wrapped"):
+                    # other forks: only games wholly inside the LOSE arm (a
+                    # later section's round the lose arm ran on into -- Making
+                    # Some Dough's brainstorm after the dodge round)
+                    _inner = [h for h in _inner
+                              if int(h.get("trigger") or h["pass_at"]) >= fail_at
+                              and int(h["fail_at"]) < _hi]
+                if _inner:
+                    for h in _inner:
+                        consumed.add(id(h))
+                    _wi = [h for h in _inner if int(h["pass_at"]) < fail_at]
+                    _lo_ = [h for h in _inner if int(h["pass_at"]) >= fail_at]
+                    if _wi:
+                        win_nodes, _s1 = _split(win_nodes, _wi); spans.extend(_s1)
+                    if _lo_:
+                        lose_nodes, _s2 = _split(lose_nodes, _lo_); spans.extend(_s2)
+                fork = {"type": "minigame", "fork": True,
+                        "kind": g.get("kind"),
+                        "minigame_id": (str(g["minigame_id"])
+                                        if g.get("minigame_id") is not None else None),
+                        "via": g.get("via"),
+                        "trigger": str(g.get("trigger")),
+                        "win_threshold": str(g.get("win_threshold")),
+                        "offset": str(g.get("gate")),
+                        "win": win_nodes, "lose": lose_nodes}
+                out = out[:win_start] + [fork] + out[run_end:]
+                # A `by_id` minigame is DEFINED by a data-def node (the pick_word/build
+                # bank) in the section header, then PLAYED later by id (1f51). Fold that
+                # standalone data-def node into the fork so the one minigame node lands
+                # at the play point (after the lead-in), carrying its round setup, and
+                # drop the now-duplicated header node.
                 if g.get("via") == "by_id":
                     trig = int(g.get("trigger") or 0)
                     for k in range(win_start - 1, -1, -1):
@@ -7254,67 +8972,33 @@ def build_story_segments(doc, var_gates=None):
                             continue
                         if nd.get("type") == "minigame" and nd.get("offset") \
                                 and int(nd["offset"]) < trig:
-                            if nd.get("setup"):
-                                marker["setup"] = nd["setup"]
+                            if nd.get("setup") and "setup" not in fork:
+                                fork["setup"] = nd["setup"]
                             if nd.get("minigame_type"):
-                                marker["minigame_type"] = nd["minigame_type"]
+                                fork["minigame_type"] = nd["minigame_type"]
                             out.pop(k)
-                            win_start -= 1     # index shifted after the pop
                             break
-                out = out[:win_start] + [marker] + out[win_start:]
-                continue
-            arm_offs = [offof(n) for n in (win_nodes + lose_nodes)
-                        if offof(n) is not None]
-            spans.append((min(arm_offs), max(arm_offs) + 1))
-            fork = {"type": "minigame", "fork": True,
-                    "kind": g.get("kind"),
-                    "minigame_id": (str(g["minigame_id"])
-                                    if g.get("minigame_id") is not None else None),
-                    "via": g.get("via"),
-                    "trigger": str(g.get("trigger")),
-                    "win_threshold": str(g.get("win_threshold")),
-                    "offset": str(g.get("gate")),
-                    "win": win_nodes, "lose": lose_nodes}
-            out = out[:win_start] + [fork] + out[run_end:]
-            # A `by_id` minigame is DEFINED by a data-def node (the pick_word/build
-            # bank) in the section header, then PLAYED later by id (1f51). Fold that
-            # standalone data-def node into the fork so the one minigame node lands
-            # at the play point (after the lead-in), carrying its round setup, and
-            # drop the now-duplicated header node.
-            if g.get("via") == "by_id":
-                trig = int(g.get("trigger") or 0)
-                for k in range(win_start - 1, -1, -1):
-                    nd = out[k]
-                    if not isinstance(nd, dict) or nd.get("fork"):
-                        continue
-                    if nd.get("type") == "minigame" and nd.get("offset") \
-                            and int(nd["offset"]) < trig:
-                        if nd.get("setup") and "setup" not in fork:
-                            fork["setup"] = nd["setup"]
-                        if nd.get("minigame_type"):
-                            fork["minigame_type"] = nd["minigame_type"]
-                        out.pop(k)
-                        break
-            elif g.get("via") == "action":
-                # The action minigame is emitted as a flat play-point node (the
-                # 0x47 prompt/options) just before its score gate. Fold that node
-                # into the fork so the single node carries both the game (prompt,
-                # options, platform variants) and its win/lose arms -- matching
-                # the shape of the by_id / word-bank minigames.
-                trig = int(g.get("trigger") or 0)
-                for k in range(win_start - 1, -1, -1):
-                    nd = out[k]
-                    if not isinstance(nd, dict) or nd.get("fork"):
-                        continue
-                    if nd.get("type") == "minigame" and nd.get("offset") \
-                            and int(nd["offset"]) <= trig:
-                        for _key in ("prompt", "options", "setup", "variants",
-                                     "minigame_type"):
-                            if nd.get(_key) is not None and _key not in fork:
-                                fork[_key] = nd[_key]
-                        out.pop(k)
-                        break
-        return out, spans
+                elif g.get("via") == "action":
+                    # The action minigame is emitted as a flat play-point node (the
+                    # 0x47 prompt/options) just before its score gate. Fold that node
+                    # into the fork so the single node carries both the game (prompt,
+                    # options, platform variants) and its win/lose arms -- matching
+                    # the shape of the by_id / word-bank minigames.
+                    trig = int(g.get("trigger") or 0)
+                    for k in range(win_start - 1, -1, -1):
+                        nd = out[k]
+                        if not isinstance(nd, dict) or nd.get("fork"):
+                            continue
+                        if nd.get("type") == "minigame" and nd.get("offset") \
+                                and int(nd["offset"]) <= trig:
+                            for _key in ("prompt", "options", "setup", "variants",
+                                         "minigame_type"):
+                                if nd.get(_key) is not None and _key not in fork:
+                                    fork[_key] = nd[_key]
+                            out.pop(k)
+                            break
+            return out, spans
+        return _split(nodes, gates)
 
     def nest_into_forks(lst, gates):
         """Recurse into fork arms (and gate `then` bodies) so each arm nests its
@@ -7415,12 +9099,32 @@ def build_story_segments(doc, var_gates=None):
                     flush({"end": True})
                 return first_name
             t = nd.get("type")
+            if t == "choice" and nd.get("_alias_of") is not None:
+                # a choice that jumps to a dispatch shared with another choice:
+                # a terminal; the code it jumps over (entered only by jumps) is
+                # its own segment
+                rest = nl[i + 1:]
+                if rest:
+                    emit(newname(scene, ""), scene, rest)
+                flush({"choice": {"id": nd.get("id"), "prompt": nd.get("prompt"),
+                                  "options": [{"index": o["index"], "label": o["label"]}
+                                              for o in nd.get("options", [])],
+                                  **({"menu": nd["menu"]} if nd.get("menu") else {}),
+                                  "_alias_of": nd["_alias_of"]}})
+                return first_name
             if t == "choice" and isinstance(nd.get("branch_dialogue"), list) \
                     and nd["branch_dialogue"] \
                     and isinstance(nd["branch_dialogue"][0], dict) \
                     and "lines" in nd["branch_dialogue"][0]:
                 after = nd.get("after_choice") or []
                 rest = after + nl[i + 1:]
+                if nd.get("_after_ends"):
+                    # the continuation ends at the routine's return; what
+                    # follows in bytecode is other routines (reached by calls)
+                    _spill = (nd.get("_after_spill") or []) + nl[i + 1:]
+                    if _spill:
+                        emit(newname(scene, ""), scene, _spill)
+                    rest = after + [{"type": "return", "source": "routine_end"}]
                 ce = choice_exits.get(str(nd.get("offset")))
                 if ce:
                     # This choice ends its section and exits to another scene. Emit
@@ -7504,6 +9208,14 @@ def build_story_segments(doc, var_gates=None):
                     if after_file is None:
                         after_file = emit(newname(scene, "after"), scene, rest) \
                             if rest else None
+                if nd.get("_after_detached"):
+                    # outcomes return; the "after" code is only reached by calls
+                    after_file = None
+                elif nd.get("_after_goto") is not None and after_file:
+                    # the outcomes meet at a jump: continue at its target
+                    # (resolved to a segment once segmentation is done)
+                    after_file = "__off%d" % int(nd["_after_goto"])
+                    post_merge_file = None
                 opts = []
                 branch_by_idx = {}
                 for br in nd["branch_dialogue"]:
@@ -7555,12 +9267,28 @@ def build_story_segments(doc, var_gates=None):
                         if tail is not None and "end" in tail:
                             tail.pop("end", None)
                             tail["next"] = target_file + ".json"
+                timeout_file = None
+                if nd.get("timeout_dialogue"):
+                    timeout_file = emit(newname(scene, "timeout"), scene,
+                                        nd["timeout_dialogue"])
+                    ttail = files[sorted(f for f in files
+                                         if f.startswith(timeout_file))[-1]] \
+                        if timeout_file in files else files.get(timeout_file)
+                    _into = branch_by_idx.get(str(nd.get("timeout_into"))) \
+                        if nd.get("timeout_into") is not None else None
+                    _tnext = _into or after_file
+                    if ttail is not None and "end" in ttail and _tnext:
+                        ttail.pop("end", None)
+                        ttail["next"] = _tnext + ".json"
+                # (a timeout that behaves as an option is resolved to that option's
+                # FINAL target after all repair passes -- see _resolve_timeout_as_option)
                 far_map = nd.get("_far_targets") or {}
                 for o in nd.get("options", []):
                     nf = branch_by_idx.get(str(o["index"]), after_file)
                     far = far_map.get(str(o["index"]))
                     opt = {"index": o["index"], "label": o["label"],
-                           **({"effects": o["effects"]} if o.get("effects") else {})}
+                           **({"effects": o["effects"]} if o.get("effects") else {}),
+                           **({"when": o["when"]} if o.get("when") else {})}
                     if far is not None:
                         # non-contiguous branch: link to the jumped-to section in the
                         # post-segmentation pass (offset -> segment) rather than the
@@ -7572,8 +9300,19 @@ def build_story_segments(doc, var_gates=None):
                 term = {"choice": {"id": nd.get("id"),
                                    "prompt": nd.get("prompt"),
                                    "options": opts,
+                                   **({"_off": nd["offset"]}
+                                      if nd.get("offset") is not None else {}),
+                                   **({"timed": True, "timer_ms": nd["timer_ms"]}
+                                      if nd.get("timed") and nd.get("timer_ms") else {}),
+                                   **({"text": nd["text"]} if nd.get("text") else {}),
+                                   **({"menu": nd["menu"]} if nd.get("menu") else {}),
                                    **({"after": after_file + ".json"}
-                                      if after_file else {})}}
+                                      if after_file else {}),
+                                   **({"on_timeout": timeout_file + ".json"}
+                                      if timeout_file else {}),
+                                   **({"_timeout_as_option": nd["timeout_as_option"]}
+                                      if nd.get("timeout_as_option") is not None
+                                      and not timeout_file else {})}}
                 flush(term)
                 return first_name
             if t == "choice" and isinstance(nd.get("branch_dialogue"), list) \
@@ -7589,10 +9328,12 @@ def build_story_segments(doc, var_gates=None):
                 cont_file = emit(newname(scene, "after"), scene, cont) if cont else None
                 opts = [{"index": o["index"], "label": o["label"],
                          **({"effects": o["effects"]} if o.get("effects") else {}),
+                         **({"when": o["when"]} if o.get("when") else {}),
                          "next": (cont_file + ".json") if cont_file else None}
                         for o in nd.get("options", [])]
                 term = {"choice": {"id": nd.get("id"), "prompt": nd.get("prompt"),
                                    "options": opts,
+                                   **({"menu": nd["menu"]} if nd.get("menu") else {}),
                                    "note": ("Option branches not separable from the "
                                             "bytecode; all options continue into the "
                                             "shared following block in script order."),
@@ -7650,7 +9391,7 @@ def build_story_segments(doc, var_gates=None):
                     # when the fork skeleton left it generic. The later scene-bank
                     # variant pass adds the tablet build_word form when a bank for
                     # this scene exists.
-                    if mgt.get("minigame_type") in (None, "content_fork") \
+                    if mgt.get("minigame_type") in (None, "content_fork", "outcome_fork") \
                             and mgt.get("options"):
                         mgt["minigame_type"] = "pick_word"
                 term = {"minigame": mgt}
@@ -7663,7 +9404,7 @@ def build_story_segments(doc, var_gates=None):
             if t == "gate":
                 then_nodes = nd.get("then") or []
                 if not any(x.get("type") in ("dialogue", "narration", "choice",
-                                             "title_card", "minigame",
+                                             "title_card", "end_card", "minigame",
                                              "status", "goto_scene", "next")
                            for x in then_nodes):
                     # a guard around pure state writes (e.g. first-run init):
@@ -7836,64 +9577,6 @@ def build_story_segments(doc, var_gates=None):
                     _cand.append((min(_os), _fn))
             if _cand:
                 entry = min(_cand)[1]
-        # Combat-walk scenes (e.g. Wrong Side of Town's town gauntlet) can have the
-        # shared combat/encounter code physically first, so the entry defaults to
-        # that combat dump instead of the walk. When the chosen entry segment is a
-        # combat dump AND the scene has a walk-hub segment (a choice whose options
-        # include walking, plus a time/distance status), start at the walk hub
-        # instead. General: only redirects when both conditions hold; other scenes
-        # are untouched.
-        def _is_combat_dump(bd):
-            txt = " ".join((n.get("text") or "") for n in bd.get("nodes", [])
-                           if isinstance(n, dict)).lower()
-            return ("still has %d life left" in txt or "goes down!" in txt) \
-                and "does %d damage" in txt
-
-        def _is_walk_hub(bd):
-            # The walk hub shows the countdown time/distance status. (The walk
-            # choice may be split into a following segment during emit, so the
-            # time status alone identifies the hub.)
-            for n in bd.get("nodes", []):
-                if not isinstance(n, dict):
-                    continue
-                t = (n.get("text") or "").lower()
-                if n.get("type") == "status" and ("before sunset" in t
-                                                  or "left before" in t):
-                    return True
-            return False
-
-        _entry_bd = files.get(entry)
-        if _entry_bd is not None and _is_combat_dump(_entry_bd):
-            # Prefer a walk hub (town-walk scenes). Otherwise, when the scene has a
-            # section dispatch whose first valid-value section sits past the combat
-            # dump, that section is the true opening (e.g. Wrong Side scene 5's
-            # arrival + Ryan confrontation). Use whichever applies.
-            _hub = next((_fn for _fn, _bd in files.items()
-                         if _bd.get("scene") == sc["scene"] and _is_walk_hub(_bd)),
-                        None)
-            if _hub is not None:
-                entry = _hub
-            else:
-                # dispatch's first valid-value section target
-                _valid = sd.get("valid_values") or []
-                _sect = None
-                for _b in sd.get("bindings", []):
-                    if _b.get("section_offset") is not None \
-                            and (not _valid or _b.get("value") in _valid):
-                        _sect = int(_b["section_offset"])
-                        break
-                if _sect is not None:
-                    _cand = []
-                    for _fn, _bd in files.items():
-                        if _bd.get("scene") != sc["scene"]:
-                            continue
-                        _os = [int(x["offset"]) for x in _bd.get("nodes", [])
-                               if isinstance(x, dict) and x.get("offset") is not None
-                               and str(x["offset"]).lstrip("-").isdigit()]
-                        if _os and min(_os) >= _sect - 4:
-                            _cand.append((min(_os), _fn))
-                    if _cand:
-                        entry = min(_cand)[1]
         # END-OF-EPISODE SCORE SCREEN AT ENTRY.
         # A scene whose header dispatches on the section register (var1001) is
         # entered from the prior scene with the register set to the STORY case:
@@ -8206,6 +9889,19 @@ def build_story_segments(doc, var_gates=None):
         return [int(n["offset"]) for n in b["nodes"]
                 if isinstance(n, dict) and n.get("offset") is not None]
 
+    # A minigame fork's WIN arm ends in the `28 <join>` that skips the lose arm
+    # (the instruction right before fail_at). Its last decoded node can sit well
+    # before that jump (var writes / sfx are not all nodes), so accept that
+    # specific jump from further away than the generic trailing-jump window.
+    arm_end_jumps = {}
+    for sc in doc["scenes"]:
+        for g in ((sc.get("minigame_results") or {}).get("gates") or []):
+            try:
+                arm_end_jumps.setdefault(str(sc["scene"]), set()).add(
+                    int(g["fail_at"]) - 3)
+            except (KeyError, TypeError, ValueError):
+                pass
+
     for _ in range(5000):
         acted = False
         for nm in list(files.keys()):
@@ -8218,11 +9914,18 @@ def build_story_segments(doc, var_gates=None):
             if not (offs and mj):
                 continue
             last_off = max(offs)
-            cand = [(int(j), j) for j in mj if last_off < int(j) <= last_off + 8]
+            _mji = {int(k_): v_ for k_, v_ in mj.items()}
+            _aej = arm_end_jumps.get(scn) or ()
+            cand = [(int(j), j) for j in mj
+                    if last_off < int(j) <= last_off + 8
+                    or (int(j) in _aej and last_off < int(j) <= last_off + 64)]
             if not cand:
                 continue                      # no trailing unconditional jump
             cand.sort()
             target = int(mj[cand[0][1]])
+            _h = 0
+            while target in _mji and _h < 4:  # a jump onto a jump
+                target = int(_mji[target]); _h += 1
             best = None                       # the node at/after target in-scene
             for onm, ob in files.items():
                 if str(ob.get("scene")) != scn:
@@ -8280,7 +9983,7 @@ def build_story_segments(doc, var_gates=None):
 
     for nm in list(files.keys()):
         body = files[nm]
-        _nxt = (body.get("next") or "").replace(".json", "")
+        _nxt = _segref(body.get("next"))
         if not _nxt or _nxt not in files:
             continue
         scn = str(body.get("scene"))
@@ -8400,10 +10103,7 @@ def build_story_segments(doc, var_gates=None):
     index = {"title": doc.get("title"), "episode": doc.get("episode"),
              "cast": doc.get("cast"), "main_characters": doc.get("main_characters"),
              "genders": genders_used,
-             "name_vars": doc.get("name_vars"),
              "entry": scene_entry.get("1"),
-             **({"variable_defaults": doc["variable_defaults"]}
-                if doc.get("variable_defaults") else {}),
              "scene_entries": scene_entry,
              "scene_minigame_banks": scene_banks,
              "section_dispatch": {str(sc["scene"]): sc["section_dispatch"]
@@ -8866,6 +10566,26 @@ def build_story_segments(doc, var_gates=None):
     # half of a split rejection segment resolves to that half rather than to
     # the combined pre-split segment that would also pull in the Mr.Hotpants
     # half. Byte-derived; no overlay.
+    # choice continuations that were a jump target (`__off<N>` placeholders)
+    def _resolve_off(v, scn):
+        if isinstance(v, str) and v.startswith("__off"):
+            _t = int(v[5:].replace(".json", ""))
+            seg = seg_for_section(scn, _t) if scn is not None else None
+            return (seg + ".json") if seg else None
+        return v
+
+    def _walk_off(o, scn):
+        if isinstance(o, dict):
+            for k2, v2 in list(o.items()):
+                if isinstance(v2, str):
+                    o[k2] = _resolve_off(v2, scn)
+                else:
+                    _walk_off(v2, scn)
+        elif isinstance(o, list):
+            for x in o:
+                _walk_off(x, scn)
+    for nm, body in files.items():
+        _walk_off(body, scene_of_seg.get(nm))
     for nm, body in files.items():
         scn = scene_of_seg.get(nm)
         for nd in body["nodes"]:
@@ -8936,7 +10656,7 @@ def build_story_segments(doc, var_gates=None):
         # NOT when a real question/answer quiz bank is attached -- that is a quiz.
         opts = mg.get("options")
         if isinstance(opts, list) and len(opts) >= 2 \
-                and k in ("action", "content_fork") \
+                and k in ("action", "content_fork", "outcome_fork") \
                 and not (mg.get("setup") or {}).get("bank") == "quiz":
             return "pick_word"
         if k == "action":
@@ -9053,7 +10773,7 @@ def build_story_segments(doc, var_gates=None):
         last = nds[-1]
         if last.get("type") != "next":
             continue                       # only repoint a plain fall-through
-        cur = str(last.get("next") or "").replace(".json", "")
+        cur = _segref(last.get("next"))
         if cur == row0_seg:
             continue                       # already correct
         # Guard: the rows[0] body must sit at or after the entry's own offsets
@@ -9191,1122 +10911,6 @@ def build_story_segments(doc, var_gates=None):
                         tgt = adj
                 cur_seg = tgt
 
-    # Emit `random` nodes for runtime random section selectors (e.g. Help Ads).
-    # A random draw has no single correct `next`, so instead of the scene entry
-    # falling through to one target, replace its terminal with a `random` node
-    # carrying the full option set + exhausted fall-through. The engine performs
-    # the draw (pick a not-yet-done option; when all are done go to `exhausted`).
-    # Each option offset is head-resolved to the ad's own intro segment (the
-    # "Kim heads to the board" block that owns that story), so the engine enters
-    # each ad at its narrative start. All byte-derived from resolve_random_selector.
-    for sc in doc.get("scenes", []):
-        sd = sc.get("section_dispatch") or {}
-        selectors = sd.get("random_selectors") or []
-        if not selectors:
-            continue
-        scn = str(sc["scene"])
-        entry = files.get("s%s" % scn)
-        if entry is None:
-            continue
-
-        def _owning_intro(off):
-            # The segment whose byte range starts at or before `off` and is the
-            # nearest such start in this scene -- i.e. the ad-intro block the
-            # target belongs to (targets land mid-story on option outcomes; the
-            # owning intro is the greatest segment-start <= off).
-            best, best_lo = None, None
-            for nm, (lo, hi) in _sr.items():
-                if str(_scene_of.get(nm)) != scn:
-                    continue
-                if lo <= off and (best_lo is None or lo > best_lo):
-                    best, best_lo = nm, lo
-            return best
-
-        for sel in selectors:
-            opts = []
-            seen = set()
-            for o in sel.get("options", []):
-                off = o.get("section_offset")
-                if off is None:
-                    continue
-                seg = _owning_intro(int(off))
-                if seg and seg not in seen:
-                    seen.add(seg)
-                    opts.append({"scene": seg + ".json"})
-            # The Help Ads random resolves its roll arms to option OUTCOME
-            # fragments (the branch reached after each ad's own choice), not to the
-            # ad's entry -- so routing the draw straight there skips the whole ad
-            # (its bulletin-board intro, the helpee conversation, and the choice),
-            # dropping the player onto a money payout mid-scene. The real draw is
-            # over the ad ENTRIES, each of which begins with the shared "Kim heads
-            # to the Help Ads bulletin board" narration and plays intro -> choice/
-            # minigame -> outcome in full. When those entry segments are present,
-            # use them as the option set instead of the mid-ad fragments. Scoped to
-            # this scene's selector; ordered by segment byte start = play order.
-            _AD_ENTRY = "help ads bulletin board"
-            _AD_LISTING = ("' needs", " needs ", " seeks ", "meet me",
-                           " wanted", "seeks ")
-            _AD_EXHAUSTED = ("no ads anymore", "no more ads",
-                             "helped just about")
-            _entries = []
-            for nm, (lo, hi) in _sr.items():
-                if str(_scene_of.get(nm)) != scn:
-                    continue
-                _fnodes = files.get(nm, {}).get("nodes") or []
-                _fl = None
-                for _n in _fnodes:
-                    if isinstance(_n, dict) and _n.get("type") in ("dialogue",
-                                                                    "narration"):
-                        _fl = (_n.get("text") or "")
-                        break
-                # a real ad entry either opens on the bulletin-board narration or
-                # jumps straight into the "Let's see here... '<listing>'" pitch (the
-                # decoder sometimes splits the shared bulletin-board line onto the
-                # previous ad's tail), AND posts a helpee listing ("... Needs ...",
-                # "... Seeks ...") in its opening beats. The shared bulletin-board
-                # narration alone also heads mid-ad continuation blocks and the "no
-                # ads anymore" exhausted block, which must not be offered as draws.
-                _blurb = " ".join((_n.get("text") or "")
-                                  for _n in _fnodes[:6]
-                                  if isinstance(_n, dict)).lower()
-                _fl_low = (_fl or "").lower()
-                _opens_ad = (_AD_ENTRY in _fl_low
-                             or _fl_low.startswith("let's see here"))
-                if _opens_ad \
-                        and any(k in _blurb for k in _AD_LISTING) \
-                        and not any(k in _blurb for k in _AD_EXHAUSTED):
-                    _entries.append((lo, nm))
-            if len(_entries) >= 2:
-                opts = [{"scene": nm + ".json"}
-                        for _lo, nm in sorted(_entries)]
-            if len(opts) < 2:
-                continue
-
-            # Attach a per-option "done" guard so the engine can skip an ad it has
-            # already run instead of tracking draws itself. Each ad, on entry, sets
-            # a per-ad-pair flag (var2005/2006/2007) to a distinguishing value (1
-            # or 2 -- two ads share each flag var). That flag write is byte-derived
-            # from the ad's own body, so an ad is "already done" exactly when its
-            # flag var equals its value. We read the flag write straight from each
-            # option segment's nodes; when an option carries no explicit flag write
-            # (the decoder didn't attach one for it), we fall back to the first
-            # such flag found by walking the scene's flag writes in ad order. The
-            # global counter (state_var, var2003) still drives the exhausted
-            # transition; the per-option guard only tells the engine which ads to
-            # exclude from the draw.
-            _FLAG_VARS = ("2005", "2006", "2007")
-            # The per-ad done-flag write sits at the top of each ad's body in the
-            # bytecode, but the decoder only surfaced it inline for some ads. For
-            # the rest, recover it from the raw flag-write scan: each write is a
-            # `read var200X ; push V ; ADD ; write` immediately preceding an ad's
-            # listing ("... Needs ...", "... Seeks ..."). Match each write to the
-            # option whose listing follows it, and inject the flag as a var_set at
-            # the head of that ad so every ad carries its own done-flag.
-            _ad_flags = sel.get("_resolved_ad_flags")
-            if _ad_flags is None:
-                _ad_flags = {}
-                _fw = sd.get("ad_flag_writes") or []
-                _ordered_opts = [(_o["scene"][:-5]
-                                  if _o["scene"].endswith(".json")
-                                  else _o["scene"]) for _o in opts]
-                # opts are already in byte (play) order; flag writes are too
-                _fw_pairs = [(w["var"], w["value"]) for w in _fw
-                             if str(w["var"]) in _FLAG_VARS]
-                for _osid, _pair in zip(_ordered_opts, _fw_pairs):
-                    _ad_flags[_osid] = _pair
-                sel["_resolved_ad_flags"] = _ad_flags
-            for _opt in opts:
-                _osid = _opt["scene"][:-5] if _opt["scene"].endswith(".json") \
-                    else _opt["scene"]
-                _flag = None
-                for _n in files.get(_osid, {}).get("nodes") or []:
-                    if isinstance(_n, dict) \
-                            and _n.get("type") in ("var_add", "var_set") \
-                            and str(_n.get("var")) in _FLAG_VARS:
-                        _flag = (str(_n["var"]), int(_n["value"]))
-                        break
-                if _flag is None and _osid in _ad_flags:
-                    _fv, _fval = _ad_flags[_osid]
-                    _flag = (str(_fv), int(_fval))
-                    # inject the recovered flag at the head of the ad body. The
-                    # flag is ACCUMULATED additively (var += value), not assigned:
-                    # two ads share one flag var and contribute distinct bit values
-                    # (1 and 2), so the variable is a bitmask of which ads are done.
-                    _onodes = files.get(_osid, {}).get("nodes") or []
-                    files[_osid]["nodes"] = [{"type": "var_add", "var": str(_fv),
-                                              "value": int(_fval),
-                                              "source": "ad_done_flag"}] + _onodes
-                if _flag is not None:
-                    # Filter this ad once its bit is set in the shared flag. Two ads
-                    # share each flag var, contributing bit values 1 and 2, and the
-                    # ad bodies ADD their value on entry -- so the var is a bitmask
-                    # (0=none, 1=first done, 2=second done, 3=both done). An ad is
-                    # done exactly when its bit is present: (flag & value) != 0.
-                    # Equality would let an ad repeat (running the value-2 ad leaves
-                    # the var != 1, so the value-1 ad looks undone); a >= test would
-                    # skip an ad (running the value-2 ad first makes the value-1 ad
-                    # look done). The bitmask test is order-independent and lets
-                    # every ad play exactly once.
-                    _opt["done_when"] = {"var": _flag[0], "op": "bitmask",
-                                         "equals": str(_flag[1])}
-
-            exhausted_seg = None
-            if sel.get("exhausted_offset") is not None:
-                exhausted_seg = _seg_at(scn, int(sel["exhausted_offset"]))
-            node = {"type": "random",
-                    "state_var": sel.get("state_var"),
-                    "options": opts,
-                    "note": ("Runtime random selector: pick one option that is not "
-                             "yet done (per its `done_when` guard), enter its scene, "
-                             "and mark it done. When no option remains -- or, if "
-                             "present, after max_count draws -- go to `exhausted`. "
-                             "Draw and done-tracking are the engine's job.")}
-            # Optional hard cap on draws. Every option here is meant to play once,
-            # so the pool empties on its own after len(options) draws via the
-            # `done_when` guards; max_count is a redundant safety stop equal to the
-            # number of options, emitted ONLY when every option is guarded (so the
-            # pool provably empties). If any option is unguarded (repeatable), no
-            # cap is emitted -- capping could stop such a selector too early.
-            if opts and all(o.get("done_when") for o in opts):
-                node["max_count"] = str(len(opts))
-            if exhausted_seg:
-                node["exhausted"] = exhausted_seg + ".json"
-            # Replace the entry's terminal fall-through with the random node.
-            nds = entry.get("nodes") or []
-            if nds and isinstance(nds[-1], dict) \
-                    and nds[-1].get("type") == "next":
-                nds[-1] = node
-            else:
-                nds.append(node)
-            entry["nodes"] = nds
-
-        # Restore the win/lose split on any ad whose brainstorm/skill minigame the
-        # decoder linearized straight into its win branch, orphaning the lose
-        # outcome. The writer ad (Andrew) is the case in Making Some Dough: the
-        # bytecode runs the brainstorm minigame, then `push T ; 0d ; 2b -> LOSE`
-        # tests the score and, on a miss, jumps to the "this really doesn't make
-        # sense... I'm not going to pay" outcome; on a hit it falls through to the
-        # reward (`var2000 += 35`) and the "it's perfect!" resolution. The decoder
-        # kept only the fall-through, so the reward and win dialogue play
-        # unconditionally and the lose block is unreachable. Here we re-insert a
-        # `minigame` fork: everything up to the brainstorm hand-off stays as the
-        # ad's setup, the win branch is the remainder (reward + resolution), and
-        # the lose branch is the orphaned outcome segment. Byte-derived from the
-        # score test; guarded to fire only when the matching lose segment exists
-        # and the ad still carries its reward inline (so it is idempotent).
-        _LOSE_MARKERS = ("doesn't make a lot of sense", "wasn't helpful at all",
-                         "going to save my")
-        _WIN_SPLIT_AFTER = "help me brainstorm"
-        for nm, bd in list(files.items()):
-            if str(_scene_of.get(nm)) != scn:
-                continue
-            _nl = bd.get("nodes") or []
-            # the ad must still have its reward inline AND a brainstorm hand-off
-            _has_reward = any(isinstance(x, dict) and x.get("type") == "var_add"
-                              and str(x.get("var")) == "2000" for x in _nl)
-            _split_at = None
-            for _i, x in enumerate(_nl):
-                if isinstance(x, dict) and _WIN_SPLIT_AFTER in (x.get("text")
-                                                                or "").lower():
-                    _split_at = _i
-                    break
-            if _split_at is None or not _has_reward:
-                continue
-            # find the orphaned lose outcome segment in this scene
-            _lose = None
-            for onm, obd in files.items():
-                if str(_scene_of.get(onm)) != scn or onm == nm:
-                    continue
-                _txt = " ".join((y.get("text") or "")
-                                for y in (obd.get("nodes") or [])
-                                if isinstance(y, dict)).lower()
-                if any(mk in _txt for mk in _LOSE_MARKERS):
-                    _lose = onm
-                    break
-            if _lose is None:
-                continue
-            # split: setup (through the brainstorm hand-off + the immediately
-            # following "okay" beat), then the win remainder
-            _win_start = _split_at + 1
-            # keep the couple of narration/dialogue beats that set up the notebook
-            while _win_start < len(_nl):
-                x = _nl[_win_start]
-                if isinstance(x, dict) and x.get("type") == "var_add" \
-                        and str(x.get("var")) == "2000":
-                    break
-                _win_start += 1
-            if _win_start >= len(_nl):
-                continue
-            _setup = _nl[:_split_at + 1]
-            _win_nodes = _nl[_win_start:]
-            _win_seg = "%s_win" % nm
-            files[_win_seg] = {"nodes": _win_nodes}
-            _mg = {"type": "minigame", "minigame_type": "pick_word",
-                   "kind": "outcome_fork",
-                   "win": _win_seg + ".json", "lose": _lose + ".json",
-                   "timed": True, "timer_ms": "20000",
-                   "note": ("Brainstorm skill check (TIME-BOUND: the game draws "
-                            "prompts from its pool until the timer runs out; "
-                            "win_threshold correct within the time wins). On "
-                            "success Andrew loves the pitch and pays (win); on "
-                            "failure the pitch makes no sense and he keeps his "
-                            "money (lose). Byte-derived from the post-minigame "
-                            "score test.")}
-            # Attach the pick-word prompt the player plays. The brainstorm is a
-            # "pick the real genres" board: the correct words are the sensible
-            # genre combos, the decoys the nonsense ones. The prompt data is the
-            # scene's own pick_word bank (byte-derived from the head-of-scene word
-            # records); match the prompt to this ad by a subtitle keyword so the
-            # right board is shown. `pool` is what the timed game draws from.
-            _pw = (sc.get("minigames") or {}).get("pick_word") or []
-            _round = None
-            for _r in _pw:
-                _sub = (_r.get("subtitle") or "").lower()
-                if "genre" in _sub or "brainstorm" in _sub:
-                    _round = _r
-                    break
-            if _round is None and _pw:
-                _round = _pw[0]
-            if _round is not None:
-                # The win bar is byte-derived: the writer ad's brainstorm gate
-                # tests `push 5 ; GTE` at its 1f51 score check (need score >= 5).
-                # The synthetic Andrew fork node isn't produced by
-                # resolve_minigame_gates, so carry that observed threshold here.
-                _mg["win_threshold"] = "5"
-                _mg["setup"] = {"bank": "pick_word", "rounds": [_round],
-                                "timer_ms": "20000"}
-            files[nm]["nodes"] = _setup + [_mg]
-
-        # Each Help Ad minigame plays ONE specific pick-word board, but the scene's
-        # whole pick_word bank (every ad's board) can get attached to a single
-        # minigame node, leaving the engine to guess which round to show. Narrow
-        # each ad minigame to the one round it actually plays, matched by a subtitle
-        # keyword tied to the ad's premise (the martial-arts ad plays "Dodge the
-        # attacks!", the writer ad plays "Pick the real genres!"). Byte-derived: the
-        # rounds and their subtitles come from the scene's word bank; this only
-        # selects which of them rides on which ad node.
-        _AD_ROUND_KEYS = (("dodge", ("dodge", "duck", "attack")),
-                          ("genre", ("genre", "brainstorm")))
-        _scene_pw = (sc.get("minigames") or {}).get("pick_word") or []
-        if len(_scene_pw) >= 2:
-            for _body in files.values():
-                if str(_body.get("scene")) != scn:
-                    continue
-                for _nd in _body.get("nodes") or []:
-                    if not (isinstance(_nd, dict)
-                            and _nd.get("type") == "minigame"
-                            and _nd.get("minigame_type") == "pick_word"):
-                        continue
-                    _rounds = (_nd.get("setup") or {}).get("rounds") or []
-                    if len(_rounds) <= 1:
-                        continue
-                    # pick the round whose subtitle best fits the ad's premise
-                    _ad_text = " ".join((x.get("text") or "")
-                                        for x in _body.get("nodes") or []
-                                        if isinstance(x, dict)).lower()
-                    _chosen = None
-                    for _key, _subs in _AD_ROUND_KEYS:
-                        _hit_ad = any(k in _ad_text for k in _subs)
-                        if not _hit_ad:
-                            continue
-                        for _r in _rounds:
-                            if any(k in (_r.get("subtitle") or "").lower()
-                                   for k in _subs):
-                                _chosen = _r
-                                break
-                        if _chosen:
-                            break
-                    if _chosen is not None:
-                        _nd["setup"] = {"bank": "pick_word", "rounds": [_chosen]}
-
-    # The academic quiz's per-section question rolls (History, Science, English)
-    # each draw one question of a small pool. The decoder linearizes the pool into
-    # a fixed chain (question 1 -> question 2 -> question 3 -> section end), so
-    # only the first is ever the "real" one and the rest chain after it. Rebuild
-    # each section as a `random` node: the section's owning intro routes to a draw
-    # over its question segments, and each drawn question, once answered, goes to
-    # the section end (the shared "That is... correct!" feedback that closes the
-    # section). Byte-derived from resolve_quiz_random; scoped to scenes that carry
-    # a quiz_random pool, so no other scene is affected.
-    for sc in doc.get("scenes", []):
-        sd = sc.get("section_dispatch") or {}
-        rolls = sd.get("quiz_random") or []
-        if not rolls:
-            continue
-        scn = str(sc["scene"])
-        _section_owners = []       # (roll_offset, owner_segment) in byte order
-
-        def _seg_starting_at(off):
-            # the question segment whose byte range begins at/just after this roll
-            # arm offset (the question body head)
-            cont = after = al = None
-            for nm, (lo, hi) in _sr.items():
-                if str(_scene_of.get(nm)) != scn:
-                    continue
-                if lo <= off <= hi:
-                    cont = nm
-                elif lo >= off and (al is None or lo < al):
-                    after, al = nm, lo
-            return cont or after
-
-        for roll in rolls:
-            qsegs = []
-            seen = set()
-            for off in roll.get("options", []):
-                seg = _seg_starting_at(int(off))
-                # A roll arm can land on the section's intro segment (when the
-                # first question's prompt prose is merged into that intro rather
-                # than a standalone question segment); in that case the real
-                # question is what the intro continues to via `next`.
-                if seg is not None:
-                    _snodes = files.get(seg, {}).get("nodes") or []
-                    _has_choice = any(isinstance(x, dict)
-                                      and x.get("type") == "choice"
-                                      for x in _snodes)
-                    if not _has_choice and _snodes:
-                        # The arm landed on an intro segment whose prose ends with
-                        # the question prompt but whose choice lives in a separate
-                        # offset-less segment. Prefer the `next` link if present;
-                        # otherwise match the intro's final prompt line to the
-                        # offset-less choice segment that poses it.
-                        _last = _snodes[-1]
-                        _nxt = None
-                        if isinstance(_last, dict) and _last.get("type") == "next":
-                            _cand = str(_last["next"]).replace(".json", "")
-                            if any(isinstance(x, dict) and x.get("type") == "choice"
-                                   for x in files.get(_cand, {}).get("nodes") or []):
-                                _nxt = _cand
-                        if _nxt is None:
-                            _tail = [(_n.get("text") or "").strip().strip("'\" ").lower()
-                                     for _n in _snodes if isinstance(_n, dict)
-                                     and _n.get("type") in ("dialogue", "narration")]
-                            _ptext = _tail[-1] if _tail else None
-                            if _ptext:
-                                _cands = []
-                                for _nm, _bd in files.items():
-                                    if str(_scene_of.get(_nm)) != scn:
-                                        continue
-                                    for _n in _bd.get("nodes") or []:
-                                        if isinstance(_n, dict) \
-                                                and _n.get("type") == "choice" \
-                                                and (_n.get("prompt") or "").strip().strip("'\" ").lower() == _ptext:
-                                            _cands.append(_nm)
-                                            break
-                                if len(_cands) == 1:
-                                    _nxt = _cands[0]
-                        if _nxt is not None:
-                            seg = _nxt
-                if seg and seg not in seen:
-                    seen.add(seg)
-                    qsegs.append(seg)
-            if len(qsegs) < 2:
-                continue
-            # The section these questions belong to: the segment that currently
-            # feeds the first question via `next` (the "settle down at the desk"
-            # intro). Its terminal becomes the draw.
-            first_q = qsegs[0]
-            owner = None
-            for nm, bd in files.items():
-                if str(_scene_of.get(nm)) != scn:
-                    continue
-                nl = bd.get("nodes") or []
-                if nl and isinstance(nl[-1], dict) \
-                        and nl[-1].get("type") == "next" \
-                        and str(nl[-1].get("next")).replace(".json", "") == first_q:
-                    owner = nm
-                    break
-            if owner is None:
-                # The intro may not yet link to the first question by `next` (the
-                # offset-less choice linker runs later). Fall back to matching the
-                # first question's prompt against a segment's final narration line
-                # (the "'Which of these words is spelled correctly?'" prompt that
-                # the intro ends on), which uniquely identifies the owning intro.
-                _prompt = None
-                for nd in files.get(first_q, {}).get("nodes", []) or []:
-                    if isinstance(nd, dict) and nd.get("type") == "choice":
-                        _prompt = (nd.get("prompt") or "").strip().strip("'\" ").lower()
-                        break
-                if _prompt:
-                    _matches = []
-                    for nm, bd in files.items():
-                        if str(_scene_of.get(nm)) != scn or nm == first_q:
-                            continue
-                        _nl = bd.get("nodes") or []
-                        _texts = [(_n.get("text") or "").strip().strip("'\" ").lower()
-                                  for _n in _nl if isinstance(_n, dict)
-                                  and _n.get("type") in ("dialogue", "narration")]
-                        if _texts and _texts[-1] == _prompt:
-                            _matches.append(nm)
-                    if len(_matches) == 1:
-                        owner = _matches[0]
-            # The section end: the segment the LAST question in the pool routes to
-            # after being answered (the shared "That is... correct!" feedback that
-            # closes the section and returns to the hub). Read it from the pool's
-            # last question BEFORE rewriting any `after`, since the decoder chained
-            # the questions so the earlier ones' `after` points at the next
-            # question, not the section end.
-            section_end = None
-            for qs in reversed(qsegs):
-                for nd in files.get(qs, {}).get("nodes", []) or []:
-                    if isinstance(nd, dict) and nd.get("type") == "choice" \
-                            and nd.get("after"):
-                        cand = str(nd["after"]).replace(".json", "")
-                        if cand not in qsegs:      # not another pooled question
-                            section_end = cand
-                            break
-                if section_end:
-                    break
-            # Point every drawn question's choice.after AND each option's `next` at
-            # the section end, so a single answered question closes the section
-            # instead of chaining to the next question in the pool. The decoder
-            # emits per-option `next` as the byte-adjacent segment (which for a
-            # question is the *next* question), so without this the engine walks
-            # the whole pool one question at a time instead of playing just the
-            # drawn one.
-            if section_end:
-                for qs in qsegs:
-                    for nd in files.get(qs, {}).get("nodes", []) or []:
-                        if isinstance(nd, dict) and nd.get("type") == "choice":
-                            nd["after"] = section_end + ".json"
-                            for _opt in nd.get("options", []) or []:
-                                if isinstance(_opt, dict) and "next" in _opt:
-                                    _opt["next"] = section_end + ".json"
-            node = {"type": "random",
-                    "options": [{"scene": qs + ".json"} for qs in qsegs],
-                    "note": ("Quiz question draw: the engine picks one question "
-                             "from this section's pool at random; answering it "
-                             "closes the section.")}
-            if owner is not None:
-                # The first question segment can absorb the section's shared intro
-                # (the challenge briefing -- prize, rules -- that plays once before
-                # ANY question). That dialogue lives at offsets before the roll, so
-                # it would only be seen when the draw happens to pick question 1.
-                # Move every node before the roll offset out of the first question
-                # and onto the end of the owner (before the draw), so the briefing
-                # always plays. Byte-derived: the roll's own `at` offset is the
-                # boundary between the shared intro and question 1's body.
-                _roll_at = None
-                try:
-                    _roll_at = int(roll.get("at"))
-                except (TypeError, ValueError):
-                    _roll_at = None
-                if _roll_at is not None and qsegs:
-                    _fq = qsegs[0]
-                    _fqn = files.get(_fq, {}).get("nodes") or []
-                    _intro, _rest = [], []
-                    for _nd in _fqn:
-                        _off = _nd.get("offset") if isinstance(_nd, dict) else None
-                        try:
-                            _oi = int(_off) if _off is not None else None
-                        except (TypeError, ValueError):
-                            _oi = None
-                        # a node with an offset strictly before the roll is intro;
-                        # offset-less nodes (e.g. the split-out choice) stay with
-                        # the question
-                        if _oi is not None and _oi < _roll_at:
-                            _intro.append(_nd)
-                        else:
-                            _rest.append(_nd)
-                    if _intro and _rest:
-                        files[_fq]["nodes"] = _rest
-                        _onl = files[owner].get("nodes") or []
-                        # drop the owner's trailing `next` (it will be the draw)
-                        if _onl and isinstance(_onl[-1], dict) \
-                                and _onl[-1].get("type") == "next":
-                            _onl = _onl[:-1]
-                        files[owner]["nodes"] = _onl + _intro
-                onl = files[owner].get("nodes") or []
-                if onl and isinstance(onl[-1], dict) \
-                        and onl[-1].get("type") == "next":
-                    onl[-1] = node
-                else:
-                    onl.append(node)
-                files[owner]["nodes"] = onl
-                try:
-                    _section_owners.append((int(roll.get("at")), owner))
-                except (TypeError, ValueError):
-                    pass
-
-        # Route the quiz scene entry to the correct SECTION by progress. The three
-        # sections (History, Science, English) play one per academic day, selected
-        # by the completion counter var2002 (0 -> History, 1 -> Science, 2 ->
-        # English). The decoder linearized the entry straight into the first
-        # section, so every visit replayed History with the same intro. Replace the
-        # entry's unconditional hand-off with a `dispatch` on var2002 whose arms are
-        # the section owners in byte order (which is the play order). Byte-derived:
-        # the section order follows the roll offsets, and var2002 is the counter the
-        # hub already tests for the "academic still available?" gate.
-        _entry = files.get("s%s" % scn)
-        # Prefer the byte-derived section dispatch when the scene header actually
-        # reads a section register with multiple case bindings (Making Some Dough
-        # scene 2: `push 1001; VREAD; op5c(11,1); op5c(14,2); ...` -- a 9-case quiz
-        # selector). The roll-based var2002 selector below only recovers the 2-3
-        # sections that carry a question-draw roll, orphaning the other quiz-day
-        # sections (the President / sequence / Gatsby questions). Build the entry
-        # dispatch from the dispatch table's own value->section_offset bindings,
-        # mapping each offset to the same-scene segment that opens at it, exactly as
-        # resolve_section_dispatch derived them from the SEP case targets.
-        _sd_bindings = [b for b in (sd.get("bindings") or [])
-                        if b.get("section_offset") is not None]
-        if (_entry is not None and sd.get("register") is not None
-                and len(_sd_bindings) >= 3):
-            def _seg_opening_at(_off):
-                # the same-scene segment whose first node offset is at/just after
-                # the binding offset (snap-forward, matching the runtime's seek).
-                # Segments are identified by their s<scn>_ name prefix, since the
-                # `scene` field is not populated on file bodies at this stage.
-                _pref = "s%s" % scn
-                _best, _bd = None, None
-                for _fn, _b in files.items():
-                    if not (_fn == _pref or _fn.startswith(_pref + "_")):
-                        continue
-                    _os = [int(x["offset"]) for x in _b.get("nodes", [])
-                           if isinstance(x, dict) and x.get("offset") is not None
-                           and str(x["offset"]).lstrip("-").isdigit()]
-                    if not _os:
-                        continue
-                    _lo = min(_os)
-                    if _lo >= _off - 40 and (_bd is None or _lo < _bd):
-                        _bd, _best = _lo, _fn
-                return _best
-            _arms = []
-            _seen_seg = set()
-            for _b in sorted(_sd_bindings, key=lambda z: z["value"]):
-                _seg = _seg_opening_at(int(_b["section_offset"]))
-                if _seg is None or _seg == ("s%s" % scn):
-                    continue
-                _arms.append({"equals": str(_b["value"]),
-                              "scene": _seg + ".json"})
-                _seen_seg.add(_seg)
-            if len(_arms) >= 3:
-                _reg = sd.get("register")
-                _disp = {"type": "dispatch", "state_var": str(_reg),
-                         "arms": _arms[:-1],
-                         "default": _arms[-1]["scene"],
-                         "note": ("Quiz-section selector read from the scene header "
-                                  "(byte-derived): var%s is the section register the "
-                                  "hub sets per academic day; each value routes to "
-                                  "that day's quiz section (the op5c case targets in "
-                                  "the dispatch table). The final case is the "
-                                  "bytecode's fall-through default." % _reg)}
-                _enl = _entry.get("nodes") or []
-                if _enl and isinstance(_enl[-1], dict) \
-                        and _enl[-1].get("type") in ("next", "goto_scene",
-                                                     "dispatch"):
-                    _enl[-1] = _disp
-                else:
-                    _enl.append(_disp)
-                _entry["nodes"] = _enl
-                _entry = None  # suppress the roll-based var2002 selector below
-        if _entry is not None and len(_section_owners) >= 2:
-            _ordered = [nm for _off, nm in sorted(_section_owners)]
-            # The bytecode tests var2002 against each value up to the last section
-            # and lets the final section be the ELSE case (it tests == 0, == 1,
-            # ... and falls through to the last), so the last section is the
-            # dispatch default rather than an explicit arm. The hub only lets the
-            # player enter while var2002 < (number of sections), so the counter is
-            # always in range and the default is only ever hit as that last
-            # section -- matching the bytecode's two-test-plus-else shape exactly.
-            _arms = [{"equals": str(_i), "scene": nm + ".json"}
-                     for _i, nm in enumerate(_ordered[:-1])]
-            _disp = {"type": "dispatch", "state_var": "2002", "arms": _arms,
-                     "default": _ordered[-1] + ".json",
-                     "note": ("Academic-challenge section selector: one section "
-                              "plays per day, chosen by the completion counter "
-                              "var2002 (0=History, 1=Science, else=English -- the "
-                              "last section is the bytecode's fall-through case).")}
-            _enl = _entry.get("nodes") or []
-            if _enl and isinstance(_enl[-1], dict) \
-                    and _enl[-1].get("type") in ("next", "goto_scene"):
-                _enl[-1] = _disp
-            else:
-                _enl.append(_disp)
-            _entry["nodes"] = _enl
-    # otherwise skips, leaving its arms orphaned. Making Some Dough's bakery
-    # (scene 4) is the case: after the baking minigame the entry reads var2004
-    # (the bakery-day counter) and a 5-arm cascade routes to that day's outcome
-    # (easiest->hardest), falling through to a "bakery closed" body once every
-    # day is done (var2004 > 4). The decoder linearized the entry straight into
-    # that closed-arm content, skipping the cascade and orphaning all 5 days.
-    # Here we split the closed-arm content out of the entry and replace it with a
-    # `dispatch` node whose arms are the byte-derived cascade targets and whose
-    # `default` is the (now separate) closed body. All byte-derived from
-    # resolve_sep_cascade_gates; guarded to fire only when the entry actually
-    # absorbed the cascade's fall-through (the arms are otherwise unreachable).
-    for sc in doc.get("scenes", []):
-        sd = sc.get("section_dispatch") or {}
-        cascades = sd.get("cascades") or []
-        if not cascades:
-            continue
-        scn = str(sc["scene"])
-        entry = files.get("s%s" % scn)
-        if entry is None:
-            continue
-        for casc in cascades:
-            arms = casc.get("cases") or []
-            if len(arms) < 3:
-                continue
-            cas_at = int(casc["at"])
-            # Only handle a cascade the entry absorbed: the cascade sits just
-            # past the entry's last pre-cascade node and the entry's own nodes
-            # continue PAST the cascade (into the fall-through body). Detect by a
-            # gap in the entry's offsets straddling cas_at.
-            ends = [int(nd["offset"]) for nd in entry.get("nodes") or []
-                    if isinstance(nd, dict) and nd.get("offset") is not None
-                    and str(nd["offset"]).lstrip("-").isdigit()]
-            if not ends:
-                continue
-            before = [e for e in ends if e < cas_at]
-            after = [e for e in ends if e > cas_at]
-            if not before or not after:
-                continue                       # entry doesn't straddle the cascade
-            # Split point: entry nodes with offset > cas_at are the fall-through
-            # (closed) body. Move them into a new default segment.
-            split_idx = None
-            for i, nd in enumerate(entry.get("nodes") or []):
-                o = nd.get("offset") if isinstance(nd, dict) else None
-                if o is not None and str(o).lstrip("-").isdigit() \
-                        and int(o) > cas_at:
-                    split_idx = i
-                    break
-            if split_idx is None:
-                continue
-            tail = entry["nodes"][split_idx:]
-            # The tail is the fall-through (bakery-closed) body. Its trailing
-            # gate is NOT an artifact -- it is the closed body's real terminal
-            # (var2002==3 -> the "what's left to do" menu, else -> the Help Ads
-            # redirect), so keep the whole tail intact.
-            default_name = "s%s_bakery_closed" % scn
-            default_nodes = list(tail)
-            # Resolve each arm's target segment (head-resolved to the arm body).
-            arm_out = []
-            for a in arms:
-                off = a.get("section_offset")
-                if off is None:
-                    continue
-                seg = _seg_at(scn, int(off))
-                if seg:
-                    arm_out.append({"equals": str(a.get("equals")),
-                                    "scene": seg + ".json"})
-            if len(arm_out) < 3:
-                continue
-            # Commit the split: entry keeps everything before the cascade, then a
-            # dispatch node; the closed body becomes its own segment.
-            files[default_name] = {"nodes": default_nodes}
-            _sr[default_name] = (cas_at + 1, max(after))
-            _scene_of[default_name] = scn
-            node = {"type": "dispatch", "state_var": casc["var"],
-                    "arms": arm_out, "default": default_name + ".json",
-                    "note": ("Byte-derived var cascade: state_var==equals enters "
-                             "the arm scene (the bakery-day outcome, easiest to "
-                             "hardest); when no arm matches (all days done) enter "
-                             "`default` (the bakery-closed body). The engine "
-                             "advances the counter each visit.")}
-            entry["nodes"] = entry["nodes"][:split_idx] + [node]
-            break                              # one cascade per scene entry
-
-    # Wire each bakery day's intro to its bake-the-cookies minigame (0x46).
-    # The bytecode places the day intro (visitor greeting) immediately before a
-    # 0x46 minigame whose result forks win/lose: win advances to a new day, lose
-    # repeats the same day. The generic minigame-fork splitter can't segment
-    # these safely (their arms return to the shared hub, and forcing the split
-    # regresses other episodes' 0x46 minigames), so wire them here, scoped to the
-    # gates the detector marked `bakery`. Each intro segment gains a trailing
-    # `minigame` node routing win -> the pass_at arm, lose -> the fail_at arm,
-    # all byte-derived from the fork offsets.
-    def _seg_at_scene(scn, off):
-        cont = after = al = None
-        pref = "s%s" % scn
-        for nm, bd in files.items():
-            if not (nm == pref or nm.startswith(pref + "_")):
-                continue
-            lohi = _sr.get(nm)
-            if not lohi:
-                continue
-            lo, hi = lohi
-            if lo <= off <= hi:
-                cont = nm
-            elif lo >= off and (al is None or lo < al):
-                after, al = nm, lo
-        return cont or after
-
-    def _seg_before_scene(scn, off, within=40):
-        pref = "s%s" % scn
-        best, gap = None, None
-        for nm in files:
-            if not (nm == pref or nm.startswith(pref + "_")):
-                continue
-            lohi = _sr.get(nm)
-            if not lohi:
-                continue
-            lo, hi = lohi
-            if hi < off and 0 <= off - hi <= within and (gap is None or off - hi < gap):
-                best, gap = nm, off - hi
-        return best
-
-    for sc in doc.get("scenes", []):
-        scn = str(sc["scene"])
-        mgr = sc.get("minigame_results") or {}
-        bgates = [g for g in (mgr.get("gates") or []) if g.get("bakery")]
-        if not bgates:
-            continue
-        # The segment whose terminal is the var2004 lose-customer cascade dispatch
-        # (the bakery entry). A bakery loss routes here so the counter advances
-        # and the next distinct "no sale" interaction plays.
-        _bakery_cascade_entry = None
-        _pref = "s%s" % scn
-        for nm, bd in files.items():
-            if not (nm == _pref or nm.startswith(_pref + "_")):
-                continue
-            for _nd in bd.get("nodes") or []:
-                if isinstance(_nd, dict) and _nd.get("type") == "dispatch" \
-                        and str(_nd.get("state_var")) == "2004":
-                    _bakery_cascade_entry = nm
-                    break
-            if _bakery_cascade_entry:
-                break
-        # Reconstruct the head of the var2009 loss-interaction chain. The chain
-        # serves the next "no sale" customer by loss count: 1st -> Hannah, 2nd ->
-        # Dexter, 3rd -> the twins (Kay/Kel), else -> the generic "no one bought"
-        # close. The eq2 and eq3 gates segment correctly (the s4 "_else" gate
-        # nodes), but the eq1 -> Hannah gate lands in an overlapping scene-1 byte
-        # span and is lost, so build it here: a gate that tests var2009 == 1,
-        # routing to the Hannah interaction on a match and to the existing eq2
-        # gate otherwise. `_bakery_lose_head` is the entry the day minigames' lose
-        # arm points at.
-        _bakery_lose_head = None
-        _has = lambda nm: nm in files
-
-        def _find_seg(pred):
-            for nm in files:
-                if not (nm == _pref or nm.startswith(_pref + "_")):
-                    continue
-                for _n in files[nm].get("nodes") or []:
-                    if isinstance(_n, dict) and pred(nm, _n):
-                        return nm
-            return None
-
-        _hannah = _find_seg(lambda nm, n: n.get("speaker") == "Hannah"
-                            and nm.endswith("_var2009_eq1"))
-        if not _hannah:
-            _hannah = _find_seg(lambda nm, n: n.get("speaker") == "Hannah")
-        # the existing eq2 gate segment (var2009 == 2 -> Dexter)
-        _eq2_gate = _find_seg(lambda nm, n: n.get("type") == "gate"
-                              and str(n.get("var")) == "2009"
-                              and str(n.get("equals")) == "2")
-        if _hannah and _eq2_gate:
-            _head_name = "s%s_lose" % scn
-            if _head_name not in files:
-                # The lose entry first advances the loss counter (var2009 += 1),
-                # THEN routes by its new value: 1 -> Hannah, 2 -> Dexter, 3 -> the
-                # twins, else -> the generic "no one bought a cookie" close. The
-                # bytecode does `read var2009 ; +1 ; write` immediately before the
-                # ==1 gate (byte offset ~12450); without that increment the counter
-                # stays 0 and every loss falls straight through to the generic
-                # close, so the Hannah/Dexter/twins escalation never plays. Emit the
-                # increment as the head's first node so repeated losses escalate.
-                files[_head_name] = {"nodes": [
-                    {"type": "var_add", "var": "2009", "value": 1,
-                     "source": "bakery_loss_counter"},
-                    {"type": "gate", "var": "2009", "equals": "1",
-                     "then": _hannah + ".json", "else": _eq2_gate + ".json"}]}
-            _bakery_lose_head = _head_name
-
-        # The bake days play the bakery word-sets IN ORDER: winning a day advances
-        # to the next set, losing repeats the same set the next day. There are four
-        # unique pick word-sets (Cinnamon, Coconut, Peanut butter, Snickerdoodles)
-        # but five bake days -- day 4 repeats the Peanut-butter set before the final
-        # Snickerdoodles day, matching the raw bytecode's five PICK sections (the
-        # fourth reuses the third's word-set). So the day -> set index sequence is
-        # [0, 1, 2, 2, 3]; days beyond that clamp to the last set.
-        _pw_bank = (sc.get("minigames") or {}).get("pick_word") or []
-        _bw_bank = (sc.get("minigames") or {}).get("build_word") or []
-        _day_set_seq = [0, 1, 2, 2, 3]
-
-        def _set_index(day_idx, bank_len):
-            if bank_len <= 0:
-                return 0
-            raw = (_day_set_seq[day_idx] if day_idx < len(_day_set_seq)
-                   else day_idx)
-            return min(raw, bank_len - 1)
-
-        for _day_idx, g in enumerate(bgates):
-            trig = int(g["trigger"])
-            intro = _seg_before_scene(scn, trig)
-            if intro is None:
-                continue
-            # The bakery gate is `minigame; push 2; ==; 2b`: the win arm is the
-            # customer sale that pays out (character interaction + "Kim earned N
-            # dollars") and then ends the day at the hub; the loss repeats the
-            # same day. The win content is the segment that immediately follows
-            # this day's intro in bytecode order (verified against gameplay: day 1
-            # -> Ashley $10, day 2 -> Spike $20, day 3 -> Mona $30, day 4 ->
-            # Shapiro $40, day 5 -> Zero-G $50). The fork's raw fail_at/pass_at
-            # offsets cross segment boundaries unreliably for the later days, so
-            # anchor on the intro's own scene span instead: win = the next segment
-            # in this scene after the intro that carries a payout line.
-            intro_hi = (_sr.get(intro) or (0, 0))[1]
-            win = None
-            _cands = []
-            for nm in files:
-                if not (nm == _pref or nm.startswith(_pref + "_")):
-                    continue
-                lohi = _sr.get(nm)
-                if not lohi or nm == intro:
-                    continue
-                lo, hi = lohi
-                if lo > intro_hi:
-                    _cands.append((lo, nm))
-            for _lo, nm in sorted(_cands):
-                _has_payout = any(isinstance(x, dict)
-                                  and x.get("type") in ("dialogue", "narration",
-                                                         "status")
-                                  and "dollar" in (x.get("text") or "").lower()
-                                  for x in (files[nm].get("nodes") or []))
-                win = nm
-                if _has_payout:
-                    break
-            if not win:
-                continue
-            # Loss: the bytecode increments the loss counter (var2009) and routes
-            # into a gate chain that serves the next "no sale" customer by count --
-            # 1st loss -> Hannah, 2nd -> Dexter, 3rd -> the twins (Kay/Kel), and
-            # every loss after that -> the generic "no one bought a cookie" close;
-            # each ends the day back at the hub, where the player picks the next
-            # day's activity. Point `lose` at the head of that var2009 chain so the
-            # loss path is reachable in order. The chain head is reconstructed
-            # below (the eq1->Hannah gate lands in an overlapping scene-1 span in
-            # the raw segmentation, so it is rebuilt here rather than trusted from
-            # the offset attribution).
-            lose = _bakery_lose_head or intro
-            mg_node = {"type": "minigame", "minigame_type": "pick_word",
-                       "kind": "bake",
-                       "win": win + ".json", "lose": lose + ".json",
-                       "win_threshold": str(g.get("win_threshold")),
-                       "timed": True, "timer_ms": "20000",
-                       "offset": str(g.get("trigger")),
-                       "note": ("Bakery bake-the-cookies round. TIME-BOUND: the "
-                                "game keeps drawing prompts from its round pool "
-                                "until the timer (timer_ms) runs out ('Time's up!'); "
-                                "there is no fixed round count. The player must get "
-                                "win_threshold prompts correct before time expires "
-                                "to win. Win: the customer buys and pays out, then "
-                                "the day ends back at the hub. Loss: the loss "
-                                "counter (var2009) advances and the next no-sale "
-                                "interaction plays (Hannah, then Dexter, then the "
-                                "twins, then the generic 'no one bought a cookie' "
-                                "close), ending the day at the hub.")}
-            # Attach the baking prompts the player plays. The bakery bake round was
-            # authored in two device variants, both compiled into the script: a
-            # tap-to-choose "pick word" game (opcode 0x47, drawing from the
-            # pick_word bank -- "Bake cookies! Pick the right ingredients!") and a
-            # spell-from-letters "build word" game (opcode 0x46, drawing from the
-            # build_word bank -- "Add sugar and flour!" with a letter pool). The
-            # original ran one or the other depending on the device (the pick / tap
-            # variant on mobile, the build / spell variant on the larger-screen
-            # tablet build); the selection happened in the native player, not via a
-            # scripted variable, so both banks sit in the file. Carry BOTH so the
-            # runtime can render whichever suits its target device: `setup` is the
-            # default (mobile pick word) and `setup_alt` is the tablet build-word
-            # variant. NOTE: `rounds` is the POOL the timed game draws from, not a
-            # fixed sequence played to completion -- the game cycles prompts (the
-            # "Next round" beat) until "Time's up!". The 0x47 pick game carries an
-            # explicit 20000 ms timer operand; the 0x46 build game uses the same
-            # engine timer, with its leading operand (9) being the pool size rather
-            # than a round cap.
-            # Each bake day is a SINGLE pick-word game: one word-set of two correct
-            # and two decoy words. The list reshuffles as the player picks, and they
-            # keep picking from that same set until the ~20s timer ends (tallying
-            # correct picks toward win_threshold). Which set a day plays follows the
-            # play order (day -> set index via _day_set_seq): winning advances to
-            # the next set, losing repeats the same one.
-            _pi = _set_index(_day_idx, len(_pw_bank))
-            _bi = _set_index(_day_idx, len(_bw_bank))
-            _pw = _pw_bank[_pi:_pi + 1] if _pw_bank else []
-            _bw = _bw_bank[_bi:_bi + 1] if _bw_bank else []
-            if _pw:
-                mg_node["setup"] = {"bank": "pick_word", "rounds": _pw,
-                                    "device": "mobile", "timer_ms": "20000"}
-                mg_node["minigame_type"] = "pick_word"
-                if _bw:
-                    mg_node["setup_alt"] = {"bank": "build_word", "rounds": _bw,
-                                            "device": "tablet",
-                                            "timer_ms": "20000"}
-            elif _bw:
-                mg_node["setup"] = {"bank": "build_word", "rounds": _bw,
-                                    "device": "tablet", "timer_ms": "20000"}
-                mg_node["minigame_type"] = "build_word"
-            nds = files[intro].get("nodes") or []
-            # replace a trailing `next`/`goto_scene` with the minigame, else append
-            if nds and isinstance(nds[-1], dict) \
-                    and nds[-1].get("type") in ("next", "goto_scene"):
-                nds[-1] = mg_node
-            else:
-                nds.append(mg_node)
-            files[intro]["nodes"] = nds
-
-        # Repair the bakery entry so it routes cleanly to the day intros. The raw
-        # scene-4 entry linearizes the shared bake-the-cookies ingredient rounds
-        # as five standalone `action` minigame nodes (win/lose null) ahead of the
-        # var2004 day dispatch, and that dispatch's arms resolve to win/lose
-        # fragments rather than the day intros (the scene-1/3/4 byte-offset overlap
-        # corrupts the landing segments). Rebuild it: drop the dead entry
-        # minigames and point the var2004 arms at the day intros in win-count order
-        # (0 wins -> day 1 ... 4 wins -> day 5), with the all-days-done default
-        # going to the bakery-closed close. Scoped to the scene that actually has
-        # the bakery gates, so no other episode is touched.
-        _entry = files.get(_pref)
-        if _entry is not None:
-            _enodes = _entry.get("nodes") or []
-            # the ordered day intros in this scene (each carries a bake minigame)
-            _day_intros = []
-            for nm in sorted(files,
-                             key=lambda n: (_sr.get(n) or (1 << 30, 0))[0]):
-                if not (nm == _pref or nm.startswith(_pref + "_")):
-                    continue
-                if any(isinstance(x, dict) and x.get("type") == "minigame"
-                       and x.get("kind") == "bake"
-                       for x in files[nm].get("nodes") or []):
-                    _day_intros.append(nm)
-            _closed = next((nm for nm in files
-                            if nm.startswith(_pref + "_")
-                            and nm.endswith("_bakery_closed")), None)
-            if _day_intros:
-                # strip the leading dead action-minigames (win/lose both null)
-                _kept = [x for x in _enodes
-                         if not (isinstance(x, dict)
-                                 and x.get("type") == "minigame"
-                                 and x.get("kind") == "action"
-                                 and not x.get("win") and not x.get("lose"))]
-                # rebuild / correct the var2004 dispatch arms
-                _fixed = []
-                for x in _kept:
-                    if isinstance(x, dict) and x.get("type") == "dispatch" \
-                            and str(x.get("state_var")) == "2004":
-                        x = dict(x)
-                        x["arms"] = [{"equals": str(i), "scene": nm + ".json"}
-                                     for i, nm in enumerate(_day_intros)]
-                        if _closed:
-                            x["default"] = _closed + ".json"
-                    _fixed.append(x)
-                # if there was no var2004 dispatch left, append one
-                if not any(isinstance(x, dict) and x.get("type") == "dispatch"
-                           and str(x.get("state_var")) == "2004" for x in _fixed):
-                    _fixed.append({"type": "dispatch", "state_var": "2004",
-                                   "arms": [{"equals": str(i), "scene": nm + ".json"}
-                                            for i, nm in enumerate(_day_intros)],
-                                   "default": (_closed + ".json") if _closed
-                                   else (_day_intros[0] + ".json")})
-                _entry["nodes"] = _fixed
-
-            # First-time vs replay intro gate. A bakery day can carry an extra
-            # "first visit" intro variant (a segment named ..._var2010_eq0, the
-            # var2010==0 arm of a `read var2010 ; ==0 ; 2b` gate in the bytecode:
-            # e.g. Day 4's full "This is the Bake-ronomicon..." reveal, shown only
-            # the first time, versus the terse "...try the Bake-ronomicon again?"
-            # on a replay). The day dispatch enters the terse intro directly, so the
-            # first-time variant is left unreferenced. Reconnect it byte-derivably:
-            # find the day intro that shares the variant's continuation (both flow
-            # into the same day gameplay), and route the dispatch arm through a
-            # gate -- var2010==0 -> the first-time variant, else -> the terse intro.
-            _variant = next((nm for nm in files
-                             if (nm == _pref or nm.startswith(_pref + "_"))
-                             and nm.endswith("_var2010_eq0")), None)
-            if _variant is not None:
-                # the continuation the variant leads into (its terminal next)
-                _vnodes = files[_variant].get("nodes") or []
-                _vnext = None
-                for x in reversed(_vnodes):
-                    if isinstance(x, dict) and x.get("type") in ("next",
-                                                                 "goto_scene"):
-                        _vnext = (x.get("next") or x.get("file"))
-                        break
-                # the terse intro is the day intro whose gameplay is that same
-                # continuation (the one the dispatch currently enters)
-                _terse = None
-                for nm in _day_intros:
-                    _mynext = None
-                    for x in files[nm].get("nodes") or []:
-                        if isinstance(x, dict) and x.get("type") == "minigame" \
-                                and x.get("kind") == "bake":
-                            _mynext = x.get("win")
-                    # match by shared continuation, or by adjacency in offset order
-                    if _vnext and (_mynext == _vnext
-                                   or files[nm] is files.get(
-                                       (_vnext or "").replace(".json", ""))):
-                        _terse = nm
-                        break
-                if _terse is None:
-                    # fall back to the day intro immediately after the variant by
-                    # offset (the variant sits just before its terse counterpart)
-                    _voff = min((int(x["offset"]) for x in _vnodes
-                                 if isinstance(x, dict)
-                                 and x.get("offset") is not None), default=None)
-                    if _voff is not None:
-                        _after = sorted(
-                            ((_sr.get(nm) or (1 << 30, 0))[0], nm)
-                            for nm in _day_intros
-                            if (_sr.get(nm) or (1 << 30, 0))[0] > _voff)
-                        _terse = _after[0][1] if _after else None
-                if _terse is not None:
-                    # repoint the dispatch arm for the terse intro at a gate node
-                    _gate_name = _terse + "_firstvisit_gate"
-                    files[_gate_name] = {"nodes": [{
-                        "type": "gate", "var": "2010", "equals": "0",
-                        "then": _variant + ".json",
-                        "else": _terse + ".json",
-                        "source": "first_visit_intro"}]}
-                    for x in _entry.get("nodes") or []:
-                        if isinstance(x, dict) and x.get("type") == "dispatch" \
-                                and str(x.get("state_var")) == "2004":
-                            for a in x.get("arms") or []:
-                                if (a.get("scene") or "") == _terse + ".json":
-                                    a["scene"] = _gate_name + ".json"
-                    # ensure the variant continues into the terse intro's gameplay
-                    if _vnext is None:
-                        files[_variant].setdefault("nodes", []).append(
-                            {"type": "next", "next": _terse + ".json"})
-    # real content at the gate's pass_at/fail_at offsets. The Help Ads (scene 3)
-    # use score-forked minigames just like the bakery: on a good result the
-    # helpee is satisfied and pays out, on a poor one they are unhappy. When the
-    # generic fork splitter produced empty win[]/lose[] stubs (the arm content
-    # sits in a segment the split could not capture), resolve each side to the
-    # segment that actually contains the byte-derived arm offset so the outcome
-    # (e.g. Andrew's dismissive "rock opera" reply) is reachable.
-    def _has_content(nm):
-        for x in files.get(nm, {}).get("nodes", []) or []:
-            if isinstance(x, dict) and x.get("type") in ("dialogue", "narration",
-                                                          "choice"):
-                return True
-        return False
-
-    for sc in doc.get("scenes", []):
-        scn = str(sc["scene"])
-        by_gate = {int(g["gate"]): g for g in
-                   ((sc.get("minigame_results") or {}).get("gates") or [])
-                   if g.get("gate") is not None}
-        if not by_gate:
-            continue
-        for nm, bd in files.items():
-            for nd in bd.get("nodes") or []:
-                if not isinstance(nd, dict) or nd.get("type") != "minigame":
-                    continue
-                off = nd.get("offset")
-                g = by_gate.get(int(off)) if off is not None \
-                    and str(off).lstrip("-").isdigit() else None
-                if g is None:
-                    continue
-                w = (nd.get("win") or "").replace(".json", "")
-                l = (nd.get("lose") or "").replace(".json", "")
-                if w and not _has_content(w):
-                    real = _seg_at_scene(scn, int(g["pass_at"]))
-                    if real and _has_content(real):
-                        nd["win"] = real + ".json"
-                if l and not _has_content(l):
-                    real = _seg_at_scene(scn, int(g["fail_at"]))
-                    if real and _has_content(real):
-                        nd["lose"] = real + ".json"
-
     # Link an offset-less CHOICE segment to the segment that poses its question.
     # A choice node carries no byte offset, so the byte-adjacency pass is blind
     # to it and cannot position it between the prompt and the following section.
@@ -10393,8 +10997,6 @@ def build_story_segments(doc, var_gates=None):
             for _v in _s.get("resets") or []:
                 if _v not in _resets:
                     _resets.append(_v)
-        if not _resets:
-            _resets = [2000, 2001]
         # segments in this scene, by their min offset, to locate a target offset
         _scene_segs = []
         for _nm, _bd in files.items():
@@ -10439,7 +11041,7 @@ def build_story_segments(doc, var_gates=None):
                     _lbl = (_opt.get("label") or "").lower()
                     if "checkpoint" not in _lbl and "replay" not in _lbl:
                         continue
-                    _tgt_seg = (_opt.get("next") or "").replace(".json", "")
+                    _tgt_seg = _segref(_opt.get("next"))
                     _tn = files.get(_tgt_seg, {}).get("nodes") or []
                     _is_stub = (len(_tn) == 0) or all(
                         isinstance(x, dict) and x.get("type") in ("end", "next")
@@ -10552,6 +11154,8 @@ def build_story_segments(doc, var_gates=None):
                 # NOT emit a redundant on_timeout in that case -- the engine uses
                 # `after`. on_timeout appears only when the timeout genuinely
                 # diverges from the default branch.
+                if _nd.get("on_timeout"):
+                    continue            # already set from the resolved timeout region
                 _toff = _info.get("timeout_offset")
                 _tseg = _seg_at(_toff) if _toff is not None else None
                 if _tseg is not None and _tseg != _nm:
@@ -10559,270 +11163,9 @@ def build_story_segments(doc, var_gates=None):
                     if _tval != _nd.get("after"):
                         _nd["on_timeout"] = _tval
 
-    # Ending-terminal repair. Making Some Dough's several alternate endings are
-    # laid out linearly and each ends with a `SEP op=63` "return to caller" jump
-    # whose target (in a data region) does not resolve, so the decoder falls each
-    # ending through into the *next* ending section in file order. That is wrong:
-    # a `22`-marker sits between them, so they are independent alternate endings,
-    # and (for example) the loan/Boss "Congratulations! You saved the bakery"
-    # ending leaks straight into the "I wasn't able to get enough money" failure
-    # text. Re-point every such ending to the shared end-of-episode survey instead,
-    # so each ending concludes and then hands off to the survey rather than
-    # replaying a different ending's narration.
-    #
-    # Byte-derived: an ending is a segment whose bytecode span ends with `0x42`
-    # SEP carrying operand 63 immediately followed (within a few instructions) by a
-    # `22 43 48 4a` section marker OR the file's end; the survey is the segment
-    # that owns the "Take Survey.|Skip Survey." choice.
-    _ending_scn_data = {}
-    for sc in doc.get("scenes", []):
-        _lbl = sc.get("script")
-        _cf = (sc.get("control_flow") or {})
-        # collect this scene's raw bytes-driven SEP op=63 terminals if present
-        _seps63 = sc.get("_sep63_terminals")
-        if _seps63:
-            _ending_scn_data[str(sc.get("scene"))] = _seps63
-    # locate the survey segment (owns a choice with a "Take Survey" option)
-    _survey_seg = None
-    for _nm, _bd in files.items():
-        for _n in _bd.get("nodes") or []:
-            if isinstance(_n, dict) and _n.get("type") == "choice" \
-                    and any("take survey" in (o.get("label") or "").lower()
-                            for o in _n.get("options") or []):
-                _survey_seg = _nm
-                break
-        if _survey_seg:
-            break
-    if _survey_seg is not None and _ending_scn_data:
-        # Split the survey choice out of the failure-preamble segment. This is only
-        # needed when the scene has `SEP op=63` ending terminals (see
-        # _ending_scn_data) that must bypass a failure-only preamble to reach the
-        # shared survey -- the Making Some Dough case, where the survey choice is
-        # packaged in the same segment as the "Yikes! Talk about a depressing
-        # ending..." narration that belongs ONLY to the failure ending. Episodes
-        # without such terminals (e.g. As Time Goes By, whose endings converge
-        # cleanly on a single survey segment) are left untouched: their survey
-        # narration is a legitimate shared convergence point, not failure-only
-        # text, so splitting it would needlessly restructure a correct ending.
-        _survey_nodes = files[_survey_seg].get("nodes") or []
-        _split_at = None
-        for _i, _n in enumerate(_survey_nodes):
-            if isinstance(_n, dict) and _n.get("type") == "choice" \
-                    and any("take survey" in (o.get("label") or "").lower()
-                            for o in _n.get("options") or []):
-                _split_at = _i
-                break
-        _survey_choice_seg = _survey_seg
-        if _split_at is not None and _split_at > 0:
-            _survey_choice_seg = _survey_seg + "_choice"
-            files[_survey_choice_seg] = {"nodes": _survey_nodes[_split_at:]}
-            _scene_of[_survey_choice_seg] = _scene_of.get(_survey_seg)
-            files[_survey_seg]["nodes"] = _survey_nodes[:_split_at] + [
-                {"type": "next", "next": _survey_choice_seg + ".json",
-                 "source": "survey_split"}]
-
-        for _scn, _term_offs in _ending_scn_data.items():
-            _scene_segs = sorted(
-                ((min(int(x["offset"]) for x in (files[nm].get("nodes") or [])
-                      if isinstance(x, dict) and x.get("offset") is not None),
-                  max(int(x["offset"]) for x in (files[nm].get("nodes") or [])
-                      if isinstance(x, dict) and x.get("offset") is not None), nm)
-                 for nm in files
-                 if str(_scene_of.get(nm)) == _scn
-                 and any(isinstance(x, dict) and x.get("offset") is not None
-                         for x in files[nm].get("nodes") or [])),
-                key=lambda t: t[0])
-            for _toff in _term_offs:
-                _toff = int(_toff)
-                _owner = None
-                for _lo, _hi, _nm in _scene_segs:
-                    _lo, _hi = int(_lo), int(_hi)
-                    if _lo <= _toff <= _hi + 40:
-                        _owner = _nm
-                # never redirect the survey segments themselves, nor the failure
-                # preamble that legitimately leads INTO the survey (that chain
-                # already resolves to the survey via the split above)
-                if _owner is None or _owner in (_survey_seg, _survey_choice_seg):
-                    continue
-                _onodes = files[_owner].get("nodes") or []
-                if _onodes and isinstance(_onodes[-1], dict) \
-                        and _onodes[-1].get("type") == "next":
-                    _cur = (_onodes[-1].get("next") or "").replace(".json", "")
-                    if _cur != _survey_choice_seg:
-                        _onodes[-1] = {"type": "next",
-                                       "next": _survey_choice_seg + ".json",
-                                       "source": "ending_terminal"}
-
-    # Var2000 >= threshold gate that guards success vs failure endings. Making
-    # Some Dough uses var2000 as money and gates the ending confrontation on
-    # `var2000 >= 200`; the two-scene episodes (Tutors, Swim, Halloween Dance)
-    # reuse var2000 as the minigame score and gate a rank/bonus branch on it. In
-    # every case the gate lives in a small inter-section gap that segmentation
-    # doesn't pin to a boundary, so the gate would be dropped and both arms would
-    # merge (in dough: the failure ending orphaned and every ending running
-    # regardless of the goal). Re-emit the gate at the head of its success entry
-    # so the engine takes the intended branch.
-    _threshold_gate = None
-    _threshold_scene = None
-    for sc in doc.get("scenes", []):
-        _sc_gates = (var_gates or {}).get(sc.get("script")) or []
-        for _g in _sc_gates:
-            if str(_g.get("var")) == "2000" and _g.get("op") == "gte":
-                _threshold_gate = _g
-                _threshold_scene = str(sc.get("scene"))
-                break
-        if _threshold_gate:
-            break
-    if _threshold_gate is not None:
-        _gate_end = int(_threshold_gate["then"][1])
-        _entry_seg = None
-        _fail_seg = None
-        _cands = [(min(int(x["offset"]) for x in (files[nm].get("nodes") or [])
-                       if isinstance(x, dict) and x.get("offset") is not None),
-                   nm)
-                  for nm in files
-                  if str(_scene_of.get(nm)) == _threshold_scene
-                  and any(isinstance(x, dict) and x.get("offset") is not None
-                          for x in files[nm].get("nodes") or [])]
-        _cands.sort()
-        for _lo, _nm in _cands:
-            if _lo >= _gate_end - 8:
-                _entry_seg = _nm
-                break
-        # the failure/no-bonus counterpart is a peer segment whose name mirrors
-        # the success entry but with an `_m` suffix (the segment layout is
-        # <base>_else -> then arm, <base>_else_m -> else arm), so just look up
-        # the same-scene sibling
-        if _entry_seg is not None:
-            for _lo, _nm in _cands:
-                if _nm.endswith("_m") and _nm[:-2] == _entry_seg:
-                    _fail_seg = _nm
-                    break
-                if _nm.endswith("_else_m"):
-                    _fail_seg = _nm
-        # Guard against a self-referential loop. When the threshold branch is
-        # already resolved as a real gate in the bytecode, one segment (the
-        # `_fail_seg` candidate) already gates on the same condition and routes
-        # into `_entry_seg`. Materializing another gate and rewiring `_entry_seg`
-        # references through it then points that segment's own gate at the new
-        # gate, whose else points back -- an infinite bounce (Halloween Dance's
-        # score screen looped this way at sub-bonus scores). If the chosen
-        # `_fail_seg` already contains a gate that reaches `_entry_seg`, the real
-        # gate is doing the job and no materialization is needed; skip it.
-        if _entry_seg is not None and _fail_seg is not None:
-            _already_gated = False
-            for _n in files.get(_fail_seg, {}).get("nodes") or []:
-                if isinstance(_n, dict) and _n.get("type") == "gate":
-                    for _k in ("then", "else"):
-                        if (_n.get(_k) or "").replace(".json", "") == _entry_seg:
-                            _already_gated = True
-            if _already_gated:
-                _fail_seg = None
-        if _entry_seg is not None and _fail_seg is not None:
-            _gate_seg = _entry_seg + "_threshold_gate"
-            files[_gate_seg] = {"nodes": [{
-                "type": "gate", "var": "2000", "op": "gte",
-                "equals": str(int(_threshold_gate["equals"])),
-                "then": _entry_seg + ".json",
-                "else": _fail_seg + ".json",
-                "source": "var2000_threshold_gate"}]}
-            _scene_of[_gate_seg] = _threshold_scene
-            for _nm, _bd in files.items():
-                if _nm == _gate_seg:
-                    continue
-                for _n in _bd.get("nodes") or []:
-                    if not isinstance(_n, dict):
-                        continue
-                    for _k in ("next", "then", "else", "after"):
-                        if (_n.get(_k) or "").replace(".json", "") == _entry_seg:
-                            _n[_k] = _gate_seg + ".json"
-
-    # Bonus-scene routing repair. A score gate can unlock a bonus scene: the
-    # `then` (high score) branch shows a short "You have unlocked the bonus scene!"
-    # card, and the `else` (low score) branch shows the ordinary end-of-episode
-    # wrap-up. In the bytecode the bonus montage and the shared survey are welded
-    # onto the tail of the wrap-up section, and the "bonus unlocked" card ends with
-    # a jump INTO the montage -- but segmentation leaves the card dead-ending and
-    # bundles promo + montage + survey into one segment, so the high-score path
-    # never plays the montage and the low-score path wrongly plays it. Repair by
-    # splitting that segment into promo / montage / survey and wiring:
-    #   high score: "bonus unlocked" -> montage -> survey
-    #   low score : promo            ->            survey
-    # The montage boundary is the first narration after the promo/social lines that
-    # begins the scene ("A while later, ... wanders out"); the survey is the
-    # trailing Take/Skip-Survey choice. Byte-agnostic and self-contained: it only
-    # fires when a gate's then-branch is a dead-end bonus card whose sibling
-    # else-branch carries both a montage and a survey choice.
-    def _seg_text(_nm, _idx):
-        _n = (files.get(_nm, {}).get("nodes") or [])
-        if 0 <= _idx < len(_n) and isinstance(_n[_idx], dict):
-            return (_n[_idx].get("text") or "")
-        return ""
-
-    for _gnm in list(files.keys()):
-        for _gn in files[_gnm].get("nodes") or []:
-            if not (isinstance(_gn, dict) and _gn.get("type") == "gate"):
-                continue
-            _then_v, _else_v = _gn.get("then"), _gn.get("else")
-            if not isinstance(_then_v, str) or not isinstance(_else_v, str):
-                continue                       # inline (non-ref) arms: skip this pass
-            _then = _then_v.replace(".json", "")
-            _else = _else_v.replace(".json", "")
-            if _then not in files or _else not in files:
-                continue
-            # then-branch must be a short "bonus unlocked" card that dead-ends
-            _tn = files[_then].get("nodes") or []
-            _t_txt = " ".join((n.get("text") or "") for n in _tn
-                              if isinstance(n, dict)).lower()
-            _t_deadend = not any(isinstance(n, dict) and n.get("type") in
-                                 ("next", "goto_scene", "choice", "gate",
-                                  "dispatch", "minigame")
-                                 for n in _tn)
-            if "bonus scene" not in _t_txt or not _t_deadend:
-                continue
-            # else-branch must carry a survey choice (Take/Skip Survey)
-            _en = files[_else].get("nodes") or []
-            _survey_idx = None
-            for _i, _n in enumerate(_en):
-                if isinstance(_n, dict) and _n.get("type") == "choice" \
-                        and any("survey" in (o.get("label") or "").lower()
-                                for o in _n.get("options") or []):
-                    _survey_idx = _i
-                    break
-            if _survey_idx is None:
-                continue
-            # montage begins at the first narration mentioning the scene turn
-            # ("a while later" / "wanders out") after the promo lines
-            _montage_idx = None
-            for _i, _n in enumerate(_en):
-                if isinstance(_n, dict) and _n.get("type") == "narration":
-                    _lt = (_n.get("text") or "").lower()
-                    if "a while later" in _lt or "wanders out" in _lt:
-                        _montage_idx = _i
-                        break
-            if _montage_idx is None or _montage_idx >= _survey_idx:
-                continue
-            # carve the survey tail into its own shared segment
-            _survey_seg2 = _else + "_survey"
-            files[_survey_seg2] = {"nodes": _en[_survey_idx:]}
-            _scene_of[_survey_seg2] = _scene_of.get(_else)
-            # carve the montage (between promo and survey) into its own segment,
-            # ending by falling through to the shared survey
-            _montage_seg = _else + "_bonus"
-            files[_montage_seg] = {"nodes": _en[_montage_idx:_survey_idx] +
-                                   [{"type": "next",
-                                     "next": _survey_seg2 + ".json",
-                                     "source": "bonus_montage"}]}
-            _scene_of[_montage_seg] = _scene_of.get(_else)
-            # the else-branch keeps only the promo prefix, then jumps to the survey
-            files[_else]["nodes"] = _en[:_montage_idx] + [
-                {"type": "next", "next": _survey_seg2 + ".json",
-                 "source": "bonus_skip"}]
-            # the bonus card (then-branch) now flows into the montage instead of
-            # dead-ending
-            files[_then]["nodes"] = _tn + [
-                {"type": "next", "next": _montage_seg + ".json",
-                 "source": "bonus_unlocked"}]
+    # (No text-keyed survey/ending surgery: endings come from executed code;
+    # where the story graph differs from the original, verification lowers
+    # the scene.)
 
     # Wire a minigame content-fork whose fail (lose) arm would otherwise be
     # orphaned. A word-bank minigame can branch on the player's score: on a pass
@@ -10843,7 +11186,7 @@ def build_story_segments(doc, var_gates=None):
     # blocks that a story choice already enters -- in every one of those the fail
     # target is reachable, so this pass leaves them untouched.
     def _norm(x):
-        return x.replace(".json", "") if isinstance(x, str) else x
+        return x.replace(".json", "") if isinstance(x, str) else (None if isinstance(x, (list, dict)) else x)
 
     def _edge_targets(_b):
         _out = []
@@ -11014,7 +11357,7 @@ def build_story_segments(doc, var_gates=None):
             _sd_here.pop("checkpoints", None)
     if _fail_offs:
         def _norm2(x):
-            return x.replace(".json", "") if isinstance(x, str) else x
+            return x.replace(".json", "") if isinstance(x, str) else (None if isinstance(x, (list, dict)) else x)
 
         def _edges2(_b):
             _o = []
@@ -11116,7 +11459,7 @@ def build_story_segments(doc, var_gates=None):
             _sd_alt.pop("branch_alt_sections", None)
     if _alt_offs:
         def _norm3(x):
-            return x.replace(".json", "") if isinstance(x, str) else x
+            return x.replace(".json", "") if isinstance(x, str) else (None if isinstance(x, (list, dict)) else x)
 
         def _edges3(_b):
             _o = []
@@ -11213,7 +11556,7 @@ def build_story_segments(doc, var_gates=None):
             _sd_def.pop("default_arm", None)
     if _def_offs:
         def _norm4(x):
-            return x.replace(".json", "") if isinstance(x, str) else x
+            return x.replace(".json", "") if isinstance(x, str) else (None if isinstance(x, (list, dict)) else x)
 
         def _edges4(_b):
             _o = []
@@ -11306,7 +11649,7 @@ def build_story_segments(doc, var_gates=None):
             _sd_cg.pop("computed_gate_targets", None)
     if _cgt_pairs:
         def _norm6(x):
-            return x.replace(".json", "") if isinstance(x, str) else x
+            return x.replace(".json", "") if isinstance(x, str) else (None if isinstance(x, (list, dict)) else x)
 
         def _edges6(_b):
             _o = []
@@ -11480,7 +11823,7 @@ def build_story_segments(doc, var_gates=None):
             _sc.pop("_linear_sep_chains", None)
     if _lsc_pairs:
         def _norm7(x):
-            return x.replace(".json", "") if isinstance(x, str) else x
+            return x.replace(".json", "") if isinstance(x, str) else (None if isinstance(x, (list, dict)) else x)
 
         def _edges7(_b):
             _o = []
@@ -11896,9 +12239,10 @@ def build_segmented_doc(doc, var_gates=None, score_tier_thresholds=None):
                 if not isinstance(_nd, dict):
                     continue
                 for _kk in ("next", "then", "else", "file", "win", "lose",
-                            "after", "default", "exhausted"):
+                            "after", "default", "exhausted", "on_timeout", "segment"):
                     if isinstance(_nd.get(_kk), str):
                         _referenced.add(_nd[_kk])
+                        _referenced.add(_nd[_kk].replace(".json", ""))
                 for _o in _nd.get("options", []) or []:
                     if isinstance(_o, dict):
                         if isinstance(_o.get("next"), str):
@@ -12058,7 +12402,8 @@ def build_segmented_doc(doc, var_gates=None, score_tier_thresholds=None):
         for _n in _s.get("nodes", []):
             if not isinstance(_n, dict):
                 continue
-            for _k in ("next", "then", "else", "win", "lose", "after", "default"):
+            for _k in ("next", "then", "else", "win", "lose", "after", "default",
+                       "on_timeout", "segment"):
                 if isinstance(_n.get(_k), str):
                     _referenced_seg.add(_n[_k].replace(".json", ""))
             for _o in _n.get("options", []) or []:
@@ -12112,7 +12457,7 @@ def build_segmented_doc(doc, var_gates=None, score_tier_thresholds=None):
         _nodes = [_n for _n in _s.get("nodes", []) if isinstance(_n, dict)]
         if len(_nodes) >= 2 and _nodes[-1].get("type") == "next" \
                 and _nodes[-2].get("type") == "end_card":
-            _tgt = (_nodes[-1].get("next") or "").replace(".json", "")
+            _tgt = _segref(_nodes[-1].get("next"))
             if _tgt in _gate_arm_targets and _tgt != _nm:
                 _s["nodes"][-1] = {"type": "end", "source": "credit_card_terminal"}
 
@@ -12342,6 +12687,6540 @@ def derive_main_characters(scripts, cast, tag_mains, speak_thresh=5):
     return tag_mains
 
 
+def _resolve_choice_aliases(seg_doc):
+    """A choice that jumps to a dispatch shared with another choice (its twin)
+    takes the twin's FINAL option targets, after every repair pass. Also strips
+    the internal offset markers."""
+    segs = seg_doc.get("segments") or {}
+    by_off = {}
+    for g in segs.values():
+        for n in g.get("nodes", []):
+            if isinstance(n, dict) and n.get("type") == "choice" and n.get("_off") is not None:
+                by_off[str(n["_off"])] = n
+    for g in segs.values():
+        for n in g.get("nodes", []):
+            if not (isinstance(n, dict) and n.get("type") == "choice"):
+                continue
+            al = n.pop("_alias_of", None)
+            if al is not None:
+                tw = by_off.get(str(al))
+                if tw is not None:
+                    tw_opts = {str(o.get("index")): o for o in tw.get("options", [])}
+                    for o in n.get("options", []):
+                        t = tw_opts.get(str(o.get("index")))
+                        if t is not None and t.get("next"):
+                            o["next"] = t["next"]
+                    for k in ("after", "on_timeout"):
+                        if tw.get(k) and not n.get(k):
+                            n[k] = tw[k]
+    for g in segs.values():
+        for n in g.get("nodes", []):
+            if isinstance(n, dict):
+                n.pop("_off", None)
+
+
+def _vm_effective_gotos(seg_doc, scripts):
+    """The engine only SCHEDULES scenes (yield 0x0a) and loads the LAST one
+    scheduled when the script halts. A goto whose schedule is followed by another
+    before the halt is superseded (New Girl's bootstrap schedules scene 1, then
+    the computed start scene 2 with section register 1001=1). For each scene, run
+    it fresh with the reference VM's semantics; where that run passes a decoded
+    goto that is not the last schedule, point it at the effective one."""
+    segs = seg_doc.get("segments") or {}
+    entries = {str(k): str(v).replace(".json", "")
+               for k, v in (seg_doc.get("scene_entries") or {}).items()}
+    for idx, (label, data) in enumerate(scripts):
+        try:
+            prog = _kiwi_program(data)
+        except Exception:
+            continue
+        tr = {}
+        _vm_first_shown(prog, {}, trace=tr)
+        sch = tr.get("schedules") or []
+        if not tr.get("halted") or len(sch) < 2:
+            continue
+        last_off, last_file = sch[-1]
+        scn = last_file - 0x61A9 + 1
+        tgt = entries.get(str(scn))
+        if not tgt:
+            continue
+        reg = (tr.get("numbers") or {}).get(1001)
+        superseded = {str(o) for o, _f in sch[:-1]}
+        pref = "s%d" % (idx + 1)
+        for s, g in segs.items():
+            if not (s == pref or s.startswith(pref + "_")):
+                continue
+            for n in g.get("nodes", []):
+                if isinstance(n, dict) and n.get("type") == "goto_scene" \
+                        and str(n.get("offset")) in superseded:
+                    n["file"] = tgt
+                    n.pop("loop_back", None)
+                    if reg is not None:
+                        n["section_register"] = {"var": "1001", "value": str(reg)}
+                    n["_note"] = ("effective scheduled scene (the engine loads the "
+                                  "last one scheduled before the halt)")
+
+
+def _vm_return_jumps(seg_doc, scripts):
+    """A segment whose code, after its last line, JUMPS to the routine's return
+    (`28 -> 22 43`) leaves the routine there; a linear `next` into whatever
+    follows in bytecode (New Girl's English class: the first-visit lines then
+    the second-visit branch) is wrong. End such segments with `return`."""
+    segs = seg_doc.get("segments") or {}
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+        except Exception:
+            continue
+        by_pc = {x.pc: x for x in ins}
+        offs = [x.byte_offset for x in ins]
+        import bisect as _b
+        pref = "s%d" % sidx
+        mine = {nm: g for nm, g in segs.items()
+                if nm == pref or nm.startswith(pref + "_")}
+
+        def lo_of(g):
+            o = [int(x["offset"]) for x in g.get("nodes", [])
+                 if isinstance(x, dict) and str(x.get("offset", "")).lstrip("-").isdigit()]
+            return (min(o), max(o)) if o else (None, None)
+        for nm, g in mine.items():
+            nl = g.get("nodes") or []
+            if not nl or not isinstance(nl[-1], dict) or nl[-1].get("type") != "next":
+                continue
+            nx = str(nl[-1].get("next") or "").replace(".json", "")
+            if nx not in mine:
+                continue
+            _lo, last = lo_of(g)
+            nlo, _nhi = lo_of(mine[nx])
+            if last is None or nlo is None or nlo <= last:
+                continue
+            k = _b.bisect_right(offs, last)
+            hit = None
+            while k < len(ins) and ins[k].byte_offset < nlo:
+                y = ins[k]
+                if y.opcode == 0x28:
+                    t = by_pc.get(y.branch_target())
+                    # straight to the return, or through bookkeeping first
+                    # (New Girl: `var1600 += 1 ; 22 43` after either visit)
+                    kk = offs.index(t.byte_offset) if t is not None else None
+                    tail_offs = []
+                    while kk is not None and kk < len(ins):
+                        z = ins[kk]
+                        if z.opcode == 0x22:
+                            hit = y
+                            break
+                        if z.opcode in (0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e,
+                                        0x5c, 0x33, 0x42, 0x43) \
+                                or (z.opcode == 0x1f and (z.operand or 0) >> 8 in _VM_SHOW):
+                            break
+                        if z.opcode == 0x1f:
+                            tail_offs.append(z.byte_offset)
+                        kk += 1
+                    break
+                if y.opcode in (0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x29, 0x5c, 0x33, 0x22) \
+                        or (y.opcode == 0x1f and (y.operand or 0) >> 8 in _VM_SHOW):
+                    break
+                k += 1
+            if hit is not None:
+                import copy as _cp
+                extra = []
+                for to in tail_offs:
+                    src = next((x for g2 in mine.values() for x in g2.get("nodes", [])
+                                if isinstance(x, dict) and str(x.get("offset")) == str(to)
+                                and x.get("type") in ("var_set", "var_add")), None)
+                    if src is not None:
+                        extra.append(_cp.deepcopy(src))
+                        continue
+                    # `var V = local + c` where the routine loaded local <- V
+                    kq = offs.index(to)
+                    zz = ins[kq - 5:kq] if kq >= 5 else []
+                    if len(zz) == 5 and zz[0].opcode == 0x1a and 0x5f <= zz[1].opcode <= 0x62 \
+                            and zz[2].opcode == 0x3f and zz[4].opcode == 0x50 \
+                            and zz[3].opcode in (0x1a, 0x5a, 0x5b):
+                        sl, V = zz[1].opcode - 0x5f, zz[0].operand
+                        c_ = (zz[3].opcode - 0x5a) if zz[3].opcode != 0x1a else zz[3].operand
+                        r0 = max((q for q in range(kq) if ins[q].opcode == 0x48), default=None)
+                        ok_ = r0 is not None and any(
+                            ins[q].opcode == 0x5f + sl and ins[q + 1].opcode == 0x1a
+                            and ins[q + 1].operand == V and ins[q + 2].opcode == 0x1f
+                            and (ins[q + 2].operand or 0) == 0x2d01
+                            and ins[q + 4].opcode == 0x3e
+                            for q in range(r0, kq - 5))
+                        if ok_:
+                            extra.append({"type": "var_add", "var": str(V), "value": c_,
+                                          "offset": str(to)})
+                nl[-1:] = extra + [{"type": "return", "source": "jump_to_return",
+                                    "offset": str(hit.byte_offset)}]
+
+
+def _attach_builder_guards(seg_doc, scripts):
+    """Choices built elsewhere (the combat turn loop's Special Move menu) that
+    mirror a conditional builder menu in the script get its per-option
+    conditions, so only the options the engine would add are offered."""
+    segs = seg_doc.get("segments") or {}
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            prog = _kiwi_program(data)
+            guards = _builder_option_guards(data)
+        except Exception:
+            continue
+        if not guards:
+            continue
+        ins = prog.instructions
+        smap = {o: t for o, t in find_strings(data)}
+        k_of = {x.byte_offset: k for k, x in enumerate(ins)}
+        menus, cur = [], {}
+        for k, y in enumerate(ins):
+            if y.opcode != 0x1f or y.operand is None:
+                continue
+            sel = y.operand >> 8
+            if sel == 0x02:
+                cur = {}
+            elif sel == 0x03:
+                a = _eval_yield_args(ins, k, y.operand & 0xFF)
+                t = smap.get(a[0] * 2 + STRING_BASE) if a and a[0] is not None else None
+                if t:
+                    cur[normalize_strings([(0, t)])[0][1]] = guards.get(y.byte_offset)
+            elif sel == 0x04 and cur:
+                if any(cur.values()):
+                    menus.append(cur)
+                cur = {}
+        for nm, g in segs.items():
+            for n in g.get("nodes", []):
+                if not (isinstance(n, dict) and n.get("type") == "choice"):
+                    continue
+                labs = [o.get("label") for o in n.get("options", []) if isinstance(o, dict)]
+                if any(o.get("when") for o in n.get("options", []) if isinstance(o, dict)):
+                    continue
+                for m in menus:
+                    if labs and set(labs) == set(m):
+                        for o in n["options"]:
+                            if m.get(o.get("label")):
+                                o["when"] = [dict(c, value=str(c["value"])) for c in m[o["label"]]]
+                        break
+
+
+def _vm_answer_gates(seg_doc, scripts):
+    """LATE TESTS ON A CHOICE'S ANSWER. A choice stores its answer in a routine
+    local; besides the immediate option dispatch, the routine may test that
+    local again much later (Swim Team Retreat: after the shared scene, `answer
+    == 0` picks "I guess you're not the one who should be apologizing..." over
+    "Wow. I'm surprised you didn't stop..."). Keep the answer in a synthetic
+    variable set on each option's path and gate the later lines on it."""
+    segs = seg_doc.get("segments") or {}
+    OPS = {0x0a: lambda a, b: a == b, 0x0b: lambda a, b: a != b,
+           0x0c: lambda a, b: a > b, 0x0d: lambda a, b: a >= b,
+           0x0e: lambda a, b: a < b, 0x0f: lambda a, b: a <= b}
+    next_var = [3700]
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+            recs = resolve_choice_branches(data)
+        except Exception:
+            continue
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        k_of = {x.byte_offset: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+        # choice yield -> (answer slot, option count, merge)
+        stores = {}
+        for rec in recs:
+            ck = k_of.get(rec["choice"])
+            if ck is None or ck + 3 >= len(ins):
+                continue
+            if not (ins[ck + 1].opcode == 0x21 and ins[ck + 2].opcode == 0x3e):
+                continue
+            # the store's address was pushed before the choice's arguments
+            argc = (ins[ck].operand or 0) & 0xFF
+            slot = None
+            q, depth = ck - 1, 0
+            while q >= 0 and ck - q < 40:
+                if 0x5f <= ins[q].opcode <= 0x62 and not (ins[q + 1].opcode == 0x3f):
+                    slot = ins[q].opcode - 0x5f
+                    break
+                if ins[q].opcode in (0x28, 0x2b, 0x1f, 0x48):
+                    break
+                q -= 1
+            if slot is None or rec.get("merge") is None:
+                continue
+            stores[rec["choice"]] = (slot, len(rec["options"]), rec)
+        if not stores:
+            continue
+        for ch, (slot, nopt, rec) in stores.items():
+            ck = k_of[ch]
+            mk = k_of.get(rec["merge"])
+            if mk is None:
+                continue
+            r_end = next((q for q in range(mk, len(ins) - 1)
+                          if ins[q].opcode == 0x22 and ins[q + 1].opcode == 0x43), None)
+            if r_end is None:
+                continue
+            for q in range(mk, r_end - 2):
+                if 0x5f <= ins[q].opcode <= 0x62 and ins[q].opcode - 0x5f == slot \
+                        and ins[q + 1].opcode != 0x3f:
+                    break                       # the slot is reused: stop
+                if ins[q].opcode == 0x41 and ins[q].operand == slot:
+                    j = q + 1
+                elif 0x5f <= ins[q].opcode <= 0x62 and ins[q].opcode - 0x5f == slot \
+                        and ins[q + 1].opcode == 0x3f:
+                    j = q + 2
+                else:
+                    continue
+                if j + 2 >= len(ins) or ins[j + 1].opcode not in OPS \
+                        or ins[j + 2].opcode != 0x2b or ins[j].opcode not in (0x1a, 0x5a, 0x5b):
+                    continue
+                c = ins[j].opcode - 0x5a if ins[j].opcode != 0x1a else ins[j].operand
+                cmpf = OPS[ins[j + 1].opcode]
+                t_k = by_pc.get(ins[j + 2].branch_target())
+                if t_k is None or t_k <= j + 3:
+                    continue
+                vals = list(range(nopt))
+                outs = [bool(cmpf(v, c)) for v in vals]
+                if all(outs) or not any(outs):
+                    continue
+                var = next_var[0]
+                # set the synthetic var on each option path of this choice
+                marked = 0
+                _labs = None
+                if (ins[ck].operand or 0) >> 8 == 0x01:
+                    _ea = _eval_yield_args(ins, ck, ins[ck].operand & 0xFF)
+                    _sm = {o_: t_ for o_, t_ in find_strings(data)}
+                    _ot = _sm.get(_ea[1] * 2 + STRING_BASE) if _ea and len(_ea) > 1 \
+                        and _ea[1] is not None else None
+                    if _ot:
+                        _labs = [normalize_strings([(0, x)])[0][1] for x in _ot.split("|")]
+                for nm, g in list(segs.items()):
+                    if not (nm == pref or nm.startswith(pref + "_")):
+                        continue
+                    for n in g.get("nodes", []):
+                        if isinstance(n, dict) and n.get("type") == "choice" \
+                                and (str(n.get("offset")) == str(ch)
+                                     or (_labs and [o.get("label") for o in n.get("options", [])]
+                                         == _labs)):
+                            for o in n.get("options", []):
+                                nx = o.get("next")
+                                if not isinstance(nx, str):
+                                    continue
+                                vn = "%s_ans%d_%s" % (nm, var, o.get("index"))
+                                segs[vn] = {"nodes": [
+                                    {"type": "var_set", "var": str(var),
+                                     "value": int(o.get("index")), "source": "choice_answer"},
+                                    {"type": "next", "next": nx.replace(".json", "")}]}
+                                o["next"] = vn
+                            marked += 1
+                if not marked:
+                    continue
+                next_var[0] += 1
+                tr_ = ("split", 0, outs + [False])
+                _result_gate_emit(segs, pref, data, ins, by_pc, q, j, t_k, tr_,
+                                  [var], [vals + [max(vals) + 1]],
+                                  ins[j + 3].byte_offset, ins[t_k].byte_offset)
+
+
+def _vm_local_gates(seg_doc, scripts):
+    """GATES ON A COMPUTED LOCAL. A routine tallies variables into a local
+    (New Girl's poll: each cheerleader's opinion var -> votes for / against)
+    and branches on it (`local1 == 5 -> "Yay! ..."`). Run the routine up to
+    the test with the reference-VM semantics for every relevant assignment of
+    the variables it read and gate the lines on the result, as for a routine
+    result."""
+    segs = seg_doc.get("segments") or {}
+    CMPF = {0x0a: lambda a, b: a == b, 0x0b: lambda a, b: a != b,
+            0x0c: lambda a, b: a > b, 0x0d: lambda a, b: a >= b,
+            0x0e: lambda a, b: a < b, 0x0f: lambda a, b: a <= b}
+    INTERACT = (0x01, 0x04, 0x47, 0x60, 0x5e, 0x11, 0x28)
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            prog = _kiwi_program(data)
+            vg_at = {g["at"] for g in resolve_var_gates(data)}
+            mg_tr = [int(m["trigger"]) for m in (resolve_minigame_gates(data) or [])
+                     if m.get("trigger") is not None]
+        except Exception:
+            continue
+        ins = prog.instructions
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+
+        def const(y):
+            if y.opcode == 0x1a:
+                return y.operand - 0x10000 if y.operand >= 0x8000 else y.operand
+            if y.opcode in (0x5a, 0x5b):
+                return y.opcode - 0x5a
+            return None
+        for q in range(3, len(ins)):
+            if ins[q].opcode != 0x2b or ins[q].byte_offset in vg_at:
+                continue
+            if ins[q - 1].opcode not in CMPF or const(ins[q - 2]) is None:
+                continue
+            if ins[q - 3].opcode == 0x41 and ins[q - 3].operand is not None \
+                    and ins[q - 3].operand < 8:
+                slot, k = ins[q - 3].operand, q - 3
+            elif q >= 4 and ins[q - 3].opcode == 0x3f and 0x5f <= ins[q - 4].opcode <= 0x62:
+                slot, k = ins[q - 4].opcode - 0x5f, q - 4
+            else:
+                continue
+            c, cmpf = const(ins[q - 2]), CMPF[ins[q - 1].opcode]
+            t_k = by_pc.get(ins[q].branch_target())
+            if t_k is None or t_k <= q + 1:
+                continue
+            r = max((kk for kk in range(k) if ins[kk].opcode == 0x48), default=None)
+            if r is None:
+                continue
+            if any(ins[kk].opcode == 0x1f and (ins[kk].operand or 0) >> 8 in INTERACT
+                   for kk in range(r, k)) or any(ins[r].byte_offset <= mt < ins[t_k].byte_offset
+                                                for mt in mg_tr):
+                continue
+            lo, hi = ins[q + 1].byte_offset, ins[t_k].byte_offset
+            rpc, stop = ins[r].pc, ins[k].byte_offset
+            reads = []
+            base_r = _vm_first_shown(prog, {}, call_pc=rpc, stop_at=stop, trace={},
+                                     reads=reads)
+            if not (isinstance(base_r, tuple) and base_r[0] == "AT"):
+                continue
+            vars_ = sorted({x[0] for x in reads})
+            if not vars_ or len(vars_) > 10:
+                continue
+            consts = {v: set() for v in vars_}
+            for kk in range(r, k - 4):
+                if ins[kk].opcode == 0x1a and ins[kk].operand in consts \
+                        and ins[kk + 1].opcode == 0x1f and (ins[kk + 1].operand or 0) == 0x2d01 \
+                        and ins[kk + 2].opcode == 0x21 and const(ins[kk + 3]) is not None \
+                        and ins[kk + 4].opcode in CMPF:
+                    consts[ins[kk].operand].add(const(ins[kk + 3]))
+
+            def val(assign):
+                rr = _vm_first_shown(prog, assign, call_pc=rpc, stop_at=stop, trace={})
+                if not (isinstance(rr, tuple) and rr[0] == "AT") or rr[1][slot] is None:
+                    return None
+                return bool(cmpf(rr[1][slot], c))
+            doms, ok, keep = [], True, []
+            for v in vars_:
+                cs = sorted(consts[v])
+                if cs:
+                    doms.append(cs + [0 if 0 not in cs else max(cs) + 1])
+                    keep.append(v)
+                    continue
+                # a variable the test never compares: it must not matter
+                outs = {val({v: x}) for x in (0, 1, 2, 3, 5, 9)}
+                if len(outs) > 1:
+                    ok = False
+                    break
+            if not ok or not keep:
+                continue
+            vars_k = keep
+            n_comb = 1
+            for d_ in doms:
+                n_comb *= len(d_)
+            if n_comb > 4096:
+                continue
+            memo = {}
+
+            def outcome(assign):
+                key = tuple(assign)
+                if key not in memo:
+                    memo[key] = val(dict(zip(vars_k, assign)))
+                return memo[key]
+
+            def tree(i, prefix):
+                if i == len(vars_k):
+                    return outcome(prefix)
+                subs = [tree(i + 1, prefix + [x]) for x in doms[i]]
+                # None = the test is not reached under that assignment (an
+                # earlier arm returned): don't care
+                known = [x for x in subs if x is not None]
+                if not known:
+                    return None
+                if all(x == known[0] for x in known):
+                    return known[0]
+                subs = [x if x is not None else known[0] for x in subs]
+                return ("split", i, subs)
+            tr_ = tree(0, [])
+            if tr_ is None or isinstance(tr_, bool):
+                continue
+            _result_gate_emit(segs, pref, data, ins, by_pc, k, q - 2, t_k, tr_,
+                              vars_k, doms, lo, hi)
+
+
+def _vm_b_gates(seg_doc, scripts):
+    """GATES ON A ROUTINE'S RESULT. `B = R() ; if B <cmp> c: <lines>` where R
+    only reads variables and computes a value (New Girl's "how many people can
+    I call?": no one left -> "But I've got no one else I can call..."). Run R
+    with the reference-VM semantics over every relevant assignment of the
+    variables it reads, and replace the unconditional lines with a decision
+    tree of ordinary var gates leading to them or past them."""
+    segs = seg_doc.get("segments") or {}
+    CMPF = {0x0a: lambda a, b: a == b, 0x0b: lambda a, b: a != b,
+            0x0c: lambda a, b: a > b, 0x0d: lambda a, b: a >= b,
+            0x0e: lambda a, b: a < b, 0x0f: lambda a, b: a <= b}
+    import itertools as _it
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            prog = _kiwi_program(data)
+        except Exception:
+            continue
+        ins = prog.instructions
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+
+        def const(y):
+            if y.opcode == 0x1a:
+                return y.operand - 0x10000 if y.operand >= 0x8000 else y.operand
+            if y.opcode in (0x5a, 0x5b):
+                return y.opcode - 0x5a
+            return None
+        for k in range(1, len(ins) - 8):
+            if not (ins[k].opcode == 0x42 and ins[k + 1].opcode == 0x29
+                    and ins[k + 2].opcode == 0x08):
+                continue
+            j = k + 3
+            if ins[j].opcode == 0x3e and ins[j + 1].opcode == 0x15 \
+                    and 0x5f <= ins[k - 1].opcode <= 0x62:
+                slot = ins[k - 1].opcode - 0x5f
+                j += 2
+                if 0x5f <= ins[j].opcode <= 0x62 and ins[j].opcode - 0x5f == slot \
+                        and ins[j + 1].opcode == 0x3f:
+                    j += 2
+                elif ins[j].opcode == 0x41 and ins[j].operand == slot:
+                    j += 1
+                else:
+                    continue
+            c = const(ins[j]) if j < len(ins) else None
+            if c is None or j + 2 >= len(ins) or ins[j + 1].opcode not in CMPF \
+                    or ins[j + 2].opcode != 0x2b:
+                continue
+            cmpf = CMPF[ins[j + 1].opcode]
+            t_k = by_pc.get(ins[j + 2].branch_target())
+            if t_k is None or t_k <= j + 3:
+                continue
+            lo, hi = ins[j + 3].byte_offset, ins[t_k].byte_offset
+            rpc = ins[k + 1].branch_target()
+            rk = by_pc.get(rpc)
+            if rk is None:
+                continue
+            # R: reads vars, shows nothing, calls nothing
+            body = []
+            for y in ins[rk:]:
+                body.append(y)
+                if y.opcode == 0x43:
+                    break
+            if any(y.opcode == 0x29 or (y.opcode == 0x1f and (y.operand or 0) >> 8 not in (0x2d,))
+                   for y in body):
+                continue
+            consts = {}
+            for q in range(len(body) - 4):
+                if body[q].opcode == 0x1a and body[q + 1].opcode == 0x1f \
+                        and (body[q + 1].operand or 0) == 0x2d01 and body[q + 2].opcode == 0x21:
+                    cc = const(body[q + 3])
+                    consts.setdefault(body[q].operand, set())
+                    if cc is not None and body[q + 4].opcode in CMPF:
+                        consts[body[q].operand].add(cc)
+            if not consts or len(consts) > 8:
+                continue
+            vars_ = sorted(consts)
+            doms = []
+            for v in vars_:
+                cs = sorted(consts[v])
+                other = 0 if 0 not in cs else max(cs) + 1
+                doms.append(cs + [other])
+            n_comb = 1
+            for d_ in doms:
+                n_comb *= len(d_)
+            if n_comb > 4096:
+                continue
+            memo = {}
+
+            def outcome(assign):
+                key = tuple(assign)
+                if key not in memo:
+                    r = _vm_first_shown(prog, dict(zip(vars_, assign)),
+                                        call_pc=rpc, trace={})
+                    memo[key] = None if not (isinstance(r, tuple) and r[1] is not None) \
+                        else bool(cmpf(r[1], c))
+                return memo[key]
+
+            def tree(i, prefix):
+                if i == len(vars_):
+                    return outcome(prefix)
+                subs = [tree(i + 1, prefix + [val]) for val in doms[i]]
+                if any(x is None for x in subs):
+                    return None
+                if all(x == subs[0] for x in subs):
+                    return subs[0]
+                return ("split", i, subs)
+            tr_ = tree(0, [])
+            if tr_ is None or isinstance(tr_, bool):
+                continue
+            _result_gate_emit(segs, pref, data, ins, by_pc, k, j, t_k, tr_, vars_, doms, lo, hi)
+
+
+def _result_gate_emit(segs, pref, data, ins, by_pc, k, j, t_k, tr_, vars_, doms, lo, hi,
+                      ops=None):
+    """Shared by the routine-result and computed-local gates: replace the
+    unconditional lines in [lo, hi) (every segment copy) with a decision
+    tree of var gates leading to them (then) or past them (rest)."""
+    # the lines in [lo, hi), in every segment holding them (copies)
+    hosts = []
+    for nm, g in list(segs.items()):
+        if not (nm == pref or nm.startswith(pref + "_")):
+            continue
+        nl = g.get("nodes") or []
+        if all(isinstance(x, dict) and x.get("type") == "gate" for x in nl):
+            continue
+        idx = [ii for ii, n in enumerate(nl) if isinstance(n, dict)
+               and str(n.get("offset", "")).lstrip("-").isdigit()
+               and lo <= int(n["offset"]) < hi]
+        if idx and idx == list(range(idx[0], idx[-1] + 1)):
+            hosts.append((nm, idx[0], idx[-1]))
+    for nm, a0, a1 in hosts:
+        nl = segs[nm]["nodes"]
+        base = "%s_bg%d" % (nm, ins[k].byte_offset)
+        if base + "_t" in segs:
+            continue
+        rest = nl[a1 + 1:]
+        segs[base + "_r"] = {"nodes": rest or [{"type": "end"}]}
+        segs[base + "_t"] = {"nodes": nl[a0:a1 + 1]
+                             + [{"type": "next", "next": base + "_r"}]}
+        # the then-block ends by JUMPING past the shared lines (New
+        # Girl: its own menu header "I guess there's only one option."
+        # jumps straight to the shared option list)
+        _last = ins[t_k - 1]
+        if _last.opcode == 0x28 and by_pc.get(_last.branch_target()) is not None \
+                and ins[by_pc[_last.branch_target()]].opcode == 0x22:
+            # the then-block leaves the routine
+            segs[base + "_t"] = {"nodes": nl[a0:a1 + 1] + [{"type": "return",
+                                                            "source": "routine_result_gate"}]}
+        elif _last.opcode == 0x28 and by_pc.get(_last.branch_target()) is not None:
+            _jt = ins[by_pc[_last.branch_target()]].byte_offset
+            _pos = next((ii for ii, x in enumerate(rest) if isinstance(x, dict)
+                         and (str(x.get("offset", "")).lstrip("-").isdigit()
+                              and int(x["offset"]) >= _jt
+                              or x.get("type") == "choice")), None)
+            if _pos is not None and _pos > 0:
+                import copy as _cpb
+                tail_ = _cpb.deepcopy(rest[_pos:])
+                # a menu header (1f02) inside the then-block replaces
+                # the shared menu's body text
+                _hdr = [q for q in range(j + 3, t_k) if ins[q].opcode == 0x1f
+                        and (ins[q].operand or 0) >> 8 == 0x02]
+                if _hdr and tail_ and tail_[0].get("type") == "choice":
+                    _ha = _eval_yield_args(ins, _hdr[-1], ins[_hdr[-1]].operand & 0xFF)
+                    _smap = {o_: t_ for o_, t_ in find_strings(data)}
+                    _ht = _smap.get(_ha[1] * 2 + STRING_BASE) \
+                        if _ha and len(_ha) > 1 and _ha[1] is not None else None
+                    if _ht:
+                        tail_[0]["text"] = normalize_strings([(0, _ht)])[0][1]
+                segs[base + "_t"] = {"nodes": nl[a0:a1 + 1] + tail_}
+        cnt = [0]
+        made = {}
+
+        def emit(t, base=base, cnt=cnt, made=made):
+            if t is True:
+                return base + "_t"
+            if t is False:
+                return base + "_r"
+            key = repr(t)
+            if key in made:
+                return made[key]
+            _s, i, subs = t
+            v = vars_[i]
+            nxt = emit(subs[-1])
+            for val, sub in reversed(list(zip(doms[i][:-1], subs[:-1]))):
+                tgt = emit(sub)
+                if tgt == nxt:
+                    continue
+                cnt[0] += 1
+                gnm = "%s_%d" % (base, cnt[0])
+                segs[gnm] = {"nodes": [{"type": "gate", "var": str(v),
+                                        "equals": str(val), "then": tgt,
+                                        "else": nxt,
+                                        "offset": str(ins[k].byte_offset)}]}
+                if ops:
+                    segs[gnm]["nodes"][0]["op"] = ops[i]
+                nxt = gnm
+            made[key] = nxt
+            return nxt
+        root = emit(tr_)
+        segs[nm]["nodes"] = nl[:a0] + [{"type": "next", "next": root,
+                                        "source": "routine_result_gate"}]
+
+
+# ===========================================================================
+# KiWi LIFTER, PARTIAL EVALUATOR AND VM STAND-IN (formerly kiwi_lift.py)
+#
+# generic lifter from KiWi routines to a small structured IR.
+#
+# Nothing here knows about any episode, character, text or variable id. A routine
+# (`0x48 0x4a ... 0x22 0x43`) is lifted by symbolic execution of the operand
+# stack over its basic blocks, using the reference VM's exact opcode semantics
+# (shs_runtime/vm.py, derived from libshs09.so FUN_00055ce0):
+#
+#   * frame cells (fp+k, k >= 0) and arguments (fp+k, k <= -3) become locals;
+#   * stack temporaries fold into expressions;
+#   * yields become statements carrying their evaluated argument expressions;
+#   * `0x42 0x29 X ; drop n` becomes a call with n arguments;
+#   * the A / B / result registers are explicit.
+#
+# IR (plain JSON-able dicts):
+#
+#   expr  := int
+#          | {"local": k}                 frame cell fp+k (k<0: argument)
+#          | {"addr": k}                  address of frame cell fp+k
+#          | {"reg": "A"|"B"}
+#          | {"mem": N}                   data word N (0x40 N)
+#          | {"deref": expr}              word at a computed address (0x3f)
+#          | {"op": o, "a": expr, "b": expr}   o in + - * / % == != > >= < <= or and
+#          | {"op": "neg"|"not", "a": expr}
+#   stmt  := {"let": lvalue, "value": expr}          lvalue: {"local":k}|{"deref":e}|{"reg":r}
+#          | {"yield": id, "args": [expr], "result": k|None}   result -> local k
+#          | {"call": pc, "args": [expr]}
+#          | {"pause": True}
+#   term  := {"goto": pc} | {"if": expr, "then": pc, "else": pc}
+#          | {"ret": True} | {"halt": True}
+#
+# `lift_routine` returns None (never guesses) when a routine uses a construct
+# the IR does not model (e.g. 0x46 stack reset, a bare 0x42, inconsistent stack
+# depth at a join); callers then keep their existing handling.
+# ===========================================================================
+
+NATIVE_NOPS = frozenset({0, 2, 6, 9, 0x10, 0x14, 0x1D, 0x27, 0x2F, 0x30, 0x31,
+                         *range(0x34, 0x3E), 0x44, 0x45, 0x47, 0x49,
+                         *range(0x4B, 0x50), *range(0x55, 0x5A), 0x5D, 0x5E})
+
+BINOPS = {0x0A: "==", 0x0B: "!=", 0x0C: ">", 0x0D: ">=", 0x0E: "<", 0x0F: "<=",
+          0x11: "or", 0x12: "and", 0x50: "+", 0x51: "-", 0x52: "*", 0x53: "/",
+          0x54: "%"}
+
+
+def s16(v):
+    v &= 0xFFFF
+    return v - 0x10000 if v & 0x8000 else v
+
+
+class LiftError(Exception):
+    pass
+
+
+def routine_entries(ins):
+    """pcs of `0x48 0x4a` routine prologues."""
+    return [ins[i].pc for i in range(len(ins) - 1)
+            if ins[i].opcode == 0x48 and ins[i + 1].opcode == 0x4A]
+
+
+def call_sites(ins):
+    """{callee_pc: [(call_pc, argc)]} for every `0x42 0x29 X` in a program;
+    argc is the caller-side drop at the return point (0 when none)."""
+    out = {}
+    for i in range(len(ins) - 2):
+        if ins[i].opcode == 0x42 and ins[i + 1].opcode == 0x29:
+            out.setdefault(ins[i + 1].operand, []).append((ins[i].pc, _drop_at(ins[i + 2])))
+    return out
+
+
+def _drop_at(y):
+    op = y.opcode
+    if 0x15 <= op <= 0x18:
+        return op - 0x14
+    if op == 0x19:
+        return y.operand
+    return 0
+
+
+# ---------------------------------------------------------------- expressions
+
+def _refs(e, acc):
+    """Collect dependency keys of an expression: ('local',k), 'mem', ('reg',r)."""
+    if isinstance(e, dict):
+        if "local" in e:
+            acc.add(("local", e["local"]))
+        elif "reg" in e:
+            acc.add(("reg", e["reg"]))
+        elif "mem" in e:
+            acc.add("mem")
+        elif "deref" in e:
+            acc.add("mem")
+            _refs(e["deref"], acc)
+        elif "op" in e:
+            _refs(e["a"], acc)
+            if "b" in e:
+                _refs(e["b"], acc)
+    return acc
+
+
+def _fold(op, a, b):
+    if isinstance(a, int) and isinstance(b, int):
+        if op in ("+", "-", "*"):
+            return s16(a + b if op == "+" else a - b if op == "-" else a * b)
+    return {"op": op, "a": a, "b": b}
+
+
+# ---------------------------------------------------------------- lifter
+
+def lift_routine(ins, entry, argc_of=None, bare=False):
+    """Lift the routine whose `0x48 0x4a` prologue is at pc `entry` (or, with
+    bare=True, the scene's top-level program starting at `entry` with an empty
+    stack and fp = 0).
+
+    `argc_of(callee_pc)` may supply arg counts for calls whose return point has
+    no drop (defaults to the drop count)."""
+    try:
+        return _Lifter(ins, entry, argc_of, bare).run()
+    except LiftError:
+        return None
+
+
+class _Lifter:
+    def __init__(self, ins, entry, argc_of, bare=False):
+        self.bare = bare
+        self.ins = ins
+        self.by_pc = {y.pc: y for y in ins}
+        self.entry = entry
+        self.argc_of = argc_of
+        self.blocks = {}
+        self.depth_in = {}
+        self.ntemp = 0
+        self.min_local = 0
+        self.max_local = -1
+        self.max_depth = 0          # deepest frame the routine builds (arrays
+                                    # handed to the engine live in these cells)
+        self.calls = set()
+        self.covered = {entry, entry + 1}
+        self.leaders = set()
+        for y in ins:
+            op = y.opcode
+            if op in (0x28, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E):
+                self.leaders.add((y.pc + s16(y.operand)) & 0xFFFF)
+            elif op == 0x29:
+                self.leaders.add(y.operand)
+            elif op == 0x5C:
+                self.leaders.add((y.pc + (y.operand >> 8)) & 0xFFFF)
+
+    def temp(self):
+        self.ntemp += 1
+        return "t%d" % (self.ntemp - 1)
+
+    def run(self):
+        y0 = self.by_pc.get(self.entry)
+        y1 = self.by_pc.get(self.entry + 1)
+        if self.bare:
+            start = self.entry
+            self.covered = set()
+        elif not (y0 and y1 and y0.opcode == 0x48 and y1.opcode == 0x4A):
+            raise LiftError("no prologue")
+        else:
+            start = self.entry + 2
+        work = [(start, 0)]
+        self.depth_in[start] = 0
+        while work:
+            pc, depth = work.pop()
+            if pc in self.blocks:
+                continue
+            blk, succ = self.block(pc, depth)
+            self.blocks[pc] = blk
+            for spc, sd in succ:
+                if spc in self.depth_in:
+                    if self.depth_in[spc] != sd:
+                        raise LiftError("depth mismatch at %d" % spc)
+                else:
+                    self.depth_in[spc] = sd
+                if spc not in self.blocks:
+                    work.append((spc, sd))
+        # renumber temps after the highest frame cell
+        base = max(self.max_local + 1, self.max_depth, 0)
+        mp = {"t%d" % i: base + i for i in range(self.ntemp)}
+        blocks = {pc: _subst_temps(b, mp) for pc, b in self.blocks.items()}
+        params = max(0, -self.min_local - 2) if self.min_local <= -3 else 0
+        return {"entry": self.entry, "start": start, "params": params,
+                "locals": base + self.ntemp, "frame": base, "blocks": blocks,
+                "calls": sorted(self.calls), "pcs": sorted(self.covered)}
+
+    def note_local(self, k):
+        if isinstance(k, int):
+            self.min_local = min(self.min_local, k)
+            self.max_local = max(self.max_local, k)
+            if k in (-1, -2):
+                raise LiftError("frame link access")
+
+    # -- one basic block -------------------------------------------------
+    def block(self, pc, depth):
+        stack = [{"local": i} for i in range(depth)]
+        for i in range(depth):
+            self.note_local(i)
+        stmts = []
+        R = [None]          # symbolic result register
+
+        def is_pending(i):
+            return stack[i] != {"local": i}
+
+        def flush_if(pred):
+            for i in range(len(stack)):
+                if is_pending(i) and pred(_refs(stack[i], set())):
+                    self.note_local(i)
+                    stmts.append({"let": {"local": i}, "value": stack[i]})
+                    stack[i] = {"local": i}
+
+        def flush_all():
+            flush_if(lambda r: True)
+
+        def flush_state():
+            # before calls / pointer stores / pointer-taking yields: cells whose
+            # value depends on mutable state must be evaluated now; constants and
+            # frame addresses can stay pending until the block ends
+            flush_if(lambda r: bool(r))
+
+        def pop():
+            if not stack:
+                raise LiftError("underflow")
+            return stack.pop()
+
+        def read_local(k):
+            self.note_local(k)
+            if 0 <= k < len(stack):
+                return stack[k]
+            if k >= len(stack):
+                raise LiftError("read above sp")
+            return {"local": k}
+
+        def store_local(k, v):
+            self.note_local(k)
+            if k >= len(stack):
+                raise LiftError("write above sp")
+            flush_if(lambda r: ("local", k) in r)
+            if 0 <= k < len(stack):
+                if stack[k] != {"local": k} and v == stack[k]:
+                    pass
+                stack[k] = {"local": k}
+            stmts.append({"let": {"local": k}, "value": v})
+
+        known_a = [None]
+
+        def set_reg(r, v):
+            flush_if(lambda rr: ("reg", r) in rr)
+            stmts.append({"let": {"reg": r}, "value": v})
+            if r == "A":
+                known_a[0] = v if isinstance(v, dict) and "addr" in v else None
+
+        self.max_depth = max(self.max_depth, len(stack))
+        cur = pc
+        while True:
+            self.covered.add(cur)
+            y = self.by_pc.get(cur)
+            if y is None:
+                raise LiftError("pc out of range")
+            op, arg = y.opcode, y.operand
+            nxt = cur + 1
+            if cur != pc and cur in self.leaders:
+                # fell into another block's leader
+                flush_all()
+                return {"stmts": stmts, "term": {"goto": cur}}, [(cur, len(stack))]
+            if op in NATIVE_NOPS:
+                pass
+            elif op == 0x01:
+                set_reg("A", s16(arg))
+            elif op == 0x03:
+                set_reg("A", pop())
+            elif op == 0x04:
+                set_reg("B", pop())
+            elif op == 0x05:
+                if not stack:
+                    raise LiftError("underflow")
+                set_reg("A", stack[-1])
+            elif op in (0x07, 0x08):
+                stack.append({"reg": "A" if op == 7 else "B"})
+            elif op in BINOPS:
+                b, a = pop(), pop()
+                stack.append(_fold(BINOPS[op], a, b))
+            elif op == 0x13:
+                stack.append({"op": "not", "a": pop()})
+            elif op == 0x24:
+                a = pop()
+                stack.append(s16(-a) if isinstance(a, int) else {"op": "neg", "a": a})
+            elif 0x15 <= op <= 0x19:
+                n = arg if op == 0x19 else op - 0x14
+                for _ in range(n):
+                    pop()
+            elif op == 0x1A:
+                stack.append(s16(arg))
+            elif op == 0x1B:
+                for byte in (arg & 0xFF, arg >> 8):
+                    stack.append(byte - 0x100 if byte > 0x7F else byte)
+            elif op == 0x1C:
+                if not stack:
+                    raise LiftError("underflow")
+                stack.append(stack[-1])
+            elif op in (0x1E, 0x1F):
+                if op == 0x1F:
+                    cnt, yid = arg & 0xFF, arg >> 8
+                else:
+                    if not isinstance(R[0], int):
+                        raise LiftError("dynamic yield count")
+                    cnt, yid = R[0], arg
+                if cnt > len(stack):
+                    raise LiftError("yield underflow")
+                args = stack[len(stack) - cnt:] if cnt else []
+                del stack[len(stack) - cnt:]
+                # a yield can observe/modify frame memory through address args
+                if any("addr" in _flat_keys(a) for a in args):
+                    flush_all()
+                    # an address escapes to the engine: everything below the
+                    # arguments (e.g. a text buffer) is live frame
+                    self.max_depth = max(self.max_depth, len(stack))
+                t = self.temp()
+                stmts.append({"yield": yid, "args": args, "result": t, "pc": cur})
+                R[0] = {"local": t}
+            elif op == 0x20:
+                R[0] = s16(arg)
+            elif op == 0x21:
+                if R[0] is None:
+                    raise LiftError("result register unknown")
+                stack.append(R[0])
+            elif op == 0x22:
+                nx = self.by_pc.get(nxt)
+                if not nx or nx.opcode != 0x43:
+                    raise LiftError("pop frame without ret")
+                flush_all()
+                return {"stmts": stmts, "term": {"ret": True}}, []
+            elif op == 0x23:
+                self.note_local(s16(arg))
+                stack.append({"addr": s16(arg)})
+            elif op in (0x25, 0x26) and known_a[0] is not None:
+                k = known_a[0]["addr"]
+                cur_v = read_local(k)
+                store_local(k, {"op": "+" if op == 0x25 else "-", "a": cur_v, "b": 1})
+            elif op in (0x25, 0x26):
+                flush_all()
+                addr = {"reg": "A"}
+                stmts.append({"let": {"deref": addr},
+                              "value": {"op": "+" if op == 0x25 else "-",
+                                        "a": {"deref": addr}, "b": 1}})
+            elif op == 0x28:
+                flush_all()
+                tgt = cur + s16(arg)
+                return {"stmts": stmts, "term": {"goto": tgt & 0xFFFF}}, [(tgt & 0xFFFF, len(stack))]
+            elif op == 0x29:
+                flush_all()
+                return {"stmts": stmts, "term": {"goto": arg}}, [(arg, len(stack))]
+            elif 0x2A <= op <= 0x2E:
+                if op in (0x2C, 0x2D):
+                    if not stack:
+                        raise LiftError("underflow")
+                    v = stack[-1]
+                else:
+                    v = pop()
+                if op == 0x2E:
+                    cond = {"op": "==", "a": v, "b": {"reg": "A"}}
+                elif op in (0x2A, 0x2C):
+                    cond = v
+                else:
+                    cond = {"op": "not", "a": v}
+                # the condition is evaluated before the flush stores (which only
+                # touch pending cells, never cells the condition refers to)
+                flush_all()
+                tgt = (cur + s16(arg)) & 0xFFFF
+                d = len(stack)
+                return ({"stmts": stmts, "term": {"if": cond, "then": tgt, "else": nxt, "pc": cur}},
+                        [(tgt, d), (nxt, d)])
+            elif op == 0x32:
+                flush_all()
+                stmts.append({"pause": True})
+            elif op == 0x33:
+                flush_all()
+                return {"stmts": stmts, "term": {"halt": True}}, []
+            elif op == 0x3E:
+                v, a = pop(), pop()
+                if isinstance(a, dict) and "addr" in a:
+                    store_local(a["addr"], v)
+                    stack.append({"local": a["addr"]} if a["addr"] < len(stack) or a["addr"] < 0
+                                 else v)
+                else:
+                    flush_all()
+                    self.max_depth = max(self.max_depth, len(stack))
+                    stmts.append({"let": {"deref": a}, "value": v})
+                    stack.append(v)
+            elif op == 0x3F:
+                a = pop()
+                if isinstance(a, dict) and "addr" in a:
+                    stack.append(read_local(a["addr"]))
+                else:
+                    stack.append({"deref": a})
+            elif op == 0x40:
+                stack.append({"mem": arg})
+            elif op == 0x41:
+                stack.append(read_local(s16(arg)))
+            elif op == 0x42:
+                nx = self.by_pc.get(nxt)
+                if not nx or nx.opcode != 0x29:
+                    raise LiftError("bare 0x42")
+                callee = nx.operand
+                ret_pc = nxt + 1
+                ry = self.by_pc.get(ret_pc)
+                n = _drop_at(ry) if ry else 0
+                if self.argc_of:
+                    m = self.argc_of(callee)
+                    if m is not None and m > n:
+                        raise LiftError("callee reads undropped args")
+                if n > len(stack):
+                    raise LiftError("call underflow")
+                args = stack[len(stack) - n:] if n else []
+                del stack[len(stack) - n:]
+                if any("addr" in _flat_keys(a) for a in args):
+                    flush_all()
+                    self.max_depth = max(self.max_depth, len(stack))
+                else:
+                    flush_state()
+                stmts.append({"call": callee, "args": args, "pc": cur})
+                self.calls.add(callee)
+                R[0] = None
+                nxt = ret_pc + (1 if n else 0)
+            elif op == 0x43:
+                raise LiftError("ret without pop frame")
+            elif op == 0x46:
+                raise LiftError("0x46 stack reset")
+            elif op in (0x48, 0x4A):
+                raise LiftError("nested prologue")
+            elif op == 0x42 and False:
+                pass
+            elif op in (0x5A, 0x5B):
+                stack.append(op - 0x5A)
+            elif op == 0x5C:
+                flush_all()
+                tgt = (cur + (arg >> 8)) & 0xFFFF
+                cond = {"op": "==", "a": {"reg": "A"}, "b": arg & 0xFF}
+                d = len(stack)
+                return ({"stmts": stmts, "term": {"if": cond, "then": tgt, "else": nxt}},
+                        [(tgt, d), (nxt, d)])
+            elif 0x5F <= op <= 0x62:
+                self.note_local(op - 0x5F)
+                stack.append({"addr": op - 0x5F})
+            else:
+                raise LiftError("unsupported opcode 0x%02x" % op)
+            cur = nxt
+
+def _flat_keys(e):
+    out = set()
+    if isinstance(e, dict):
+        out.update(e.keys())
+        for v in e.values():
+            out |= _flat_keys(v)
+    elif isinstance(e, list):
+        for v in e:
+            out |= _flat_keys(v)
+    return out
+
+
+def _subst_temps(o, mp):
+    if isinstance(o, dict):
+        r = {}
+        for k, v in o.items():
+            if k in ("local", "addr", "result") and isinstance(v, str) and v in mp:
+                r[k] = mp[v]
+            else:
+                r[k] = _subst_temps(v, mp)
+        return r
+    if isinstance(o, list):
+        return [_subst_temps(v, mp) for v in o]
+    return o
+
+
+# ---------------------------------------------------------------- interpreter
+
+class IRError(Exception):
+    pass
+
+
+class _Frame:
+    __slots__ = ("cells",)
+
+    def __init__(self):
+        self.cells = {}
+
+
+def run_ir(routines, entry, args, engine, data=None, budget=200000, scratch_base=0):
+    """Execute lifted IR. `routines` {entry_pc: ir}; `engine(yid, args)` -> int;
+    `data` = mutable list of data words. Addresses into frames are
+    ('f', frame, k) tuples."""
+    regs = {"A": None, "B": None}
+    data = data if data is not None else []
+    steps = [0]
+
+    def ev(e, fr):
+        if isinstance(e, int):
+            return e
+        if "dataval" in e:
+            return e["dataval"]
+        if "dataptr" in e:
+            return e["dataptr"]
+        if "table" in e:
+            return ("t", e["table"], 0)
+        if "scratch_addr" in e:
+            return s16(scratch_base + ev(e["scratch_addr"], fr))
+        if "scratch" in e:
+            return rd(s16(scratch_base + ev(e["scratch"], fr)))
+        if "local" in e:
+            k = e["local"]
+            if k not in fr.cells:
+                raise IRError("uninit local %s" % k)
+            return fr.cells[k]
+        if "addr" in e:
+            return ("f", fr, e["addr"])
+        if "reg" in e:
+            v = regs[e["reg"]]
+            if v is None:
+                raise IRError("uninit reg")
+            return v
+        if "mem" in e:
+            return rd(e["mem"])
+        if "deref" in e:
+            return rd(ev(e["deref"], fr))
+        o = e["op"]
+        a = ev(e["a"], fr)
+        if o == "neg":
+            return s16(-a)
+        if o == "not":
+            return int(not a)
+        b = ev(e["b"], fr)
+        if isinstance(a, tuple) or isinstance(b, tuple):
+            if o == "+" and isinstance(a, tuple) and isinstance(b, int):
+                return (a[0], a[1], a[2] + b)
+            raise IRError("address arithmetic")
+        if o == "==": return int(a == b)
+        if o == "!=": return int(a != b)
+        if o == ">": return int(a > b)
+        if o == ">=": return int(a >= b)
+        if o == "<": return int(a < b)
+        if o == "<=": return int(a <= b)
+        if o == "or": return int(bool(a or b))
+        if o == "and": return int(bool(a and b))
+        if o == "+": return s16(a + b)
+        if o == "-": return s16(a - b)
+        if o == "*": return s16(a * b)
+        if b == 0:
+            raise IRError("division by zero")
+        q = abs(a) // abs(b)
+        if (a < 0) != (b < 0):
+            q = -q
+        return s16(q if o == "/" else a - q * b)
+
+    def rd(addr):
+        if isinstance(addr, tuple) and addr[0] == "t":
+            if not 0 <= addr[2] < len(addr[1]):
+                raise IRError("table index")
+            return addr[1][addr[2]]
+        if isinstance(addr, tuple):
+            fr, k = addr[1], addr[2]
+            if k not in fr.cells:
+                raise IRError("uninit cell")
+            return fr.cells[k]
+        a = s16(addr)
+        if not 0 <= a < len(data) or data[a] is None:
+            raise IRError("data address")
+        return data[a]
+
+    def wr(addr, v, fr):
+        if isinstance(addr, tuple):
+            addr[1].cells[addr[2]] = s16(v) if isinstance(v, int) else v
+        else:
+            a = s16(addr)
+            if not 0 <= a < len(data):
+                raise IRError("data write")
+            data[a] = s16(v)
+
+    def call(ep, argv):
+        ir = routines.get(ep)
+        if ir is None:
+            raise IRError("unknown routine %s" % ep)
+        fr = _Frame()
+        n = len(argv)
+        for i, v in enumerate(argv):
+            fr.cells[-(2 + n - i)] = v
+        pc = ir["start"]
+        while True:
+            steps[0] += 1
+            if steps[0] > budget:
+                raise IRError("budget")
+            blk = ir["blocks"][pc]
+            for st in blk["stmts"]:
+                if "let" in st:
+                    lv, v = st["let"], ev(st["value"], fr)
+                    if "local" in lv:
+                        fr.cells[lv["local"]] = v
+                    elif "reg" in lv:
+                        regs[lv["reg"]] = v
+                    elif "scratch" in lv:
+                        wr(s16(scratch_base + ev(lv["scratch"], fr)), v, fr)
+                    else:
+                        wr(ev(lv["deref"], fr), v, fr)
+                elif "yield" in st:
+                    r = engine(st["yield"], [ev(a, fr) for a in st["args"]])
+                    if st.get("result") is not None:
+                        fr.cells[st["result"]] = r
+                elif "call" in st:
+                    call(st["call"], [ev(a, fr) for a in st["args"]])
+                elif "pause" in st:
+                    engine("pause", [])
+            t = blk["term"]
+            if "goto" in t:
+                pc = t["goto"]
+            elif "if" in t:
+                pc = t["then"] if ev(t["if"], fr) else t["else"]
+            elif "ret" in t:
+                return
+            else:
+                raise IRError("halt")
+
+    call(entry, list(args))
+    return regs
+
+
+# ---------------------------------------------------------------- lowering plan
+
+# yields that put something on screen or ask the player (reference engine map)
+VISIBLE_YIELDS = frozenset({1, 2, 3, 4, 8, 13, 65, 71, 94, 96, 17, 40, 78})
+CMP_OPS = ("==", "!=", ">", ">=", "<", "<=")
+
+
+def _walk_stmts(ir):
+    for pc, b in ir["blocks"].items():
+        for st in b["stmts"]:
+            yield pc, st
+
+
+def _expr_uses_local(e, k):
+    return ("local", k) in _refs(e, set())
+
+
+def _local_reads(ir, k):
+    """Every place local k is read: ('stmt', st) / ('term', blk_pc, term)."""
+    out = []
+    for pc, b in ir["blocks"].items():
+        for st in b["stmts"]:
+            exprs = []
+            if "let" in st:
+                exprs.append(st["value"])
+                if "deref" in st["let"]:
+                    exprs.append(st["let"]["deref"])
+            elif "args" in st:
+                exprs.extend(st["args"])
+            if any(_expr_uses_local(e, k) or ("addr", k) in _addr_refs(e) for e in exprs):
+                out.append(("stmt", pc, st))
+        t = b["term"]
+        if "if" in t and (_expr_uses_local(t["if"], k) or ("addr", k) in _addr_refs(t["if"])):
+            out.append(("term", pc, t))
+    return out
+
+
+def _addr_refs(e, acc=None):
+    acc = set() if acc is None else acc
+    if isinstance(e, dict):
+        if "addr" in e:
+            acc.add(("addr", e["addr"]))
+        for v in e.values():
+            _addr_refs(v, acc)
+    elif isinstance(e, list):
+        for v in e:
+            _addr_refs(v, acc)
+    return acc
+
+
+def _gate_form(cond, k):
+    """`local k CMP const` (optionally negated) -> (op, const, negated) or None."""
+    neg = False
+    while isinstance(cond, dict) and cond.get("op") == "not":
+        neg, cond = not neg, cond["a"]
+    if isinstance(cond, dict) and cond.get("op") in CMP_OPS \
+            and cond["a"] == {"local": k} and isinstance(cond["b"], int):
+        return cond["op"], cond["b"], neg
+    return None
+
+
+MAIN = -1          # pseudo-entry of the scene's top-level program
+
+
+def plan_lowering(ins, force=()):
+    """Decide which routines of a program must be lowered to IR, generically.
+
+    A routine is lowered when it takes arguments and it (or anything it calls)
+    shows something to the player -- its behaviour depends on runtime values
+    the story graph cannot hold. Everything it calls is lowered with it. A
+    routine that calls a lowered routine is lowered too unless every such call
+    site is *simple*: constant arguments, and the result B either unused or
+    stored into a local that is only ever tested against constants (those
+    become gates on a result variable).
+
+    Returns {"irs": {pc: ir}, "lowered": set, "sites": [site...]} where a site
+    is {"caller", "call_pc", "callee", "args", "store": local|None,
+    "tests": [(if_pc, op, const, negated)]}."""
+    entries = routine_entries(ins)
+    irs = {}
+    for ep in entries:
+        ir = lift_routine(ins, ep)
+        if ir is not None:
+            irs[ep] = ir
+    if MAIN in force:
+        m = lift_routine(ins, ins[0].pc if ins else 0, bare=True)
+        if m is not None:
+            m["entry"] = MAIN
+            irs[MAIN] = m
+    owner = {}
+    for ep, ir in irs.items():
+        for pc in ir["pcs"]:
+            owner.setdefault(pc, ep)
+
+    vis_memo = {}
+
+    def visible(ep, seen=()):
+        if ep in vis_memo:
+            return vis_memo[ep]
+        ir = irs.get(ep)
+        if ir is None or ep in seen:
+            return False
+        v = any("yield" in st and (st["yield"] in VISIBLE_YIELDS or st["yield"] in OPAQUE_YIELDS)
+                for _, st in _walk_stmts(ir)) \
+            or any(visible(c, seen + (ep,)) for c in ir["calls"])
+        vis_memo[ep] = v
+        return v
+
+    lowered = {ep for ep, ir in irs.items() if visible(ep) and _seed(ir)}
+    lowered |= {ep for ep in force if ep in irs}
+
+    def close_down():
+        work = list(lowered)
+        while work:
+            ep = work.pop()
+            for c in irs[ep]["calls"]:
+                if c in irs and c not in lowered:
+                    lowered.add(c)
+                    work.append(c)
+                elif c not in irs:
+                    raise LiftError("lowered routine calls unliftable %d" % c)
+
+    try:
+        close_down()
+    except LiftError:
+        return {"irs": irs, "lowered": set(), "sites": []}
+    while True:
+        sites, grow = [], set()
+        for ep, ir in irs.items():
+            if ep in lowered:
+                continue
+            for bpc, st in _walk_stmts(ir):
+                if "call" not in st or st["call"] not in lowered:
+                    continue
+                site = _classify_site(ir, bpc, st)
+                if site is None:
+                    grow.add(ep)
+                else:
+                    site["caller"] = ep
+                    sites.append(site)
+        # call sites outside every routine (the scene's own top-level code)
+        for y in ins:
+            if MAIN in lowered:
+                break
+            if y.opcode == 0x42 and y.pc not in owner:
+                nx = next((z for z in ins if z.pc == y.pc + 1), None)
+                if nx is not None and nx.opcode == 0x29 and nx.operand in lowered:
+                    sites.append({"caller": None, "call_pc": y.pc, "callee": nx.operand,
+                                  "args": None, "store": None, "tests": [],
+                                  "unresolved": True})
+        if not grow:
+            break
+        lowered |= grow
+        try:
+            close_down()
+        except LiftError:
+            return {"irs": irs, "lowered": set(), "sites": []}
+    # partial lowering: routines the IR cannot carry (and lowered routines that
+    # call them) stay as decoded; their call sites are not spliced
+    bad = {ep for ep in lowered if check_supported(irs, {ep})}
+    why = {ep: check_supported(irs, {ep}) for ep in bad}
+    changed = True
+    while changed:
+        changed = False
+        for ep in list(lowered - bad):
+            if any(c in bad for c in irs[ep]["calls"]):
+                bad.add(ep)
+                why[ep] = "calls r%d" % next(c for c in irs[ep]["calls"] if c in bad)
+                changed = True
+    # a routine lowered only because it called a now-dropped routine is dropped
+    # too (grow closure recomputed from the surviving seeds)
+    keep = lowered - bad
+    sites = [s_ for s_ in sites if s_["callee"] in keep and (s_["caller"] is None or s_["caller"] not in keep)]
+    return {"irs": irs, "lowered": keep, "sites": sites, "dropped": why}
+
+
+def _classify_site(ir, bpc, st):
+    if any(not isinstance(a, int) for a in st["args"]):
+        return None
+    blk = ir["blocks"][bpc]
+    i = blk["stmts"].index(st)
+    rest = blk["stmts"][i + 1:]
+    site = {"call_pc": st["pc"], "callee": st["call"], "args": list(st["args"]),
+            "store": None, "tests": []}
+    b_uses = []
+    for pc, s in _walk_stmts(ir):
+        if "let" in s and s["value"] == {"reg": "B"}:
+            b_uses.append((pc, s))
+        elif "let" in s and ("reg", "B") in _refs(s["value"], set()):
+            return None
+        elif "args" in s and any(("reg", "B") in _refs(a, set()) for a in s["args"]):
+            return None
+    for pc, b in ir["blocks"].items():
+        if "if" in b["term"] and ("reg", "B") in _refs(b["term"]["if"], set()):
+            return None
+    # is B read right after this call?
+    if rest and "let" in rest[0] and rest[0]["value"] == {"reg": "B"}:
+        lv = rest[0]["let"]
+        if "local" not in lv:
+            return None
+        k = lv["local"]
+        # every write of k is a B store after a lowered call; every read a test
+        for pc, s in _walk_stmts(ir):
+            if "let" in s and s["let"] == {"local": k} and s["value"] != {"reg": "B"} \
+                    and not isinstance(s["value"], int):
+                return None
+            if "yield" in s and s.get("result") == k:
+                return None
+        for kind, pc, obj in _local_reads(ir, k):
+            if kind != "term":
+                return None
+            g = _gate_form(obj["if"], k)
+            if g is None:
+                return None
+            site["tests"].append((obj["pc"], g[0], g[1], g[2]))
+        site["store"] = k
+    return site
+
+
+ARITH = ("+", "-", "*", "/", "%", "neg")
+
+
+def _has_arith_on(e, dyn):
+    """expression does arithmetic whose operands are not all constants/params."""
+    if isinstance(e, dict) and e.get("op") in ARITH:
+        ops = [e["a"]] + ([e["b"]] if "b" in e else [])
+        if any(not isinstance(o, int) and not (isinstance(o, dict) and "local" in o
+               and isinstance(o["local"], int) and o["local"] < 0) for o in ops):
+            return True
+    if isinstance(e, dict):
+        return any(_has_arith_on(v, dyn) for v in e.values() if isinstance(v, (dict, list)))
+    if isinstance(e, list):
+        return any(_has_arith_on(v, dyn) for v in e)
+    return False
+
+
+def _needs_runtime_values(ir):
+    """True when values computed at run time (arithmetic on state, not just
+    constant arguments) reach what the player sees or where the routine goes:
+    the story graph can hold constants and variable tests, not frame
+    arithmetic (a fight's hit points, a tally shown with %d)."""
+    # arguments themselves are run-time values too: a routine whose parameter
+    # is the character a line is spoken by (the same "..." shown by every
+    # fighter in turn) shows a different speaker per call
+    dyn = {k for k in range(-(ir["params"] + 2), -2)} if ir["params"] else set()
+    changed = True
+    while changed:
+        changed = False
+        for _, st in _walk_stmts(ir):
+            if "let" in st and "local" in st["let"]:
+                k = st["let"]["local"]
+                if k in dyn:
+                    continue
+                v = st["value"]
+                refs = _refs(v, set())
+                if _has_arith_on(v, dyn) or any(r[0] == "local" and r[1] in dyn
+                                                for r in refs if isinstance(r, tuple)):
+                    dyn.add(k)
+                    changed = True
+
+    def uses_dyn(e):
+        return any(isinstance(r, tuple) and r[0] == "local" and r[1] in dyn
+                   for r in _refs(e, set())) or _has_arith_on(e, dyn)
+    for _, st in _walk_stmts(ir):
+        if "yield" in st and (st["yield"] in VISIBLE_YIELDS or st["yield"] == 0):
+            if any(uses_dyn(a) for a in st["args"]):
+                return True
+    for b in ir["blocks"].values():
+        if "if" in b["term"] and uses_dyn(b["term"]["if"]):
+            return True
+    return False
+
+
+# ---------------------------------------------------------------- IR -> JSON
+
+# Text-reference argument positions per yield, from the reference engine's
+# read_text/resolve_text calls (engine.py). Yield 0 (format) and 13 (dialogue)
+# depend on argument values and are handled in _text_positions.
+TEXT_ARGS = {1: (0, 1, 2), 2: (0, 1), 3: (0,), 7: (0, 1), 8: (0, 1), 15: (0, 1),
+             33: (0, 1), 65: (1,), 24: (0, 1), 17: (0, 1, 2), 40: (0, 1, 2),
+             25: (0, 1), 28: (0,), 71: (0, 1, 2, 3), 78: (0,), 88: (0,),
+             46: (0, 1), 47: (0, 1), 49: (1,), 64: (1,), 90: (1,), 94: (20, 21),
+             96: (14, 15)}
+# arguments the engine reads VM memory through (reference engine): position ->
+# ("buf",) a text buffer / scratch array, or ("rows", count_arg, stride,
+# text_fields) a record table of args[count_arg] rows, or ("term", stride,
+# marker) rows up to the one starting with `marker`, or ("fixed", n, text_fields)
+YIELD_PTRS = {
+    9: {2: ("buf",), 5: ("buf",)},
+    25: {0: ("buf",)},
+    28: {0: ("buf",)},
+    78: {2: ("rows", 1, 1, ())},
+    94: {2: ("term", 4, 0x7FFE), 3: ("term", 4, 0x7FFE), 4: ("term", 4, 0x7FFE),
+         5: ("term", 4, 0x7FFE), 6: ("term", 4, 0x7FFE), 7: ("term", 4, 0x7FFE),
+         8: ("fixed", 6, (0, 1, 2, 3, 4, 5))},
+    96: {12: ("rows", 11, 10, (2, 3, 4, 5)), 17: ("rows", 16, 2, ()),
+         19: ("rows", 18, 17, (0, 1, 7, 8, 9, 11))},
+}
+# yields the IR does not carry (they write into VM memory or read data tables)
+MEMORY_YIELDS = frozenset({17, 25, 28, 40, 71, 78, 94, 96})
+YIELD_NAMES = {0: "format", 1: "choice", 2: "menu_begin", 3: "menu_option",
+               4: "menu_show", 5: "set_character_expression", 7: "host_card",
+               8: "presentation", 9: "survey_submit", 15: "named_dialogue",
+               33: "host_card_timed", 70: "bakery_minigame",
+               10: "goto_scene", 11: "set_background", 13: "dialogue", 16: "set_scene_value",
+               27: "random_below", 29: "get_ui_result", 34: "set_background",
+               35: "set_background", 44: "set_number", 45: "get_number", 46: "set_string",
+               47: "get_string_default", 49: "set_character_name", 50: "set_number_bit",
+               51: "get_number_bit", 52: "set_owner_number", 53: "get_owner_number",
+               54: "set_owner_number", 55: "get_owner_number", 64: "set_character_name",
+               65: "narration", 72: "set_character_art_base", 73: "get_character_art_base",
+               74: "set_ui_default", 75: "set_ui_default", 79: "request_audio",
+               80: "request_audio", 81: "stop_audio", 82: "vibrate", 86: "set_background",
+               88: "dialogue_notice", 89: "wobble", 90: "scene_badge", 91: "loading"}
+
+
+def _text_positions(yid, args, strings):
+    if yid == 0:
+        if not args or not isinstance(args[0], int):
+            return None
+        at = 1 if args[0] < 0 else 0
+        if len(args) == at + 1:
+            return (at,)                 # a bare pattern (e.g. a typed-in buffer)
+        if len(args) <= at or not isinstance(args[at], int) or args[at] not in strings:
+            return None
+        pat, pos, argi = strings[args[at]], [at], at + 1
+        i = 0
+        while i < len(pat):
+            if pat[i] == "%" and i + 1 < len(pat) and pat[i + 1] in "cds":
+                if pat[i + 1] == "s":
+                    pos.append(argi)
+                argi += 1
+                i += 1
+            i += 1
+        return tuple(pos)
+    if yid == 13:
+        if not args or not isinstance(args[0], int):
+            return None
+        return (1,) if args[0] < 0 else (0,)
+    return TEXT_ARGS.get(yid, ())
+
+
+def check_supported(irs, lowered):
+    """None when every lowered routine is expressible, else a reason. Data
+    memory (tables, buffers, frame arrays) is carried by the scene's memory
+    image, so nothing the lifter produces is refused."""
+    return None
+
+
+def needs_memory(irs, lowered):
+    """Does any lowered routine read or write VM data memory, or hand an
+    address to the engine? Then the scene must carry its data image."""
+    for ep in lowered:
+        for _, st in _walk_stmts(irs[ep]):
+            blob = str(st)
+            if "'mem'" in blob or "'deref'" in blob:
+                return True
+            if "yield" in st and (st["yield"] in MEMORY_YIELDS or "'addr'" in str(st["args"])):
+                return True
+        for b in irs[ep]["blocks"].values():
+            if "'mem'" in str(b["term"]) or "'deref'" in str(b["term"]):
+                return True
+    return False
+
+
+def type_text(irs, lowered, strings):
+    """Which locals / params of the lowered routines hold text references.
+    Returns ({ep: set(locals)}, error-or-None)."""
+    tl = {ep: set() for ep in lowered}
+    err = []
+
+    def mark(ep, e):
+        if isinstance(e, dict) and "local" in e:
+            if e["local"] not in tl[ep]:
+                tl[ep].add(e["local"])
+                return True
+        elif isinstance(e, int):
+            if e != -1 and e not in strings:
+                err.append("r%d: %d is not a string" % (ep, e))
+        elif isinstance(e, dict) and "text" in e:
+            pass
+        elif _mark_text_tables(e):
+            pass            # text read from a constant table / a scratch buffer
+        else:
+            err.append("r%d: text from %s" % (ep, str(e)[:60]))
+        return False
+
+    fmt_results = {ep: set() for ep in lowered}
+    for ep in lowered:
+        for _, st in _walk_stmts(irs[ep]):
+            if "yield" in st and st["yield"] == 0 and st.get("result") is not None:
+                fmt_results[ep].add(st["result"])
+    changed = True
+    while changed:
+        changed = False
+        for ep in lowered:
+            ir = irs[ep]
+            for _, st in _walk_stmts(ir):
+                if "yield" in st:
+                    pos = _text_positions(st["yield"], st["args"], strings)
+                    if pos is None:
+                        if st["yield"] in (0, 13):
+                            err.append("r%d: yield %d text positions unknown" % (ep, st["yield"]))
+                        continue
+                    for p in pos:
+                        if p < len(st["args"]):
+                            a = st["args"][p]
+                            if isinstance(a, dict) and "local" in a and a["local"] in fmt_results[ep]:
+                                continue
+                            changed |= mark(ep, a)
+                elif "let" in st and "local" in st["let"] and st["let"]["local"] in tl[ep]:
+                    v = st["value"]
+                    if isinstance(v, dict) and "local" in v and v["local"] in fmt_results[ep]:
+                        continue
+                    changed |= mark(ep, v)
+                elif "call" in st and st["call"] in tl:
+                    n = len(st["args"])
+                    for k in tl[st["call"]]:
+                        if k < 0:
+                            i = n + 2 + k
+                            if 0 <= i < n:
+                                changed |= mark(ep, st["args"][i])
+    return tl, (err[0] if err else None)
+
+
+def _mark_text_tables(e):
+    """flag the constant tables `e` reads text from; True when `e` is a table
+    read or a scratch (engine-written) text buffer"""
+    found = [False]
+
+    def w(x):
+        if isinstance(x, dict):
+            if "table" in x:
+                x["_text"] = True
+                found[0] = True
+                return
+            if "scratch_addr" in x or "scratch" in x:
+                found[0] = True
+            for v in x.values():
+                w(v)
+        elif isinstance(x, list):
+            for v in x:
+                w(v)
+    w(e)
+    return found[0]
+
+
+def _type_tables(o, tx):
+    if isinstance(o, dict):
+        if "table" in o:
+            if o.pop("_text", False):
+                o["table"] = [tx(v) for v in o["table"]]
+            at = o.pop("_text_at", None)
+            if at:
+                o["table"] = [tx(v) if i in at else v for i, v in enumerate(o["table"])]
+            return
+        for v in o.values():
+            _type_tables(v, tx)
+    elif isinstance(o, list):
+        for v in o:
+            _type_tables(v, tx)
+
+
+def text_params(tl, ep, argc):
+    """argument indexes of routine ep that are text references"""
+    return {argc + 2 + k for k in tl.get(ep, ()) if k < 0 and 0 <= argc + 2 + k < argc}
+
+
+def ir_to_segments(ir, name, strings, tl, rname, argcs, key=None):
+    """Emit one lowered routine as segments of IR nodes. `rname(pc)` names a
+    routine; `argcs` {callee: argc}. Returns (segments, entry_name)."""
+    segs = {}
+    text_locals = tl.get(ir["entry"] if key is None else key, set())
+    fmt_res = {st["result"] for _, st in _walk_stmts(ir)
+               if "yield" in st and st["yield"] == 0 and st.get("result") is not None}
+
+    def seg(pc):
+        return "%s_b%d" % (name, pc)
+
+    def tx(e):
+        if isinstance(e, int) and e in strings:
+            return {"text": strings[e]}
+        return e
+
+    for pc, b in sorted(ir["blocks"].items()):
+        nodes = []
+        for st in b["stmts"]:
+            if "let" in st:
+                v = st["value"]
+                if "local" in st["let"] and st["let"]["local"] in text_locals \
+                        and not (isinstance(v, dict) and v.get("local") in fmt_res):
+                    v = tx(v)
+                nodes.append({"type": "let", "to": st["let"], "value": v})
+            elif "yield" in st:
+                args = list(st["args"])
+                for p in _text_positions(st["yield"], st["args"], strings) or ():
+                    if p < len(args):
+                        args[p] = tx(args[p])
+                n = {"type": "yield", "yield": st["yield"],
+                     "name": YIELD_NAMES.get(st["yield"], "yield_%d" % st["yield"]),
+                     "args": args}
+                if st.get("result") is not None and _local_used(ir, st["result"]):
+                    n["to"] = st["result"]
+                nodes.append(n)
+            elif "call" in st:
+                args = list(st["args"])
+                for i in text_params(tl, st["call"], len(args)):
+                    args[i] = tx(args[i])
+                nodes.append({"type": "call", "routine": rname(st["call"]), "args": args})
+            elif "pause" in st:
+                nodes.append({"type": "pause"})
+        t = b["term"]
+        if "goto" in t:
+            nodes.append({"type": "next", "next": seg(t["goto"])})
+        elif "if" in t:
+            nodes.append({"type": "if", "cond": t["if"], "then": seg(t["then"]),
+                          "else": seg(t["else"])})
+        elif "ret" in t:
+            nodes.append({"type": "ret"})
+        else:
+            nodes.append({"type": "end"})
+        _type_tables(nodes, tx)
+        segs[seg(pc)] = {"nodes": nodes}
+    return segs, seg(ir["start"])
+
+
+def _local_used(ir, k):
+    return bool(_local_reads(ir, k))
+
+
+# ---------------------------------------------------------------- var expressions
+
+def _var_writes(ir):
+    """keys written by set_number anywhere in the routine (None = unknown key)"""
+    out = set()
+    for _, st in _walk_stmts(ir):
+        if "yield" in st and st["yield"] in (44, 54, 52):
+            k = st["args"][0] if st["yield"] == 44 else None
+            out.add(k if isinstance(k, int) else None)
+    return out
+
+
+def var_expr(ir, blk_pc, idx, e, _depth=0):
+    """Rewrite expression `e`, used by statement `idx` of block `blk_pc`, over
+    story variables ({"var": key}) and constants only, or None when it depends on
+    frame state the story graph cannot hold. Locals resolve to their defining
+    expression: an earlier definition in the same block, or the routine's only
+    definition when the variables it reads are never written in the routine."""
+    if _depth > 12:
+        return None
+    if isinstance(e, int):
+        return e
+    if not isinstance(e, dict):
+        return None
+    if "op" in e:
+        if e["op"] in ("neg", "not"):
+            a = var_expr(ir, blk_pc, idx, e["a"], _depth + 1)
+            return None if a is None else {"op": e["op"], "a": a}
+        a = var_expr(ir, blk_pc, idx, e["a"], _depth + 1)
+        b = var_expr(ir, blk_pc, idx, e["b"], _depth + 1)
+        return None if a is None or b is None else {"op": e["op"], "a": a, "b": b}
+    if "local" not in e:
+        return None
+    k = e["local"]
+    stmts = ir["blocks"][blk_pc]["stmts"]
+    writes = _var_writes(ir)
+    # nearest earlier definition in this block
+    for j in range(min(idx, len(stmts)) - 1, -1, -1):
+        st = stmts[j]
+        if "let" in st and st["let"] == {"local": k}:
+            return var_expr(ir, blk_pc, j, st["value"], _depth + 1)
+        if "yield" in st and st.get("result") == k:
+            return _yield_value(st, stmts[j + 1:idx])
+        if "call" in st:
+            return None                     # a callee may have changed it
+        if "let" in st and "deref" in st["let"]:
+            return None
+    # single definition in the routine
+    defs = [(pc, j, st) for pc, b in ir["blocks"].items() for j, st in enumerate(b["stmts"])
+            if ("let" in st and st["let"] == {"local": k}) or ("yield" in st and st.get("result") == k)]
+    if len(defs) != 1 or k < 0:
+        return None
+    pc, j, st = defs[0]
+    if "yield" in st:
+        v = _yield_value(st, [])
+    else:
+        v = var_expr(ir, pc, j, st["value"], _depth + 1)
+    if v is None or None in writes or any(r in writes for r in _vars_in(v)):
+        return None
+    return v
+
+
+def _yield_value(st, between):
+    """get_number(key) -> {"var": key} when key is constant and not written in
+    `between`."""
+    if st["yield"] != 45 or not isinstance(st["args"][0], int):
+        return None
+    key = st["args"][0]
+    for s in between:
+        if "yield" in s and s["yield"] in (44, 54, 52) and (s["args"][0] == key or not isinstance(s["args"][0], int)):
+            return None
+        if "call" in s:
+            return None
+    return {"var": key}
+
+
+def _vars_in(e, acc=None):
+    acc = set() if acc is None else acc
+    if isinstance(e, dict):
+        if "var" in e:
+            acc.add(e["var"])
+        for v in e.values():
+            _vars_in(v, acc)
+    return acc
+
+
+
+# yields the story graph has no node for: a routine performing them is lowered
+# so they are reproduced exactly (host cards, survey submission)
+OPAQUE_YIELDS = frozenset({7, 9, 33})
+
+
+def _seed(ir):
+    """Must this routine be lowered? With arguments: when run-time values
+    (frame arithmetic) reach its output or its branches. Without: only when a
+    shown value cannot be written as an expression over story variables
+    (Tier 1 -- those stay story nodes with expression arguments)."""
+    if any("yield" in st and st["yield"] in OPAQUE_YIELDS for _, st in _walk_stmts(ir)):
+        return True
+    if ir["params"] > 0:
+        return _needs_runtime_values(ir)
+    fmt_res = {st["result"] for _, st in _walk_stmts(ir)
+               if "yield" in st and st["yield"] == 0 and st.get("result") is not None}
+    for pc, b in ir["blocks"].items():
+        for i, st in enumerate(b["stmts"]):
+            if "yield" not in st or not (st["yield"] in VISIBLE_YIELDS or st["yield"] == 0):
+                continue
+            for a in st["args"]:
+                if isinstance(a, int) or (isinstance(a, dict) and a.get("local") in fmt_res):
+                    continue
+                if var_expr(ir, pc, i, a) is None:
+                    return True
+    return False
+
+
+# ---------------------------------------------------------------- bytecode VM
+# A faithful mirror of the reference KiWi VM (shs_runtime/vm.py, from
+# libshs09.so FUN_00055ce0), used to *verify* decoded output: the decoder plays
+# the original scripts and its own re-encoded scripts with the same engine
+# stand-in and compares what the player would see.
+
+class VMError(Exception):
+    pass
+
+
+STACK_CAP = 0x400
+STACK_BASE = 0x7FF5 - STACK_CAP
+
+
+class Program:
+    def __init__(self, ins, main_words, gap, extra):
+        self.ins = list(ins)
+        self.main_words, self.gap, self.extra = list(main_words), gap, list(extra)
+
+
+def program_from_chunk(data):
+    """Parse a KiWi v2 chunk (bytes) into a Program (reference decode_program)."""
+    import struct
+    if data[:4] != b"kiwi" or data[4] != 2:
+        raise VMError("not a KiWi v2 chunk")
+    pos = 5
+    prev = data[pos]; pos += 1
+    if prev:
+        raise VMError("linked segments unsupported")
+    pos += 1                                   # flag
+    main, gap, extra, count = struct.unpack(">HHHH", data[pos:pos + 8]); pos += 8
+    mw = struct.unpack(">%dH" % main, data[pos:pos + 2 * main]); pos += 2 * main
+    ew = struct.unpack(">%dH" % extra, data[pos:pos + 2 * extra]); pos += 2 * extra
+    ins = []
+
+    class I:
+        __slots__ = ("pc", "byte_offset", "opcode", "operand")
+    for k in range(count):
+        y = I()
+        y.pc, y.byte_offset, y.opcode = k, pos, data[pos]
+        pos += 1
+        if y.opcode in OPERAND_OPCODES:
+            y.operand = (data[pos] << 8) | data[pos + 1]
+            pos += 2
+        else:
+            y.operand = None
+        ins.append(y)
+    return Program(ins, mw, gap, ew)
+
+
+# the definitive operand-bearing opcode set (reference OPERAND_OPCODES,
+# int32 table at 0x002593a8)
+OPERAND_OPCODES = frozenset({0x01, 0x19, 0x1A, 0x1B, 0x1E, 0x1F, 0x20, 0x23,
+                             0x28, 0x29, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x40,
+                             0x41, 0x5C})
+
+
+class KiwiVM:
+    def __init__(self, prog):
+        self.load(prog)
+        self.a = self.b = self.result = None
+
+    def load(self, prog):
+        self.prog = prog
+        self.data = [s16(w) for w in prog.main_words] + [None] * prog.gap + \
+                    [s16(w) for w in prog.extra]
+        if len(self.data) > STACK_BASE:
+            raise VMError("data overlaps the stack")
+        self.stack = [None] * STACK_CAP
+        self.pc = self.sp = self.fp = 0
+
+    def rd(self, addr):
+        a = s16(addr)
+        if a >= STACK_BASE:
+            i = a - STACK_BASE
+            if not 0 <= i < STACK_CAP or self.stack[i] is None:
+                raise VMError("stack word %d" % i)
+            return self.stack[i]
+        if not 0 <= a < len(self.data) or self.data[a] is None:
+            raise VMError("data word %d" % a)
+        return self.data[a]
+
+    def wr(self, addr, v):
+        a = s16(addr)
+        if STACK_BASE <= a < STACK_BASE + STACK_CAP:
+            self.stack[a - STACK_BASE] = s16(v)
+        elif 0 <= a < len(self.data):
+            self.data[a] = s16(v)
+        else:
+            raise VMError("write address %d" % a)
+
+    def push(self, v):
+        if self.sp >= STACK_CAP:
+            raise VMError("stack overflow")
+        self.stack[self.sp] = s16(v)
+        self.sp += 1
+
+    def pop(self):
+        if self.sp <= 0:
+            raise VMError("stack underflow")
+        self.sp -= 1
+        v = self.stack[self.sp]
+        if v is None:
+            raise VMError("uninit stack")
+        return v
+
+    def top(self):
+        v = self.stack[max(0, self.sp - 1)]
+        if v is None:
+            raise VMError("uninit stack")
+        return v
+
+    def known(self, v):
+        if v is None:
+            raise VMError("uninitialized register")
+        return v
+
+    def run(self, budget=200000):
+        """Run to the next yield/pause/halt: ('yield', id, args) | ('pause',) |
+        ('halt',)."""
+        ins = self.prog.ins
+        for _ in range(budget):
+            if not 0 <= self.pc < len(ins):
+                raise VMError("pc out of range")
+            y = ins[self.pc]
+            op, arg = y.opcode, y.operand
+            nxt = self.pc + 1
+            if op in NATIVE_NOPS:
+                pass
+            elif op == 0x01:
+                self.a = s16(arg)
+            elif op == 0x03:
+                self.a = self.pop()
+            elif op == 0x04:
+                self.b = self.pop()
+            elif op == 0x05:
+                self.a = self.top()
+            elif op in (0x07, 0x08):
+                self.push(self.known(self.a if op == 7 else self.b))
+            elif op in BINOPS:
+                r, l = self.pop(), self.pop()
+                o = BINOPS[op]
+                if o in ("/", "%"):
+                    if r == 0:
+                        raise VMError("division by zero")
+                    q = abs(l) // abs(r)
+                    if (l < 0) != (r < 0):
+                        q = -q
+                    v = q if o == "/" else l - q * r
+                else:
+                    v = {"==": l == r, "!=": l != r, ">": l > r, ">=": l >= r, "<": l < r,
+                         "<=": l <= r, "or": bool(l or r), "and": bool(l and r),
+                         "+": l + r, "-": l - r, "*": l * r}[o]
+                self.push(int(v))
+            elif op == 0x13:
+                self.push(int(not self.pop()))
+            elif 0x15 <= op <= 0x19:
+                n = arg if op == 0x19 else op - 0x14
+                if not 0 <= self.sp - n <= STACK_CAP:
+                    raise VMError("sp range")
+                self.sp -= n
+            elif op == 0x1A:
+                self.push(arg)
+            elif op == 0x1B:
+                for byte in (arg & 0xFF, arg >> 8):
+                    self.push(byte - 0x100 if byte > 0x7F else byte)
+            elif op == 0x1C:
+                self.push(self.top())
+            elif op in (0x1E, 0x1F):
+                cnt = (arg & 0xFF) if op == 0x1F else self.known(self.result)
+                if not 0 <= cnt <= self.sp:
+                    raise VMError("yield count")
+                args = [self.stack[i] for i in range(self.sp - cnt, self.sp)]
+                if any(v is None for v in args):
+                    raise VMError("uninit yield arg")
+                self.pc = nxt
+                self._pending_argc = cnt
+                return ("yield", (arg >> 8) if op == 0x1F else arg, args)
+            elif op == 0x20:
+                self.result = s16(arg)
+            elif op == 0x21:
+                self.push(self.known(self.result))
+            elif op == 0x22:
+                old = self.stack[self.fp - 1] if self.fp >= 1 else None
+                if old is None:
+                    raise VMError("frame link")
+                self.sp = self.fp - 1
+                self.fp = old
+            elif op == 0x23:
+                self.push(STACK_BASE + self.fp + s16(arg))
+            elif op == 0x24:
+                self.push(-self.pop())
+            elif op in (0x25, 0x26):
+                ad = self.known(self.a)
+                self.wr(ad, self.rd(ad) + (1 if op == 0x25 else -1))
+            elif op == 0x28:
+                nxt = (self.pc + arg) & 0xFFFF
+            elif op == 0x29:
+                nxt = arg
+            elif 0x2A <= op <= 0x2E:
+                v = self.top() if op in (0x2C, 0x2D) else self.pop()
+                if op == 0x2E:
+                    take = v == self.known(self.a)
+                else:
+                    take = (v != 0) if op in (0x2A, 0x2C) else (v == 0)
+                if take:
+                    nxt = (self.pc + arg) & 0xFFFF
+            elif op == 0x32:
+                self.pc = nxt
+                return ("pause",)
+            elif op == 0x33:
+                return ("halt",)
+            elif op == 0x3E:
+                v, ad = self.pop(), self.pop()
+                self.wr(ad, v)
+                self.push(v)
+            elif op == 0x3F:
+                if not self.sp:
+                    raise VMError("underflow")
+                self.stack[self.sp - 1] = self.rd(self.top())
+            elif op == 0x40:
+                self.push(self.rd(arg))
+            elif op == 0x41:
+                self.push(self.rd(STACK_BASE + self.fp + s16(arg)))
+            elif op == 0x42:
+                self.push(self.pc + 1)
+            elif op == 0x43:
+                nxt = (self.pop() + 1) & 0xFFFF
+            elif op == 0x46:
+                self.sp = self.top()
+            elif op == 0x48:
+                self.push(self.fp)
+            elif op == 0x4A:
+                self.fp = self.sp
+            elif op in (0x5A, 0x5B):
+                self.push(op - 0x5A)
+            elif op == 0x5C:
+                if self.known(self.a) == (arg & 0xFF):
+                    nxt = (self.pc + (arg >> 8)) & 0xFFFF
+            elif 0x5F <= op <= 0x62:
+                self.push(STACK_BASE + self.fp + op - 0x5F)
+            else:
+                raise VMError("unsupported opcode 0x%02x" % op)
+            self.pc = nxt
+        raise VMError("budget")
+
+    def resume(self, result):
+        self.sp -= self._pending_argc
+        self.result = s16(result)
+
+
+# ---------------------------------------------------------------- engine stand-in
+
+# yield argument counts the reference engine insists on (need / at_least)
+YIELD_ARITY = {0: ('at_least', 1), 1: ('need', 8), 2: ('need', 6), 3: ('need', 3),
+               4: ('need', 1), 5: ('need', 2), 8: ('need', 4), 10: ('need', 2),
+               11: ('at_least', 2), 13: ('at_least', 2), 16: ('need', 1), 17: ('need', 3),
+               18: ('need', 0), 24: ('need', 2), 25: ('need', 2), 27: ('need', 1),
+               28: ('need', 1), 29: ('need', 1), 34: ('at_least', 2), 35: ('at_least', 4),
+               40: ('need', 3), 44: ('need', 2), 45: ('need', 1), 46: ('need', 2),
+               47: ('need', 3), 49: ('need', 3), 50: ('need', 4), 51: ('need', 3),
+               52: ('need', 3), 53: ('need', 2), 54: ('need', 2), 55: ('need', 1),
+               64: ('need', 2), 65: ('need', 3), 71: ('need', 8), 72: ('need', 2),
+               73: ('need', 1), 74: ('need', 1), 75: ('need', 1), 78: ('need', 3),
+               79: ('need', 1), 80: ('need', 2), 81: ('need', 1), 82: ('need', 0),
+               86: ('at_least', 3), 88: ('need', 1), 89: ('need', 0), 90: ('need', 2),
+               91: ('need', 1), 94: ('need', 22), 95: ('need', 1), 96: ('need', 20),
+               99: ('need', 1)}
+
+
+class _Rand:
+    def __init__(self, seed):
+        self.s = seed
+
+    def below(self, n):
+        self.s = (self.s * 1103515245 + 12345) & 0x7FFFFFFF
+        return (self.s >> 8) % n if n > 0 else 0
+
+
+class Engine:
+    """The part of the reference engine (engine.py dispatch) that decides what
+    the player sees and what values scripts get back. Presentation-only yields
+    complete with 0. Choices are answered by a policy."""
+
+    def __init__(self, policy=0, seed=12345, name="Zoe"):
+        self.numbers, self.strings = {}, {}
+        self.dyn = [""] * 11
+        self.last_input = ""
+        self.builder = None
+        self.scheduled = []
+        self.art = {}
+        self.rand = _Rand(seed)
+        self.policy = policy
+        self.pick_rand = _Rand(seed * 7 + 1)
+        self.name = name
+        self.events = []
+
+    @staticmethod
+    def nkey(owner, key):
+        return s16(owner) * 0x10000 + s16(key)
+
+    def read_text(self, vm, ref):
+        ref = s16(ref)
+        if ref == -1:
+            return ""
+        if ref >= 0x7FF5:
+            return self.dyn[ref - 0x7FF5] if ref - 0x7FF5 < len(self.dyn) else ""
+        out = bytearray()
+        a = ref
+        while a < 0x7FF5:
+            w = vm.rd(a) & 0xFFFF
+            for byte in (w >> 8, w & 0xFF):
+                if byte == 0:
+                    return out.decode("latin-1")
+                out.append(byte)
+            a += 1
+        raise VMError("unterminated text")
+
+    def write_text(self, vm, addr, text):
+        b = text.split("\0", 1)[0].encode("latin-1") + b"\0"
+        if len(b) % 2:
+            b += b"\0"
+        for i in range(len(b) // 2):
+            vm.wr(addr + i, (b[2 * i] << 8) | b[2 * i + 1])
+
+    def subst(self, text):
+        seen = set()
+        for _ in range(100):
+            if text in seen:
+                raise VMError("cyclic substitution")
+            seen.add(text)
+            ch = False
+            for k, v in self.strings.items():
+                if k and k in text:
+                    if k in v:
+                        raise VMError("self-referencing substitution")
+                    text = text.replace(k, v)
+                    ch = True
+            if not ch:
+                return text
+        raise VMError("substitution limit")
+
+    def pick(self, n_enabled):
+        if n_enabled <= 0:
+            return 0
+        p = self.policy
+        if p == "rand":
+            return self.pick_rand.below(n_enabled)
+        return min(p if p >= 0 else n_enabled - 1, n_enabled - 1)
+
+    def dispatch(self, vm, y, args):
+        """Returns the yield result (int). Raises VMError on the state errors
+        the reference engine stops on (art for an unregistered character, a
+        choice option with no builder, ...), so a decode that loses engine
+        state is caught."""
+        # (argument counts are not enforced: both sides run the same yields,
+        # the encoder guards the code it generates, and some shipped scripts
+        # carry yields the reference engine would refuse -- verification should
+        # see past them)
+        rt = lambda r: self.read_text(vm, r)
+        if y == 0:
+            slot, at = (1 - args[0], 1) if args[0] < 0 else (0, 0)
+            pat = rt(args[at])
+            out, i, ai = "", 0, at + 1
+            while i < len(pat):
+                c = pat[i]
+                if c == "%" and i + 1 < len(pat) and pat[i + 1] in "cds":
+                    sp, v = pat[i + 1], args[ai] if ai < len(args) else 0
+                    c = rt(v) if sp == "s" else str(s16(v)) if sp == "d" else chr(v & 0xFF)
+                    i += 1
+                    ai += 1
+                out += c
+                i += 1
+            if 0 <= slot < len(self.dyn):
+                self.dyn[slot] = out
+            return 0x7FF5 + slot
+        if y in (44, 54, 52):
+            owner, key, val = args if y == 52 else (0, args[0], args[1])
+            self.numbers[self.nkey(owner, key)] = val
+            return 0
+        if y in (45, 55, 53):
+            owner, key = args if y == 53 else (0, args[0])
+            return self.numbers.get(self.nkey(owner, key), 0)
+        if y in (50, 51):
+            owner, key, bit = args[:3]
+            k = self.nkey(owner, key)
+            v = self.numbers.get(k, 0)
+            sh = bit & 0xFF
+            if y == 51:
+                return (v >> sh) & 1
+            m = (1 << sh) if sh < 32 else 0
+            self.numbers[k] = (v | m) if args[3] == 1 else (v & ~m)
+            return 0
+        if y == 46:
+            self.strings[rt(args[0])] = rt(args[1])
+            return 0
+        if y == 47:
+            slot = ~args[2]
+            key = rt(args[0])
+            v = self.strings.get(key, "") or rt(args[1])
+            self.strings[key] = v
+            if 0 <= slot < len(self.dyn):
+                self.dyn[slot] = v
+            return 0x7FF5 + slot
+        if y == 72:
+            self.art[args[0]] = args[1]
+            return 0
+        if y == 73:
+            if args[0] not in self.art:
+                raise VMError("art requested for uninitialized character %d" % args[0])
+            return self.art[args[0]]
+        if y == 10:
+            self.scheduled.append((args[0], args[1] != 0))
+            return 0
+        if y == 27:
+            return self.rand.below(args[0]) if args[0] > 0 else 0
+        if y in (13, 65):
+            ti = 1 if y == 65 or args[0] < 0 else 0
+            self.events.append(("say", self.subst(rt(args[ti]))))
+            return 0
+        if y == 15:
+            # named one-off speaker ("Voice", "Calendar"): [name, text, char, expr]
+            self.events.append(("say", self.subst(rt(args[1]))))
+            return 0
+        if y in (7, 33):
+            # host card (the end-of-episode credits card): [title, text, ...]
+            self.events.append(("card", y, self.subst(rt(args[0])), self.subst(rt(args[1]))))
+            return 0
+        if y == 70:
+            self.events.append(("minigame", 70))
+            return 0
+        if y == 1:
+            opts = self.subst(rt(args[1])).split("|")
+            self.events.append(("choice", tuple(opts)))
+            return self.pick(len(opts))
+        if y == 2:
+            self.builder = {"opts": [], "vals": [], "en": []}
+            return 0
+        if y == 3:
+            if self.builder is None:
+                raise VMError("choice option without a builder")
+            b = self.builder
+            b["opts"].append(self.subst(rt(args[0])))
+            b["vals"].append(len(b["vals"]) if args[1] == -999 else args[1])
+            b["en"].append(args[2] != 0)
+            return 0
+        if y == 4:
+            if self.builder is None:
+                raise VMError("choice display without a builder")
+            b = self.builder
+            self.builder = None
+            en = [i for i, e in enumerate(b["en"]) if e]
+            self.events.append(("choice", tuple(b["opts"][i] for i in en)))
+            if not en:
+                return 0
+            return b["vals"][en[self.pick(len(en))]]
+        if y in (17, 40):
+            self.dyn[0] = self.last_input = self.name
+            return 0x7FF5
+        if y == 24:
+            return int(rt(args[0]) == rt(args[1]))
+        if y == 25:
+            self.write_text(vm, args[0], rt(args[0]) + rt(args[1]))
+            return 0
+        if y == 28:
+            self.write_text(vm, args[0], self.last_input)
+            return 0
+        rw = lambda a: s16(vm.rd(a))
+
+        def rtx(ref):
+            return self.subst(rt(ref)) if s16(ref) != -1 else ""
+        if y == 78:
+            if not 1 <= args[1] <= 5:
+                raise VMError("character selection count")
+            ids = tuple(rw(args[2] + i) for i in range(args[1]))
+            self.events.append(("pick_character", rtx(args[0]), ids))
+            return self.pick(max(1, args[1]))
+        if y == 71:
+            # word game: title text and the good / bad word lists (reference
+            # engine reads args 1..3 as text)
+            self.events.append(("minigame", 71, tuple(rt(args[i]) for i in (0, 1, 2, 3)),
+                                tuple(args[4:8])))
+            return 0
+        if y == 94:
+            plans = []
+            for a in args[2:8]:
+                rows, i = [], 0
+                while rw(a + i * 4) & 0xFFFF != 0x7FFE and i < 64:
+                    rows.append(tuple(rw(a + i * 4 + k) for k in range(4)))
+                    i += 1
+                plans.append(tuple(rows))
+            texts = tuple(rt(rw(args[8] + i)) for i in range(6))
+            self.events.append(("minigame", 94, tuple(plans), texts, tuple(args[9:20]),
+                                tuple(rtx(args[i]) for i in (20, 21))))
+            return 0
+        if y == 96:
+            def rows(count, a, stride, tf):
+                if not 0 <= count <= 256:
+                    raise VMError("grid record count")
+                return tuple(tuple(rtx(rw(a + r * stride + k)) if k in tf else rw(a + r * stride + k)
+                                   for k in range(stride)) for r in range(count))
+            self.events.append(("minigame", 96, tuple(args[:12]),
+                                rows(args[11], args[12], 10, (2, 3, 4, 5)),
+                                rows(args[18], args[19], 17, (0, 1, 7, 8, 9, 11)),
+                                rows(args[16], args[17], 2, ()),
+                                args[13], rtx(args[14]), rtx(args[15])))
+            return 0
+        return 0
+
+
+def play(programs, start, policy=0, seed=12345, max_events=300, max_scenes=200):
+    """Play an episode (programs: {script_id: Program}) with the engine
+    stand-in. Returns [(event, script_id)] -- ending with ('end',) or
+    ('error', message)."""
+    eng = Engine(policy, seed)
+    out = []
+    sid = start
+    vm = KiwiVM(programs[sid])
+    scenes = 0
+    try:
+        while len(out) < max_events:
+            st = vm.run()
+            if st[0] == "yield":
+                n0 = len(eng.events)
+                r = eng.dispatch(vm, st[1], st[2])
+                vm.resume(r)
+                for e in eng.events[n0:]:
+                    out.append((e, sid))
+            elif st[0] == "halt":
+                if not eng.scheduled:
+                    out.append((("end",), sid))
+                    break
+                sid, _flag = eng.scheduled.pop()
+                if sid not in programs:
+                    out.append((("error", "missing script %d" % sid), sid))
+                    break
+                scenes += 1
+                if scenes > max_scenes:
+                    break
+                vm.load(programs[sid])
+    except (VMError, IndexError, KeyError, TypeError) as ex:
+        out.append((("error", str(ex)[:80]), sid))
+    return out[:max_events + 1]
+
+
+# ---------------------------------------------------------------- partial evaluation
+# The episode JSON says what should happen; it never carries VM memory. Lowered
+# code that reads the script's data words is specialised against them here:
+# reads of constant data become constants, loops over constant data unroll
+# (character registration, survey question lists), frame-cell pointers become
+# plain locals. What remains is (a) lookups whose index is a run-time value --
+# emitted as a named read-only table plus the index -- and (b) text buffers the
+# engine writes (a typed-in name) -- emitted as named buffers the VM owns.
+
+class _DV(int):
+    """an int that was read from script data (it may be used as an address)"""
+
+
+class _PV(_DV):
+    """a pointer read from the script's extra words (table / scratch addresses)"""
+
+
+class _Data:
+    BUF_WORDS = 16
+
+    def __init__(self, main_words, gap, extra, buffers=()):
+        self.main = [s16(w) for w in main_words]
+        self.gap = gap
+        self.extra = [s16(w) for w in extra]
+        self.base_extra = len(self.main) + gap
+        self.buffers = set(buffers)          # start addresses the engine writes
+
+    def buffer_of(self, a):
+        for b in self.buffers:
+            if b <= a < b + self.BUF_WORDS:
+                return b
+        return None
+
+    def const_word(self, a):
+        """value of data word `a` when it is constant script data, else None"""
+        if not isinstance(a, int) or self.buffer_of(a) is not None:
+            return None
+        if 0 <= a < len(self.main):
+            return _DV(self.main[a])
+        if self.base_extra <= a < self.base_extra + len(self.extra):
+            return _PV(self.extra[a - self.base_extra])
+        return None
+
+    def is_data_addr(self, a):
+        return isinstance(a, int) and (0 <= a < len(self.main) or
+                                       self.base_extra <= a < self.base_extra + len(self.extra))
+
+
+class PEvalError(Exception):
+    pass
+
+
+def _lit(v):
+    if isinstance(v, tuple) and v[0] == "f":
+        return {"addr": v[1]}
+    if isinstance(v, _PV):
+        return {"dataptr": int(v)}
+    if isinstance(v, _DV):
+        return {"dataval": int(v)}
+    return v
+
+
+def _fold_bin(o, a, b):
+    if isinstance(a, tuple) or isinstance(b, tuple):
+        if o == "+" and isinstance(a, tuple) and isinstance(b, int) and not isinstance(b, tuple):
+            return ("f", a[1] + b)
+        if o == "+" and isinstance(b, tuple) and isinstance(a, int):
+            return ("f", b[1] + a)
+        if o == "-" and isinstance(a, tuple) and isinstance(b, int):
+            return ("f", a[1] - b)
+        return None
+    dv = isinstance(a, _DV) or isinstance(b, _DV)
+    if o in ("/", "%") and b == 0:
+        return None
+    if o in ("/", "%"):
+        q = abs(a) // abs(b)
+        if (a < 0) != (b < 0):
+            q = -q
+        r = q if o == "/" else a - q * b
+    else:
+        r = {"==": a == b, "!=": a != b, ">": a > b, ">=": a >= b, "<": a < b, "<=": a <= b,
+             "or": bool(a or b), "and": bool(a and b), "+": a + b, "-": a - b,
+             "*": a * b}[o]
+    r = s16(int(r))
+    if o in ("+", "-") and (isinstance(a, _PV) or isinstance(b, _PV)):
+        return _PV(r)
+    return _DV(r) if dv and o in ("+", "-") else r
+
+
+def _addr_locals(irs):
+    """{routine: locals whose values reach a data / frame address} -- the only
+    values worth specialising on (everything else keeps its original let, so
+    a join after a random pick or a choice does not multiply the code)."""
+    rel = {ep: set() for ep in irs}
+
+    def loc(e, acc):
+        if isinstance(e, dict):
+            if "local" in e:
+                acc.add(e["local"])
+            for v in e.values():
+                if isinstance(v, (dict, list)):
+                    loc(v, acc)
+        elif isinstance(e, list):
+            for v in e:
+                loc(v, acc)
+        return acc
+
+    def seeds(e, acc):
+        if isinstance(e, dict):
+            if "deref" in e:
+                loc(e["deref"], acc)
+            for v in e.values():
+                if isinstance(v, (dict, list)):
+                    seeds(v, acc)
+        elif isinstance(e, list):
+            for v in e:
+                seeds(v, acc)
+        return acc
+    for ep, ir in irs.items():
+        for b in ir["blocks"].values():
+            seeds(b["stmts"], rel[ep])
+            seeds(b["term"], rel[ep])
+            for st in b["stmts"]:
+                if "yield" in st:
+                    for i in YIELD_PTRS.get(st["yield"], ()):
+                        if i < len(st["args"]):
+                            loc(st["args"][i], rel[ep])
+    changed = True
+    while changed:
+        changed = False
+        for ep, ir in irs.items():
+            r = rel[ep]
+            n0 = len(r)
+            for b in ir["blocks"].values():
+                for st in b["stmts"]:
+                    if "let" in st and st["let"].get("local") in r:
+                        loc(st["value"], r)
+                    elif "call" in st and st["call"] in rel:
+                        n = len(st["args"])
+                        for i, a in enumerate(st["args"]):
+                            if -(2 + n - i) in rel[st["call"]]:
+                                loc(a, r)
+            if len(r) != n0:
+                changed = True
+    return rel
+
+
+class _Spec:
+    """Online partial evaluator over lifted IR (one per program)."""
+
+    PER_PC = 300
+    MAX_BLOCKS = 40000
+
+    def __init__(self, irs, data):
+        self.irs = irs
+        self.data = data
+        self.out = {}            # new id -> residual routine
+        self.keys = {}           # (orig entry, argsig) -> new id
+        self.next_id = [1000000]
+        self.name = {}           # new id -> (orig entry, n)
+        self.rel = _addr_locals(irs)
+
+    def known_args(self, ep, argvals):
+        """argument values worth specialising on (they reach an address)"""
+        n = len(argvals)
+        r = self.rel.get(ep, ())
+        return [v if (v is not None and not isinstance(v, tuple) and -(2 + n - i) in r)
+                else None for i, v in enumerate(argvals)]
+
+    def routine(self, ep, argvals):
+        argvals = self.known_args(ep, argvals)
+        sig = (ep, tuple(argvals))
+        if sig in self.keys:
+            return self.keys[sig]
+        rid = ep if not any(v is not None for v in argvals) else self._new_id()
+        self.keys[sig] = rid
+        self.name[rid] = (ep, sum(1 for k in self.keys if k[0] == ep) - 1)
+        self.out[rid] = None
+        self.out[rid] = _SpecRoutine(self, self.irs[ep], argvals).build()
+        return rid
+
+    def _new_id(self):
+        self.next_id[0] += 1
+        return self.next_id[0]
+
+
+class _SpecRoutine:
+    def __init__(self, spec, ir, argvals):
+        self.spec, self.ir, self.data = spec, ir, spec.data
+        self.argvals = argvals
+        self.rel = spec.rel.get(ir["entry"], set())
+        self.blocks = {}
+        self.ids = {}
+        self.count = {}
+        self.seen = {}           # pc -> states specialised there
+        self.work = []
+        self.nid = [0]
+
+    def build(self):
+        n = self.ir["params"]
+        st = {}
+        for i, v in enumerate(self.argvals):
+            if v is not None:
+                st[-(2 + n - i)] = v
+        start = self.block_id(self.ir["start"], st, {"A": None, "B": None})
+        while self.work:
+            pc, state, regs, bid = self.work.pop()
+            self.blocks[bid] = self.run_block(pc, dict(state), dict(regs))
+            if len(self.blocks) > _Spec.MAX_BLOCKS:
+                raise PEvalError("specialisation too large")
+        mx = -1
+        for b in self.blocks.values():
+            for k in _locals_in(b):
+                mx = max(mx, k)
+        return {"entry": self.ir["entry"], "start": start, "params": self.ir["params"],
+                "locals": mx + 1, "frame": self.ir.get("frame", mx + 1), "blocks": self.blocks,
+                "calls": sorted({st_["call"] for b in self.blocks.values()
+                                 for st_ in b["stmts"] if "call" in st_})}
+
+    # state: local -> known value (int, _DV, ("f", k)); regs likewise (None = unknown)
+    def block_id(self, pc, state, regs):
+        key = (pc, tuple(sorted((k, repr(v)) for k, v in state.items())),
+               tuple(sorted((k, repr(v)) for k, v in regs.items() if v is not None)))
+        if key in self.ids:
+            return self.ids[key]
+        c = self.count.get(pc, 0)
+        self.count[pc] = c + 1
+        self.nid[0] += 1
+        bid = self.nid[0]
+        self.ids[key] = bid
+        self.work.append((pc, state, regs, bid))
+        return bid
+
+    def goto(self, pc, state, regs, stmts):
+        """emit the jump to (pc, state). Once a pc has been specialised too
+        often (a loop whose state does not settle) the state is widened: values
+        that differ from earlier visits are materialised and forgotten, values
+        that never change there (table bases, frame pointers) are kept"""
+        state = {k: v for k, v in state.items() if self.tracked(k, v)}
+        regs = {r: (v if isinstance(v, tuple) else None) for r, v in regs.items()}
+        if self.count.get(pc, 0) >= _Spec.PER_PC:
+            prev = self.seen.get(pc, [])
+            keep = {k: v for k, v in state.items()
+                    if all(p[0].get(k) == v and type(p[0].get(k)) is type(v) for p in prev)}
+            keepr = {r: v for r, v in regs.items()
+                     if v is not None and all(p[1].get(r) == v for p in prev)}
+            drop = {k: v for k, v in state.items() if k not in keep}
+            dropr = {r: v for r, v in regs.items() if v is not None and r not in keepr}
+            self.materialize(drop, dropr, stmts)
+            state = keep
+            regs = {"A": keepr.get("A"), "B": keepr.get("B")}
+        self.seen.setdefault(pc, []).append((dict(state), dict(regs)))
+        return self.block_id(pc, state, regs)
+
+    def tracked(self, k, v):
+        """is local k's known value kept only in the specialiser (its let was
+        folded away) rather than also written to the frame?"""
+        return k in self.rel or isinstance(v, tuple)
+
+    def materialize(self, state, regs, stmts):
+        for k, v in sorted(state.items(), key=lambda x: repr(x[0])):
+            if self.tracked(k, v):
+                stmts.append({"let": {"local": k}, "value": _lit(v)})
+        for r, v in regs.items():
+            if isinstance(v, tuple):
+                stmts.append({"let": {"reg": r}, "value": _lit(v)})
+
+    def ev(self, e, state, regs):
+        """-> (known value or None, residual expression)"""
+        if isinstance(e, int):
+            return e, e
+        if "local" in e:
+            k = e["local"]
+            if k in state:
+                return state[k], _lit(state[k])
+            return None, e
+        if "addr" in e:
+            return ("f", e["addr"]), e
+        if "reg" in e:
+            v = regs.get(e["reg"])
+            return (v, _lit(v)) if v is not None else (None, e)
+        if "text" in e:
+            return None, e
+        if "mem" in e:
+            v = self.data.const_word(e["mem"])
+            if v is not None:
+                return v, _lit(v)
+            return None, {"deref": e["mem"]}
+        if "deref" in e:
+            av, ar = self.ev(e["deref"], state, regs)
+            if isinstance(av, tuple):
+                k = av[1]
+                if k in state:
+                    return state[k], _lit(state[k])
+                return None, {"local": k}
+            if isinstance(av, int):
+                v = self.data.const_word(av)
+                if v is not None:
+                    return v, _lit(v)
+                return None, {"deref": av}
+            return None, {"deref": ar}
+        o = e["op"]
+        if o in ("neg", "not"):
+            av, ar = self.ev(e["a"], state, regs)
+            if isinstance(av, int) and not isinstance(av, tuple):
+                return (s16(-av) if o == "neg" else int(not av)), None
+            return None, {"op": o, "a": ar}
+        av, ar = self.ev(e["a"], state, regs)
+        bv, br = self.ev(e["b"], state, regs)
+        if av is not None and bv is not None:
+            r = _fold_bin(o, av, bv)
+            if r is not None:
+                return r, _lit(r)
+        return None, {"op": o, "a": ar, "b": br}
+
+    def value(self, e, state, regs):
+        v, r = self.ev(e, state, regs)
+        if v is not None:
+            return v, _lit(v)
+        return None, r
+
+    def run_block(self, pc, state, regs):
+        b = self.ir["blocks"][pc]
+        out = []
+        for st in b["stmts"]:
+            if "let" in st:
+                lv = st["let"]
+                v, r = self.value(st["value"], state, regs)
+                if "reg" in lv:
+                    regs[lv["reg"]] = v
+                    if not isinstance(v, tuple):
+                        out.append({"let": lv, "value": r})
+                    continue
+                tgt = None
+                if "local" in lv:
+                    tgt = lv["local"]
+                else:
+                    av, ar = self.ev(lv["deref"], state, regs)
+                    if isinstance(av, tuple):
+                        tgt = av[1]
+                    elif isinstance(av, int):
+                        # a store into the script's scratch words: VM state,
+                        # not a frame cell
+                        out.append({"let": {"deref": _lit(av)}, "value": r})
+                        continue
+                    else:
+                        # a store through an unknown pointer (a frame array
+                        # indexed at run time): memory state becomes unknown
+                        self.materialize(state, regs, out)
+                        state.clear()
+                        out.append({"let": {"deref": ar}, "value": r})
+                        continue
+                if v is not None:
+                    state[tgt] = v
+                    if not self.tracked(tgt, v):
+                        out.append({"let": {"local": tgt}, "value": r})
+                else:
+                    state.pop(tgt, None)
+                    out.append({"let": {"local": tgt}, "value": r})
+            elif "yield" in st:
+                vals = [self.value(a, state, regs) for a in st["args"]]
+                if any(isinstance(v, tuple) for v, _r in vals) or any(
+                        _mentions_frame_ptr(r) for _v, r in vals):
+                    # the engine may read or write frame cells through a pointer
+                    self.materialize(state, regs, out)
+                    state.clear()
+                    regs = {"A": None, "B": None}
+                    vals = [self.value(a, state, regs) for a in st["args"]]
+                y = dict(st)
+                y["args"] = [r for _v, r in vals]
+                out.append(y)
+                if st.get("result") is not None:
+                    state.pop(st["result"], None)
+            elif "call" in st:
+                vals = [self.value(a, state, regs) for a in st["args"]]
+                refs = any(isinstance(v, tuple) for v, _r in vals) or any(
+                    _mentions_frame_ptr(r) for _v, r in vals)
+                if refs:
+                    self.materialize(state, regs, out)
+                    state.clear()
+                    vals = [self.value(a, state, regs) for a in st["args"]]
+                known = [v if (v is not None and not isinstance(v, tuple)) else None
+                         for v, _r in vals]
+                if st["call"] in self.spec.irs:
+                    cid = self.spec.routine(st["call"], known)
+                else:
+                    cid = st["call"]
+                out.append({"call": cid, "args": [r for _v, r in vals], "pc": st.get("pc")})
+                regs = {"A": None, "B": None}
+                if refs:
+                    state.clear()
+            elif "pause" in st:
+                out.append(st)
+        t = b["term"]
+        if "goto" in t:
+            return {"stmts": out, "term": {"goto": self.goto(t["goto"], state, regs, out)}}
+        if "if" in t:
+            v, r = self.value(t["if"], state, regs)
+            if v is not None and not isinstance(v, tuple):
+                nxt = t["then"] if v else t["else"]
+                return {"stmts": out, "term": {"goto": self.goto(nxt, state, regs, out)}}
+            eo, to = [], []
+            then_id = self.goto(t["then"], dict(state), dict(regs), to)
+            else_id = self.goto(t["else"], dict(state), dict(regs), eo)
+            if to:
+                then_id = self._edge(to, then_id)
+            if eo:
+                else_id = self._edge(eo, else_id)
+            return {"stmts": out, "term": {"if": r, "then": then_id, "else": else_id,
+                                           "pc": t.get("pc")}}
+        if "ret" in t:
+            if isinstance(regs.get("B"), tuple):
+                out.append({"let": {"reg": "B"}, "value": _lit(regs["B"])})
+            return {"stmts": out, "term": {"ret": True}}
+        return {"stmts": out, "term": {"halt": True}}
+
+    def _edge(self, stmts, target):
+        self.nid[0] += 1
+        bid = self.nid[0]
+        self.blocks[bid] = {"stmts": stmts, "term": {"goto": target}}
+        return bid
+
+
+def _mentions_frame_ptr(e):
+    if isinstance(e, dict):
+        if "addr" in e:
+            return True
+        return any(_mentions_frame_ptr(v) for v in e.values())
+    if isinstance(e, list):
+        return any(_mentions_frame_ptr(v) for v in e)
+    return False
+
+
+def _locals_in(b):
+    acc = []
+
+    def w(e):
+        if isinstance(e, dict):
+            for k in ("local", "addr"):
+                if isinstance(e.get(k), int) and e[k] >= 0:
+                    acc.append(e[k])
+            for v in e.values():
+                w(v)
+        elif isinstance(e, list):
+            for v in e:
+                w(v)
+    w(b)
+    for st in b["stmts"]:
+        if st.get("result") is not None and isinstance(st["result"], int):
+            acc.append(st["result"])
+    return acc
+
+
+def buffer_starts(irs, lowered, data_len):
+    """addresses the engine writes text into (copy_last_input / append_text
+    destinations), resolved as far as constants go"""
+    out = set()
+    for ep in lowered:
+        for _, st in _walk_stmts(irs[ep]):
+            if "yield" in st and st["yield"] in (25, 28) and st["args"]:
+                a = st["args"][0]
+                if isinstance(a, int):
+                    out.add(a)
+                elif isinstance(a, dict) and "mem" in a:
+                    out.add(("mem", a["mem"]))
+    return out
+
+
+def _spec_run(irs, lowered, main_words, gap, extra, entries):
+    raw = buffer_starts(irs, lowered, len(main_words))
+    d0 = _Data(main_words, gap, extra)
+    bufs = set()
+    for b in raw:
+        if isinstance(b, tuple):
+            v = d0.const_word(b[1])
+            if v is not None:
+                bufs.add(int(v))
+        else:
+            bufs.add(b)
+    for _pass in range(4):
+        data = _Data(main_words, gap, extra, bufs)
+        sp = _Spec({ep: irs[ep] for ep in lowered}, data)
+        for ep, av in entries:
+            sp.routine(ep, list(av))
+        # stores that land in the script's main words make those words
+        # mutable: never fold them, and specialise again
+        written = set()
+        for ir in sp.out.values():
+            for b in ir["blocks"].values():
+                for st in b["stmts"]:
+                    if "let" in st and "deref" in st["let"]:
+                        t = st["let"]["deref"]
+                        a = t.get("dataval", t.get("dataptr")) if isinstance(t, dict) else t
+                        if isinstance(a, int) and 0 <= a < len(main_words) \
+                                and data.buffer_of(a) is None:
+                            written.add(a)
+        if not written:
+            break
+        bufs |= written
+    _inline_trivial(sp.out)
+    return sp, data
+
+
+def specialize_program(irs, lowered, main_words, gap, extra, entry_points):
+    """Partially evaluate the lowered routines against the script's constant
+    data (every entry point generic). Returns (routines, names, data)."""
+    sp, data = _spec_run(irs, lowered, main_words, gap, extra,
+                         [(ep, [None] * irs[ep]["params"]) for ep in entry_points])
+    return sp.out, sp.name, data
+
+
+def _closure(out, rid):
+    seen, work = set(), [rid]
+    while work:
+        r = work.pop()
+        if r in seen or out.get(r) is None:
+            continue
+        seen.add(r)
+        work.extend(out[r]["calls"])
+    return seen
+
+
+def _param_pointer_reads(ir):
+    """does the routine dereference an address computed from its arguments?"""
+    hit = [False]
+
+    def neg_local(e):
+        if isinstance(e, dict):
+            if isinstance(e.get("local"), int) and e["local"] < 0:
+                return True
+            return any(neg_local(v) for v in e.values())
+        if isinstance(e, list):
+            return any(neg_local(v) for v in e)
+        return False
+
+    def w(e):
+        if isinstance(e, dict):
+            if "deref" in e and neg_local(e["deref"]):
+                hit[0] = True
+            for v in e.values():
+                w(v)
+        elif isinstance(e, list):
+            for v in e:
+                w(v)
+    for b in ir["blocks"].values():
+        w(b["stmts"])
+        w(b["term"])
+    return hit[0]
+
+
+def specialize_lowered(irs, lowered, main_words, gap, extra, sites, with_main):
+    """Specialise the lowered routines of one script for how the story graph
+    uses them. A routine the story graph calls is kept generic unless it (or
+    something it calls) reads script data through an address its arguments
+    carry (a cast table, a word list): then each call site gets its own copy,
+    specialised on the site's constant arguments. Returns (sp, data, site_rid)
+    where site_rid[i] is the routine id story site i calls."""
+    callees = []
+    for s_ in sites:
+        if s_.get("caller") is not None and s_["callee"] not in callees:
+            callees.append(s_["callee"])
+    base = [(MAIN, [])] if with_main else []
+    gen = base + [(ep, [None] * irs[ep]["params"]) for ep in callees]
+    sp, data = _spec_run(irs, lowered, main_words, gap, extra, gen)
+    per_site = set()
+    for ep in callees:
+        rid = sp.keys[(ep, tuple([None] * irs[ep]["params"]))]
+        if any(_param_pointer_reads(sp.out[r]) for r in _closure(sp.out, rid)):
+            per_site.add(ep)
+    if per_site:
+        ent = list(base)
+        for ep in callees:
+            if ep not in per_site:
+                ent.append((ep, [None] * irs[ep]["params"]))
+        for s_ in sites:
+            if s_.get("caller") is not None and s_["callee"] in per_site:
+                ent.append((s_["callee"], list(s_["args"])))
+        sp, data = _spec_run(irs, lowered, main_words, gap, extra, ent)
+    site_rid = {}
+    for i, s_ in enumerate(sites):
+        if s_.get("caller") is None:
+            continue
+        ep = s_["callee"]
+        av = list(s_["args"]) if ep in per_site else [None] * irs[ep]["params"]
+        site_rid[i] = sp.keys[(ep, tuple(sp.known_args(ep, av)))]
+    return sp, data, site_rid
+
+
+# ---------------------------------------------------------------- finalisation
+# After specialisation no residual expression may name a data address. What is
+# left becomes:  plain ints (constants read from data);  {"table": [...]} -- the
+# address of a constant word array (a lookup whose index is only known at run
+# time);  {"scratch": i} / {"scratch_addr": i} -- VM-owned scratch cell i (the
+# script's uninitialised data words: survey answers, a copied-input text
+# buffer), its value or its address.
+
+POINTER_YIELDS = MEMORY_YIELDS | {9}
+
+
+def _split_sum(e):
+    """e as (constant, [symbolic terms]) over + / - constant"""
+    if isinstance(e, int) and not isinstance(e, bool):
+        return int(e), []
+    if isinstance(e, dict):
+        for k in ("dataval", "dataptr"):
+            if k in e:
+                return int(e[k]), []
+        if e.get("op") == "+":
+            ca, ta = _split_sum(e["a"])
+            cb, tb = _split_sum(e["b"])
+            return ca + cb, ta + tb
+        if e.get("op") == "-":
+            cb, tb = _split_sum(e["b"])
+            if not tb:
+                ca, ta = _split_sum(e["a"])
+                return ca - cb, ta
+    return 0, [e]
+
+
+def _sum(terms):
+    r = None
+    for t in terms:
+        r = t if r is None else {"op": "+", "a": r, "b": t}
+    return r
+
+
+class _Finalizer:
+    TABLE_CAP = 2048
+
+    def __init__(self, data, strings):
+        self.d = data
+        self.strings = strings
+        self.m = len(data.main)
+        self.g = data.gap
+        self.bounds = sorted({self.m} | {v for v in data.extra if 0 <= v < self.m}
+                             | {b for b in data.buffers if isinstance(b, int) and 0 <= b < self.m})
+        self.tables = {}
+        self.warn = []
+        # text buffers the engine writes that sit in the main words become
+        # scratch cells too (after the script's own uninitialised words)
+        self.mbuf = {}
+        for j, b in enumerate(sorted(x for x in data.buffers if isinstance(x, int) and 0 <= x < self.m)):
+            self.mbuf[b] = self.g + j * self.BUF
+
+    BUF = 64
+
+    def kind(self, a):
+        if self._mb(a) is not None:
+            return "scratch"
+        if 0 <= a < self.m:
+            return "main"
+        if self.m <= a < self.m + self.g:
+            return "scratch"
+        return None
+
+    def _mb(self, a):
+        for b, i in self.mbuf.items():
+            if b <= a < b + _Data.BUF_WORDS:
+                return i + (a - b)
+        return None
+
+    def sidx(self, a):
+        """scratch cell index of scratch address a"""
+        i = self._mb(a)
+        return i if i is not None else a - self.m
+
+    def table(self, a):
+        if a not in self.tables:
+            end = next((b for b in self.bounds if b > a), self.m)
+            if end - a > self.TABLE_CAP:
+                self.warn.append("table at %d capped" % a)
+                end = a + self.TABLE_CAP
+            self.tables[a] = {"table": list(self.d.main[a:end])}
+        return self.tables[a]
+
+    def ptr(self, a):
+        k = self.kind(a)
+        if k == "scratch":
+            return {"scratch_addr": self.sidx(a)}
+        if k == "main":
+            return self.table(a)
+        return a
+
+    def val(self, e):
+        if isinstance(e, int) or not isinstance(e, dict):
+            return e
+        if "dataval" in e:
+            return int(e["dataval"])
+        if "dataptr" in e:
+            a = int(e["dataptr"])
+            return {"scratch_addr": self.sidx(a)} if self.kind(a) == "scratch" else a
+        if "deref" in e:
+            return self.deref(e["deref"])
+        if "mem" in e:
+            return self.deref(e["mem"])
+        if "op" in e:
+            r = {"op": e["op"], "a": self.val(e["a"])}
+            if "b" in e:
+                r["b"] = self.val(e["b"])
+            return r
+        return e
+
+    def deref(self, a, lvalue=False):
+        c, terms = _split_sum(a)
+        if any(_mentions_frame_ptr(t) for t in terms) or (terms and c == 0):
+            return {"deref": self.val(a)}
+        k = self.kind(c)
+        if not terms:
+            if k == "scratch":
+                return {"scratch": self.sidx(c)}
+            if k == "main" and not lvalue:
+                v = self.d.const_word(c)
+                if v is not None:
+                    return int(v)
+            self.warn.append("data word %d" % c)
+            return {"deref": c}
+        idx = _sum([self.val(t) for t in terms])
+        if k is None:
+            self.warn.append("pointer %d" % c)
+            return {"deref": {"op": "+", "a": c, "b": idx}}
+        return {"deref": {"op": "+", "a": self.ptr(c), "b": idx}}
+
+    def lvalue(self, lv):
+        if "deref" in lv:
+            r = self.deref(lv["deref"], lvalue=True)
+            return r if isinstance(r, dict) else {"deref": r}
+        return lv
+
+    def records(self, a, n, text_at):
+        key = (a, n)
+        if key not in self.tables:
+            t = {"table": list(self.d.main[a:a + n])}
+            if text_at:
+                t["_text_at"] = sorted(text_at)
+            self.tables[key] = t
+        return self.tables[key]
+
+    def yield_args(self, st):
+        y = st["yield"]
+        args = [self.val(a) for a in st["args"]]
+        pos = set(_text_positions(y, args, self.strings) or ())
+        if y == 0 and args and isinstance(args[0], int):
+            pos.add(1 if args[0] < 0 else 0)
+        ptrs = YIELD_PTRS.get(y, {})
+        for i, a in enumerate(args):
+            if not isinstance(a, int) or isinstance(a, bool):
+                continue
+            k = self.kind(a)
+            if k == "scratch" and (i in pos or i in ptrs or y in POINTER_YIELDS):
+                args[i] = {"scratch_addr": self.sidx(a)}
+            elif k == "main" and i in ptrs and ptrs[i][0] != "buf":
+                lay = ptrs[i]
+                if lay[0] == "rows":
+                    cnt = args[lay[1]] if isinstance(args[lay[1]], int) else None
+                    if cnt is None:
+                        self.warn.append("yield %d: row count unknown" % y)
+                        args[i] = self.table(a)
+                        continue
+                    n, st_, tf = max(0, cnt) * lay[2], lay[2], lay[3]
+                    args[i] = self.records(a, n, {r * st_ + f for r in range(max(0, cnt)) for f in tf})
+                elif lay[0] == "term":
+                    r = 0
+                    while a + r * lay[1] < self.m and (self.d.main[a + r * lay[1]] & 0xFFFF) != lay[2]:
+                        r += 1
+                    args[i] = self.records(a, r * lay[1] + 1, ())
+                else:
+                    args[i] = self.records(a, lay[1], set(lay[2]))
+            elif k == "main" and i in ptrs:
+                args[i] = self.table(a)
+        return args
+
+
+def finalize_program(sp, data, strings, roots):
+    """Rewrite the specialised routines reachable from `roots` so no data
+    address remains (see above). Copies whose arguments were all folded in
+    take no arguments. Returns ({rid: ir}, warnings)."""
+    out = sp.out
+    keep = set()
+    for r in roots:
+        keep |= _closure(out, r)
+    res = {r: out[r] for r in keep}
+    fz = _Finalizer(data, strings)
+    # arguments a copy was specialised on are dead in it: callers pass 0 (and
+    # nothing at all when every argument was folded in)
+    folded, argless = {}, set()
+    for rid, ir in res.items():
+        key = next(k for k, v in sp.keys.items() if v == rid)
+        folded[rid] = {i for i, v in enumerate(key[1]) if v is not None}
+        if ir["params"] and len(folded[rid]) == ir["params"] and not any(
+                k < 0 for b in ir["blocks"].values() for k in _neg_locals(b)):
+            argless.add(rid)
+    for rid, ir in res.items():
+        for b in ir["blocks"].values():
+            ns = []
+            for st in b["stmts"]:
+                st = dict(st)
+                if "let" in st:
+                    st["let"] = fz.lvalue(st["let"])
+                    st["value"] = fz.val(st["value"])
+                elif "yield" in st:
+                    st["args"] = fz.yield_args(st)
+                elif "call" in st:
+                    c = st["call"]
+                    st["args"] = [] if c in argless else [
+                        0 if i in folded.get(c, ()) else fz.val(a) for i, a in enumerate(st["args"])]
+                ns.append(st)
+            b["stmts"] = ns
+            if "if" in b["term"]:
+                b["term"] = dict(b["term"], **{"if": fz.val(b["term"]["if"])})
+    _scratch_text_locals(res, fz)
+    for ir in res.values():
+        _compact_temps(ir)
+    for rid in argless:
+        res[rid]["params"] = 0
+    return res, (argless, folded), fz.warn
+
+
+def _uses_defs(st):
+    """(locals read, local written) by one IR statement / terminator"""
+    rd = set()
+
+    def w(e):
+        if isinstance(e, dict):
+            if isinstance(e.get("local"), int):
+                rd.add(e["local"])
+            for v in e.values():
+                if isinstance(v, (dict, list)):
+                    w(v)
+        elif isinstance(e, list):
+            for v in e:
+                w(v)
+    d = None
+    if "let" in st:
+        w(st["value"])
+        lv = st["let"]
+        if "local" in lv:
+            d = lv["local"]
+        else:
+            w(lv)
+    elif "yield" in st:
+        w(st["args"])
+        d = st.get("result")
+    elif "call" in st:
+        w(st["args"])
+    elif "if" in st:
+        w(st["if"])
+    return rd, d
+
+
+def _addr_taken(b):
+    acc = []
+
+    def w(e):
+        if isinstance(e, dict):
+            if isinstance(e.get("addr"), int):
+                acc.append(e["addr"])
+            for v in e.values():
+                w(v)
+        elif isinstance(e, list):
+            for v in e:
+                w(v)
+    w(b)
+    return acc
+
+
+def _compact_temps(ir):
+    """The lifter gives every stack temporary (a yield's result, a value kept
+    across a call) its own frame cell above the routine's real frame, so a
+    routine with many yields would reserve a huge frame -- and a replay loop
+    that re-enters routines would exhaust the VM stack far sooner than the
+    original. Temporaries whose lifetimes do not overlap share a cell
+    (liveness over the routine's blocks, greedy colouring)."""
+    base = ir.get("frame")
+    if base is None:
+        return
+    blocks = ir["blocks"]
+    temps = set()
+    info = {}
+    for bid, b in blocks.items():
+        seq = [_uses_defs(st) for st in b["stmts"]] + [_uses_defs(b["term"])]
+        info[bid] = seq
+        for rd, d in seq:
+            temps |= {k for k in rd if k >= base}
+            if isinstance(d, int) and d >= base:
+                temps.add(d)
+    if not temps or any(k >= base for b in blocks.values() for k in _addr_taken(b)):
+        return
+
+    def succ(b):
+        t = b["term"]
+        return [t[k] for k in ("goto", "then", "else") if k in t and t[k] in blocks]
+    live_in = {bid: set() for bid in blocks}
+    changed = True
+    while changed:
+        changed = False
+        for bid in sorted(blocks, reverse=True):
+            out = set()
+            for s_ in succ(blocks[bid]):
+                out |= live_in[s_]
+            live = set(out)
+            for rd, d in reversed(info[bid]):
+                if d is not None:
+                    live.discard(d)
+                live |= {k for k in rd if k in temps}
+            if live != live_in[bid]:
+                live_in[bid] = live
+                changed = True
+    graph = {t: set() for t in temps}
+    for bid, b in blocks.items():
+        live = set()
+        for s_ in succ(b):
+            live |= live_in[s_]
+        for rd, d in reversed(info[bid]):
+            if d in temps:
+                for x in live:
+                    if x != d:
+                        graph[d].add(x)
+                        graph[x].add(d)
+                live.discard(d)
+            live |= {k for k in rd if k in temps}
+    colour = {}
+    for t in sorted(temps):
+        used = {colour[n] for n in graph[t] if n in colour}
+        c = base
+        while c in used:
+            c += 1
+        colour[t] = c
+    mp = {t: c for t, c in colour.items() if t != c}
+    if not mp:
+        return
+
+    def rn(e):
+        if isinstance(e, dict):
+            r = {}
+            for k, v in e.items():
+                if k in ("local", "result") and isinstance(v, int) and v in mp:
+                    r[k] = mp[v]
+                else:
+                    r[k] = rn(v)
+            return r
+        if isinstance(e, list):
+            return [rn(v) for v in e]
+        return e
+    for b in blocks.values():
+        b["stmts"] = rn(b["stmts"])
+        b["term"] = rn(b["term"])
+    ir["locals"] = max([base] + [c + 1 for c in colour.values()])
+
+
+def _scratch_text_locals(res, fz):
+    """a frame cell that carries an address to a text position or an engine
+    pointer argument, set from a constant scratch address -> scratch_addr"""
+    use = {r: set() for r in res}
+
+    def uses(y, args):
+        pos = set(_text_positions(y, args, fz.strings) or ()) | set(YIELD_PTRS.get(y, ()))
+        if y == 0 and args and isinstance(args[0], int):
+            pos.add(1 if args[0] < 0 else 0)
+        return pos
+    changed = True
+    while changed:
+        changed = False
+        for rid, ir in res.items():
+            u = use[rid]
+            n0 = len(u)
+            for b in ir["blocks"].values():
+                for st in b["stmts"]:
+                    if "yield" in st:
+                        for i in uses(st["yield"], st["args"]):
+                            if i < len(st["args"]) and isinstance(st["args"][i], dict) \
+                                    and "local" in st["args"][i]:
+                                u.add(st["args"][i]["local"])
+                    elif "let" in st and st["let"].get("local") in u \
+                            and isinstance(st["value"], dict) and "local" in st["value"]:
+                        u.add(st["value"]["local"])
+                    elif "call" in st and st["call"] in use:
+                        n = len(st["args"])
+                        for i, a in enumerate(st["args"]):
+                            if -(2 + n - i) in use[st["call"]] and isinstance(a, dict) and "local" in a:
+                                u.add(a["local"])
+            changed |= len(u) != n0
+
+    def fix(v):
+        if isinstance(v, int) and not isinstance(v, bool) and fz.kind(v) == "scratch":
+            return {"scratch_addr": fz.sidx(v)}
+        return v
+    for rid, ir in res.items():
+        for b in ir["blocks"].values():
+            for st in b["stmts"]:
+                if "let" in st and st["let"].get("local") in use[rid]:
+                    st["value"] = fix(st["value"])
+                elif "call" in st and st["call"] in use:
+                    n = len(st["args"])
+                    st["args"] = [fix(a) if -(2 + n - i) in use[st["call"]] else a
+                                  for i, a in enumerate(st["args"])]
+
+
+def _neg_locals(b):
+    acc = []
+
+    def w(e):
+        if isinstance(e, dict):
+            for k in ("local", "addr"):
+                if isinstance(e.get(k), int) and e[k] < 0:
+                    acc.append(e[k])
+            for v in e.values():
+                w(v)
+        elif isinstance(e, list):
+            for v in e:
+                w(v)
+    w(b)
+    return acc
+
+
+def _inline_trivial(out):
+    """calls to specialised routines that are a single straight run of yields
+    with constant arguments (e.g. one registration per cast member) are
+    replaced by those yields"""
+    def trivial(ir):
+        if ir is None or len(ir["blocks"]) != 1:
+            return None
+        b = next(iter(ir["blocks"].values()))
+        if "ret" not in b["term"]:
+            return None
+        body = []
+        for st in b["stmts"]:
+            if "yield" not in st or _locals_in({"stmts": [], "x": st["args"]}) \
+                    or _neg_locals({"stmts": [], "x": st["args"]}):
+                return None
+            if _mentions_frame_ptr(st["args"]) or any(
+                    isinstance(a, dict) and "reg" in str(a) for a in st["args"]):
+                return None
+            y = dict(st)
+            y.pop("result", None)
+            body.append(y)
+        return body
+    bodies = {rid: trivial(ir) for rid, ir in out.items()}
+    for rid, ir in out.items():
+        if ir is None:
+            continue
+        for b in ir["blocks"].values():
+            new = []
+            for st in b["stmts"]:
+                if "call" in st and bodies.get(st["call"]) is not None \
+                        and not any(_mentions_frame_ptr(a) for a in st["args"]):
+                    new.extend(dict(x) for x in bodies[st["call"]])
+                else:
+                    new.append(st)
+            b["stmts"] = new
+        ir["calls"] = sorted({st["call"] for b in ir["blocks"].values()
+                              for st in b["stmts"] if "call" in st})
+    # drop routines nothing calls any more (entry points are kept by caller)
+    return out
+
+
+class _ChunkStrings:
+    """Text at a word address, read the way the engine reads it (packed bytes
+    from data word `ref`, i.e. chunk offset ref*2 + STRING_BASE, to the NUL)."""
+
+    def __init__(self, data):
+        self.data = data
+        self.cache = {}
+        try:
+            # static text lives in the main words only; gap / extra addresses
+            # are run-time buffers (a typed-in name, copied input)
+            self.limit = len(_kiwi_program(data).main_words)
+        except Exception:
+            self.limit = None
+
+    def _read(self, ref):
+        if ref in self.cache:
+            return self.cache[ref]
+        t = None
+        if isinstance(ref, int) and ref >= 0 and (self.limit is None or ref < self.limit):
+            o = ref * 2 + STRING_BASE
+            e = self.data.find(b"\0", o, o + 4000) if o < len(self.data) else -1
+            if e > o or e == o:
+                t = self.data[o:e].decode("latin-1")
+        self.cache[ref] = t
+        return t
+
+    def __contains__(self, ref):
+        return self._read(ref) is not None
+
+    def __getitem__(self, ref):
+        t = self._read(ref)
+        if t is None:
+            raise KeyError(ref)
+        return t
+
+
+_GATE_OPS = {"==": "eq", "!=": "ne", ">": "gt", ">=": "gte", "<": "lt", "<=": "lte"}
+_GATE_INV = {"==": "!=", "!=": "==", ">": "<=", ">=": "<", "<": ">=", "<=": ">"}
+
+
+_LOWERED = {}
+
+
+def _vm_finish_lowering(seg_doc):
+    seg_doc.pop("_hub_head", None)
+    for g in (seg_doc.get("segments") or {}).values():
+        nl = g.get("nodes")
+        if isinstance(nl, list) and any(isinstance(n, dict) and n.get("type") == "_lcall"
+                                        for n in nl):
+            g["nodes"] = [n for n in nl if not (isinstance(n, dict) and n.get("type") == "_lcall")] \
+                or [{"type": "end"}]
+
+
+def _speaker_hints(seg_doc):
+    """Exact-code dialogue names its speaker by character id; the engine gets
+    the name from set_character_name (yield 49) registrations. Each dialogue /
+    narration yield whose character id is a constant gets a read-only
+    `speaker` hint: the name registered for that id in the scene (registrations
+    made through a routine call are followed into the routine), else in an
+    earlier scene, else the script's cast table."""
+    segs = seg_doc.get("segments") or {}
+    routines = seg_doc.get("routines") or {}
+    cast = seg_doc.get("cast") or []
+
+    def seg_nodes(entry):
+        seen, work = set(), [entry]
+        while work:
+            nm = work.pop()
+            if nm in seen or nm not in segs:
+                continue
+            seen.add(nm)
+            for n in segs[nm].get("nodes") or []:
+                yield n
+                for k in ("next", "then", "else"):
+                    if isinstance(n.get(k), str):
+                        work.append(n[k])
+
+    reg_param = {}          # routine -> [(param local, name)]
+    for rn_, r in routines.items():
+        acc = []
+        for n in seg_nodes(r.get("entry")):
+            if n.get("type") == "yield" and n.get("yield") in (49, 64):
+                a = n.get("args") or []
+                if len(a) >= 2 and isinstance(a[0], dict) and "local" in a[0] \
+                        and isinstance(a[1], dict) and "text" in a[1]:
+                    acc.append((a[0]["local"], a[1]["text"]))
+        reg_param[rn_] = acc
+
+    def scene_of(nm):
+        m = re.match(r"s(\d+)", nm)
+        return int(m.group(1)) if m else 0
+    names = {}              # scene -> {id: name}
+    for nm in sorted(segs, key=lambda x: (scene_of(x), x)):
+        mp = names.setdefault(scene_of(nm), {})
+        for n in segs[nm].get("nodes") or []:
+            if not isinstance(n, dict):
+                continue
+            a = n.get("args") or []
+            if n.get("type") == "yield" and n.get("yield") in (49, 64) and len(a) >= 2 \
+                    and isinstance(a[0], int) and isinstance(a[1], dict) and "text" in a[1]:
+                mp.setdefault(a[0], a[1]["text"])
+            elif n.get("type") == "call" and n.get("routine") in reg_param:
+                for k, name in reg_param[n["routine"]]:
+                    i = len(a) + 2 + k
+                    if 0 <= i < len(a) and isinstance(a[i], int):
+                        mp.setdefault(a[i], name)
+
+    def lookup(sc, cid):
+        for s_ in sorted(names, reverse=True):
+            if s_ <= sc and cid in names[s_]:
+                return names[s_][cid]
+        if 0 <= cid < len(cast) and cast[cid]:
+            return cast[cid]
+        return None
+    for nm, g in segs.items():
+        sc = scene_of(nm)
+        for n in g.get("nodes") or []:
+            if not isinstance(n, dict) or n.get("type") != "yield":
+                continue
+            a, y = n.get("args") or [], n.get("yield")
+            cid = None
+            if y == 13 and a:
+                ti = 1 if isinstance(a[0], int) and a[0] < 0 else 0
+                cid = a[ti + 1] if len(a) > ti + 1 else None
+            elif y == 65 and a:
+                cid = a[0]
+            if isinstance(cid, int) and not isinstance(cid, bool) and cid >= 0:
+                name = lookup(sc, cid)
+                if name:
+                    n["speaker"] = name
+
+
+def _drop_unreachable_segments(seg_doc):
+    """Remove segments nothing can reach: no entry, dispatch table, routine or
+    node names them (directly or through a chain). Conservative: any string
+    anywhere in the document that equals a segment name counts as a link, and
+    a segment is kept if any text it shows is not shown by a reachable one."""
+    segs = seg_doc.get("segments") or {}
+
+    def names_in(o, acc):
+        if isinstance(o, str):
+            v = o.replace(".json", "")
+            if v in segs:
+                acc.add(v)
+        elif isinstance(o, dict):
+            for v in o.values():
+                names_in(v, acc)
+        elif isinstance(o, list):
+            for v in o:
+                names_in(v, acc)
+        return acc
+    roots = names_in({k: v for k, v in seg_doc.items() if k != "segments"}, set())
+    seen, work = set(), list(roots)
+    while work:
+        nm = work.pop()
+        if nm in seen:
+            continue
+        seen.add(nm)
+        work.extend(names_in(segs[nm].get("nodes"), set()) - seen)
+
+    def texts(o, acc):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k in ("text", "prompt", "label") and isinstance(v, str):
+                    acc.add(v)
+                else:
+                    texts(v, acc)
+        elif isinstance(o, list):
+            for v in o:
+                texts(v, acc)
+        return acc
+    shown = set()
+    for nm in seen:
+        texts(segs[nm].get("nodes"), shown)
+    dead = [nm for nm in segs if nm not in seen]
+    for nm in dead:
+        if texts(segs[nm].get("nodes"), set()) <= shown:
+            del segs[nm]
+
+
+def _state_index(seg_doc):
+    """Read-only indexes of the state the episode touches, derived from the
+    nodes themselves (the JSON still stores no values: these list what exists
+    and where it starts).
+
+    variable_defaults -- every story variable the episode reads or writes,
+      each 0 at load (the engine zero-initialises its numeric store; no script
+      writes a nonzero initial value -- the first write is a node where it
+      happens). `set_only`: only ever assigned, never accumulated.
+      `owner_values`: character-owned numbers ("owner:key"), same rule.
+    name_vars -- every $Token name placeholder the episode binds:
+      `default` (string_default / yield 47: used only while nothing is stored
+      under the token), `set_to` (the names set_string stores under it, in
+      order of appearance), `from_player_input` (bound from typed-in text)."""
+    set_v, add_v, read_v, owner = set(), set(), set(), set()
+    names = {}
+
+    def num(v):
+        try:
+            return int(v)
+        except (TypeError, ValueError):
+            return None
+
+    def expr_vars(e):
+        if isinstance(e, dict):
+            if "var" in e and num(e["var"]) is not None:
+                read_v.add(num(e["var"]))
+            for v in e.values():
+                expr_vars(v)
+        elif isinstance(e, list):
+            for v in e:
+                expr_vars(v)
+
+    for g in (seg_doc.get("segments") or {}).values():
+        for n in g.get("nodes") or []:
+            if not isinstance(n, dict):
+                continue
+            t = n.get("type")
+            v = num(n.get("var"))
+            if t == "var_set" and v is not None:
+                set_v.add(v)
+            elif t == "var_add" and v is not None:
+                add_v.add(v)
+            elif v is not None:
+                read_v.add(v)
+            for k in ("section_register",):
+                if isinstance(n.get(k), dict) and num(n[k].get("var")) is not None:
+                    set_v.add(num(n[k]["var"]))
+            for k in ("state_var", "result_var"):
+                if num(n.get(k)) is not None:
+                    (set_v if k == "result_var" else read_v).add(num(n[k]))
+            for k in ("expr", "format", "cond", "when"):
+                if k in n:
+                    expr_vars(n[k])
+            if t == "string_default" and isinstance(n.get("key"), str):
+                names.setdefault(n["key"], {}).setdefault("default", n.get("default"))
+            if t == "set_string" and isinstance(n.get("key"), str) and n["key"].startswith("$"):
+                e_ = names.setdefault(n["key"], {})
+                if isinstance(n.get("value"), str) and n["value"]:
+                    if n["value"] not in e_.setdefault("set_to", []):
+                        e_["set_to"].append(n["value"])
+                else:
+                    e_["from_player_input"] = True
+            if t == "yield":
+                a = n.get("args") or []
+                y = n.get("yield")
+                ci = [x if isinstance(x, int) and not isinstance(x, bool) else None for x in a]
+                # numeric store yields: 44/45 key; 54/55 key; 50/51/52/53 owner, key
+                if y in (44, 45, 54, 55):
+                    o, k = 0, (ci[0] if a else None)
+                elif y in (50, 51, 52, 53):
+                    o, k = (ci[0], ci[1]) if len(a) >= 2 else (None, None)
+                else:
+                    o = k = None
+                if o is not None and k is not None:
+                    if o:
+                        owner.add("%d:%d" % (o, k))
+                    else:
+                        (set_v if y in (44, 50, 52, 54) else read_v).add(k)
+                if y == 47 and len(a) >= 2 and all(isinstance(x, dict) and "text" in x for x in a[:2]):
+                    names.setdefault(a[0]["text"], {}).setdefault("default", a[1]["text"])
+                if y == 46 and len(a) >= 2 and isinstance(a[0], dict) \
+                        and str(a[0].get("text", "")).startswith("$"):
+                    e_ = names.setdefault(a[0]["text"], {})
+                    if isinstance(a[1], dict) and "text" in a[1]:
+                        if a[1]["text"] not in e_.setdefault("set_to", []):
+                            e_["set_to"].append(a[1]["text"])
+                    else:
+                        e_["from_player_input"] = True
+    for sd in (seg_doc.get("section_dispatch") or {}).values():
+        if isinstance(sd, dict) and num(sd.get("register")) is not None:
+            read_v.add(num(sd["register"]))
+    allv = set_v | add_v | read_v
+    if allv or owner:
+        seg_doc["variable_defaults"] = {
+            "values": {str(v): 0 for v in sorted(allv)},
+            "set_only": [str(v) for v in sorted(set_v - add_v)],
+            **({"owner_values": {k: 0 for k in sorted(owner, key=lambda x: tuple(map(int, x.split(":"))))}}
+               if owner else {}),
+        }
+    if names:
+        seg_doc["name_vars"] = dict(sorted(names.items()))
+
+
+def _finalize_doc(seg_doc):
+    return json.loads(json.dumps(strip_notes(restore_int_values(stringify_numbers(seg_doc))),
+                                 ensure_ascii=False))
+
+
+def _lower_and_finish(pre, scripts, force_scenes):
+    import copy as _copy
+    doc = _copy.deepcopy(pre)
+    _vm_lowered_routines(doc, scripts, force_scenes=force_scenes)
+    _vm_var_exprs(doc, scripts)
+    _vm_format_args(doc, scripts)
+    _vm_var_gate_repair(doc, scripts)
+    _vm_finish_lowering(doc)
+    return doc
+
+
+_VERIFY_POLICIES = (0, -1, ("rand", 1), ("rand", 2))
+
+
+def _verify_decode(pre, doc, scripts, force_all=False, rounds=None):
+    """SELF-VERIFICATION. Play the original scripts and the re-encoded decode
+    (shs_encoder = the executable definition of the JSON contract) with the
+    same engine stand-in (play(): reference-VM + reference-engine
+    semantics) under several choice policies and random seeds. Where the two
+    first differ, that scene's decoded graph is not faithful: lower the scene
+    to exact IR and try again, until they agree. Generic -- whatever a
+    heuristic got wrong in any episode, the scene falls back to the exact
+    lift; nothing is tuned to an episode."""
+    import re as _re
+    try:
+        import shs_encoder as ENC
+    except Exception as ex:
+        print("[!] verification skipped (%s): keep shs_encoder.py next to "
+              "shs_decoder.py" % ex, file=sys.stderr)
+        return doc
+    try:
+        orig = {int(lbl, 16): program_from_chunk(data) for lbl, data in scripts}
+    except Exception as ex:
+        print("[!] verification skipped: %s" % ex, file=sys.stderr)
+        return doc
+    ids = [int(lbl, 16) for lbl, _ in scripts]
+    sidx_of = {sid: i + 1 for i, sid in enumerate(ids)}
+    start = 25001 if 25001 in orig else min(orig)
+
+    def clean(t):
+        return _re.sub(r"[\s`()]", "", t)
+
+    def norm(evs):
+        out = []
+        for e, sid in evs:
+            if e[0] == "say":
+                out.append((("say", clean(e[1])), sid))
+            elif e[0] == "choice":
+                out.append((("choice", tuple(clean(x) for x in e[1])), sid))
+            else:
+                out.append((e[:1] if e[0] in ("end", "error") else e, sid))
+        return out
+    DEPTH = 6000
+
+    def cut_overflow(evs):
+        # a replay loop that never unwinds frames exhausts the VM stack in the
+        # original too; where each side runs out differs, so compare only up
+        # to the first stack exhaustion (the run is then "truncated")
+        for i, (e, _sid) in enumerate(evs):
+            if e[0] == "error" and "overflow" in (e[1] if len(e) > 1 else ""):
+                return evs[:i] + [(("truncated", "overflow"), _sid)]
+        if len(evs) >= DEPTH:
+            return evs + [(("truncated",), evs[-1][1] if evs else None)]
+        return evs
+    ref = {}
+    for pol in _VERIFY_POLICIES:
+        p, seed = (("rand", 12345 + pol[1]) if isinstance(pol, tuple) else (pol, 12345))
+        ref[pol] = norm(cut_overflow(play(orig, start, p, seed=seed, max_events=DEPTH)))
+    forced = set()
+    n_scenes = len(scripts)
+    for _round in range(rounds or n_scenes + 1):
+        try:
+            blob = ENC.compile_episode(_finalize_doc(doc))
+            arc = ExpArchive(blob)
+            mine = {eid: program_from_chunk(pl) for eid, pl, kind in arc.chunks()
+                    if kind == "script"}
+        except Exception as ex:
+            print("[!] verification: re-encode failed (%s); lowering every scene" % ex,
+                  file=sys.stderr)
+            if force_all:
+                return doc
+            force_all = True
+            doc = _lower_and_finish(pre, scripts, "all")
+            continue
+        bad = None
+        for pol in _VERIFY_POLICIES:
+            p, seed = (("rand", 12345 + pol[1]) if isinstance(pol, tuple) else (pol, 12345))
+            got = norm(cut_overflow(play(mine, start, p, seed=seed, max_events=DEPTH)))
+            want = ref[pol]
+            k = 0
+            while k < min(len(got), len(want)) and got[k][0] == want[k][0]:
+                k += 1
+            truncated = (got and got[-1][0][0] == "truncated") or \
+                (want and want[-1][0][0] == "truncated")
+            got_ovf = bool(got) and got[-1][0] == ("truncated", "overflow")
+            want_ovf = bool(want) and want[-1][0] == ("truncated", "overflow")
+            if truncated:
+                got = [x for x in got if x[0][0] != "truncated"]
+                want = [x for x in want if x[0][0] != "truncated"]
+                k = 0
+                while k < min(len(got), len(want)) and got[k][0] == want[k][0]:
+                    k += 1
+            # the decode may not run out of VM stack before the original does
+            # (its frames would be larger than the game's)
+            early_overflow = got_ovf and not want_ovf and len(got) < len(want)
+            if early_overflow or k < min(len(got), len(want)) or (
+                    len(got) != len(want) and not truncated and
+                    not (len(got) > len(want) and want[-1][0][0] == "error")):
+                at_w = want[min(k, len(want) - 1)][1] if want else None
+                at_g = got[min(k, len(got) - 1)][1] if got else None
+                # the side that went astray is usually the decode: when the two
+                # are in different scenes, suspect the decode's scene first
+                cands = [sidx_of.get(x) for x in ((at_g, at_w) if at_g != at_w else (at_w,))]
+                bad = (cands, pol, k, got[k][0] if k < len(got) else None)
+                break
+        if bad is None:
+            if forced:
+                print("[+] verification: decode matches the original under %d policies "
+                      "(scenes lowered to exact IR: %s)" % (len(_VERIFY_POLICIES),
+                                                            sorted(forced)), file=sys.stderr)
+            else:
+                print("[+] verification: decode matches the original under %d policies"
+                      % len(_VERIFY_POLICIES), file=sys.stderr)
+            return doc
+        sc = next((c for c in bad[0] if c is not None and c not in forced), None)
+        if sc is None:
+            # the divergence is in a scene already exact: lower the rest too
+            rest = set(range(1, n_scenes + 1)) - forced
+            if not rest:
+                print("[!] verification: still differs after lowering every scene "
+                      "(policy %r, event %d)" % (bad[1], bad[2]), file=sys.stderr)
+                return doc
+            forced |= rest
+        else:
+            forced.add(sc)
+        _w = ref[bad[1]]
+        print("[i] verification: scene %s differs (policy %r, event %d: original %r, "
+              "decoded %r) -> exact IR"
+              % (sc, bad[1], bad[2], (_w[bad[2]][0] if bad[2] < len(_w) else None), bad[3]),
+              file=sys.stderr)
+        doc = _lower_and_finish(pre, scripts, forced)
+    return doc
+
+
+def _vm_var_exprs(seg_doc, scripts):
+    """VARIABLES SET FROM OTHER VARIABLES. `set_number(k, <expression over
+    variables>)` in story code (restoring hit points from their maximum, a
+    score scaled from a tally) becomes a var_set with an `expr`, at the
+    position the write happens. Derived from the lifted IR of the enclosing
+    routine; routines already lowered keep the write inside their IR."""
+    segs = seg_doc.get("segments") or {}
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        low, irs = _LOWERED.get(sidx, (set(), None))
+        if MAIN in low:
+            continue
+        try:
+            ins = _kiwi_program(data).instructions
+            if irs is None:
+                irs = {ep: lift_routine(ins, ep) for ep in routine_entries(ins)}
+            irs = dict(irs)
+            m = lift_routine(ins, ins[0].pc if ins else 0, bare=True)
+            if m is not None:
+                irs[MAIN] = m
+        except Exception:
+            continue
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+        for ep, ir in irs.items():
+            if ir is None or ep in low:
+                continue
+            for pc, b in ir["blocks"].items():
+                for i, st in enumerate(b["stmts"]):
+                    if "yield" not in st or st["yield"] != 44 or len(st["args"]) != 2:
+                        continue
+                    key, val = st["args"]
+                    if not isinstance(key, int) or isinstance(val, int):
+                        continue
+                    v = var_expr(ir, pc, i, val)
+                    if v is None:
+                        continue
+                    off = ins[by_pc[st["pc"]]].byte_offset
+                    node = {"type": "var_set", "var": str(key), "expr": v, "offset": str(off)}
+                    if v == {"op": "+", "a": {"var": key}, "b": v.get("b")} and isinstance(v.get("b"), int):
+                        node = {"type": "var_add", "var": str(key), "value": v["b"], "offset": str(off)}
+                    _place_node(segs, pref, ins, by_pc, ir, pc, i, node)
+
+
+def _vm_format_args(seg_doc, scripts):
+    """FORMATTED LINES. A shown line whose text is a format (`%d`, `%s`) of
+    values computed from story variables ("You have earned %d out of 100
+    Points!" = var2000 * 5) gets `format: {pattern, args}` with the exact
+    expressions (lifted IR, var_expr). Lines whose values need frame state
+    belong to lowered routines instead."""
+    segs = seg_doc.get("segments") or {}
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        low, irs = _LOWERED.get(sidx, (set(), None))
+        if MAIN in low:
+            continue
+        try:
+            ins = _kiwi_program(data).instructions
+            if irs is None:
+                irs = {ep: lift_routine(ins, ep) for ep in routine_entries(ins)}
+            irs = dict(irs)
+            m = lift_routine(ins, ins[0].pc if ins else 0, bare=True)
+            if m is not None:
+                irs[MAIN] = m
+        except Exception:
+            continue
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        strings = _ChunkStrings(data)
+        pref = "s%d" % sidx
+        want = {}
+        for ep, ir in irs.items():
+            if ir is None or ep in low:
+                continue
+            for pc, b in ir["blocks"].items():
+                stmts = b["stmts"]
+                for i, st in enumerate(stmts):
+                    if "yield" not in st or st["yield"] not in (13, 15, 65):
+                        continue
+                    ti = 1 if st["yield"] in (15, 65) else (
+                        1 if isinstance(st["args"][0], int) and st["args"][0] < 0 else 0)
+                    if ti >= len(st["args"]):
+                        continue
+                    ta = st["args"][ti]
+                    if not (isinstance(ta, dict) and "local" in ta):
+                        continue
+                    fj = next((j for j in range(i - 1, -1, -1) if "yield" in stmts[j]
+                               and stmts[j]["yield"] == 0
+                               and stmts[j].get("result") == ta["local"]), None)
+                    if fj is None:
+                        continue
+                    fa = stmts[fj]["args"]
+                    at = 1 if isinstance(fa[0], int) and fa[0] < 0 else 0
+                    if not (isinstance(fa[at], int) and fa[at] in strings):
+                        continue
+                    pat = strings[fa[at]]
+                    spec, ok = [], True
+                    pos = _text_positions(0, fa, strings) or ()
+                    for ai in range(at + 1, len(fa)):
+                        a = fa[ai]
+                        if ai in pos:
+                            if isinstance(a, int) and a in strings:
+                                spec.append({"text": strings[a]})
+                                continue
+                            ok = False
+                            break
+                        v = var_expr(ir, pc, fj, a)
+                        if v is None:
+                            ok = False
+                            break
+                        spec.append(v)
+                    if not ok:
+                        continue
+                    offs = {str(ins[by_pc[st["pc"]]].byte_offset),
+                            str(ins[by_pc[stmts[fj]["pc"]]].byte_offset)}
+                    want[frozenset(offs)] = {"pattern": pat, "args": spec}
+        if not want:
+            continue
+        for nm, g in segs.items():
+            if not (nm == pref or nm.startswith(pref + "_")):
+                continue
+            for n in g.get("nodes") or []:
+                if not isinstance(n, dict) or n.get("type") not in ("narration", "dialogue",
+                                                                    "status"):
+                    continue
+                for offs, spec in want.items():
+                    if str(n.get("offset")) in offs:
+                        n["format"] = spec
+                        n.pop("value_from", None)
+                        break
+
+
+def _vm_var_gate_repair(seg_doc, scripts):
+    """BRANCHES ON STORY VARIABLES THE GRAPH LOST. Every conditional branch in
+    story code whose condition reduces (lifted IR, var_expr) to `var <cmp>
+    constant` guards the lines it falls through to. Where the decoded graph
+    shows those lines unconditionally (segmentation dropped the test, e.g. a
+    score gate in a small gap between sections), gate them on the variable.
+    Generic: any variable, any comparison, any episode."""
+    segs = seg_doc.get("segments") or {}
+    INV = {"==": "!=", "!=": "==", ">": "<=", ">=": "<", "<": ">=", "<=": ">"}
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        low, irs = _LOWERED.get(sidx, (set(), None))
+        if MAIN in low:
+            continue
+        try:
+            ins = _kiwi_program(data).instructions
+            if irs is None:
+                irs = {ep: lift_routine(ins, ep) for ep in routine_entries(ins)}
+            irs = dict(irs)
+            m = lift_routine(ins, ins[0].pc if ins else 0, bare=True)
+            if m is not None:
+                irs[MAIN] = m
+        except Exception:
+            continue
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+        # every (source index, target index) branch edge, to refuse regions
+        # that are also entered from elsewhere (those lines run untested)
+        edges = []
+        for k_, y_ in enumerate(ins):
+            if y_.opcode in (0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x5c):
+                tk_ = by_pc.get(y_.branch_target()) if y_.opcode != 0x5c else \
+                    by_pc.get((y_.pc + (y_.operand >> 8)) & 0xFFFF)
+                if tk_ is not None:
+                    edges.append((k_, tk_))
+        for ep, ir in irs.items():
+            if ir is None or ep in low:
+                continue
+            for pc, b in ir["blocks"].items():
+                t = b["term"]
+                if "if" not in t or "pc" not in t:
+                    continue
+                q = by_pc.get(t["pc"])
+                if q is None or ins[q].opcode not in (0x2a, 0x2b):
+                    continue
+                cond = var_expr(ir, pc, len(b["stmts"]), t["if"])
+                if cond is None:
+                    continue
+                # the jump is taken when `cond`; the lines fall through when not
+                neg = False
+                while isinstance(cond, dict) and cond.get("op") == "not":
+                    neg, cond = not neg, cond["a"]
+                if not (isinstance(cond, dict) and cond.get("op") in INV
+                        and isinstance(cond.get("a"), dict) and "var" in cond["a"]
+                        and isinstance(cond.get("b"), int)):
+                    continue
+                op = cond["op"] if neg else INV[cond["op"]]
+                t_k = by_pc.get(t["then"])
+                if t_k is None or t_k <= q + 1:
+                    continue
+                if any(q + 1 <= dst < t_k and not (q <= src < t_k) for src, dst in edges):
+                    continue
+                _result_gate_emit(segs, pref, data, ins, by_pc, q, q - 2, t_k,
+                                  ("split", 0, [True, False]), [cond["a"]["var"]],
+                                  [[cond["b"], None]], ins[q + 1].byte_offset,
+                                  ins[t_k].byte_offset, ops=[_GATE_OPS[op]])
+
+
+def _place_node(segs, pref, ins, by_pc, ir, blk_pc, idx, node):
+    """Put `node` (emitted by statement `idx` of block `blk_pc`) into every
+    decoded segment copy at its bytecode position: replace an existing node with
+    the same offset, else insert after the nearest earlier statement's node in
+    the block (or before the nearest later one)."""
+    off = node["offset"]
+    stmts = ir["blocks"][blk_pc]["stmts"]
+
+    def o(st):
+        return str(ins[by_pc[st["pc"]]].byte_offset) if "pc" in st and st["pc"] in by_pc else None
+    before = [o(s) for s in stmts[:idx]]
+    after = [o(s) for s in stmts[idx + 1:]]
+    hit = False
+    for nm, g in segs.items():
+        if not (nm == pref or nm.startswith(pref + "_")):
+            continue
+        nl = g.get("nodes") or []
+        offs = [str(n.get("offset")) if isinstance(n, dict) else None for n in nl]
+        if off in offs:
+            j = offs.index(off)
+            if nl[j].get("type") in ("var_set", "var_add", "var_sub"):
+                nl[j] = dict(node)
+                hit = True
+            continue
+        pos = None
+        for b in reversed(before):
+            if b in offs:
+                pos = offs.index(b) + 1
+                break
+        if pos is None:
+            for a in after:
+                if a in offs:
+                    pos = offs.index(a)
+                    break
+        if pos is not None:
+            nl.insert(pos, dict(node))
+            hit = True
+    return hit
+
+
+def _vm_scene_setup(seg_doc, scripts):
+    """SCENE SETUP BY EXECUTION. Every scene starts by registering its cast
+    with the engine -- art base (yield 72), display name and its format flag
+    (49 / 64) -- and naming the primary speaker (74) and the narrator (75)
+    before it shows anything. The registration is recorded by running the
+    scene on the VM stand-in up to its first shown line, so a re-encode
+    registers exactly the same ids, names and portraits (the story graph's
+    dialogue nodes name speakers by these ids). Scenes that run as exact code
+    carry their registration in that code."""
+    SHOW = {13, 65, 15, 1, 2, 8, 7, 33, 17, 40, 71, 78, 94, 96, 70, 9, 4, 3}
+    setup = {}
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            prog = program_from_chunk(data)
+        except Exception:
+            continue
+        eng = Engine(0, 12345)
+        vm = KiwiVM(prog)
+        chars, order, defaults = {}, [], {}
+        try:
+            for _ in range(4000):
+                st = vm.run()
+                if st[0] != "yield":
+                    break
+                y, a = st[1], st[2]
+                if y in SHOW:
+                    break
+                if y == 72 and len(a) >= 2:
+                    chars.setdefault(a[0], {"id": a[0]})["art"] = a[1]
+                    order.append(a[0]) if a[0] not in order else None
+                elif y in (49, 64) and len(a) >= 2:
+                    c = chars.setdefault(a[0], {"id": a[0]})
+                    c["name"] = eng.read_text(vm, a[1])
+                    if y == 49:
+                        c["format"] = a[2] if len(a) > 2 else 0
+                    order.append(a[0]) if a[0] not in order else None
+                elif y in (74, 75) and a:
+                    defaults[str(y)] = a[0]
+                vm.resume(eng.dispatch(vm, y, a))
+        except (VMError, IndexError, KeyError, TypeError):
+            pass
+        # recorded for every scene: a scene that registers nothing itself
+        # (its cast was registered by an earlier scene -- engine state
+        # persists across scenes) must not be given a made-up prologue
+        setup[str(sidx)] = {"characters": [chars[i] for i in order],
+                            "ui_defaults": defaults}
+    seg_doc["scene_setup"] = setup
+
+
+def _vm_word_game_args(seg_doc, scripts):
+    """A decoded pick-word minigame carries the exact arguments of its word-game
+    yield (1f 47: title, prompt, correct words, decoy words, duration, character,
+    portrait mode, second timer), evaluated from the bytecode at the node's
+    trigger offset -- not reassembled from nearby text."""
+    segs = seg_doc.get("segments") or {}
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+        except Exception:
+            continue
+        at = {x.byte_offset: i for i, x in enumerate(ins)}
+        strings = _ChunkStrings(data)
+        pref = "s%d" % sidx
+        for nm, g in segs.items():
+            if not (nm == pref or nm.startswith(pref + "_")):
+                continue
+            for n in g.get("nodes") or []:
+                if not isinstance(n, dict) or n.get("type") != "minigame" \
+                        or n.get("minigame_type") != "pick_word":
+                    continue
+                try:
+                    i = at.get(int(n.get("trigger")))
+                except (TypeError, ValueError):
+                    i = None
+                if i is None or ins[i].opcode != 0x1f or (ins[i].operand >> 8) != 0x47:
+                    continue
+                a = _eval_yield_args(ins, i, 8)
+                if not a or any(v is None for v in a):
+                    continue
+                txt = [strings[v] if v in strings else None for v in a[:4]]
+                if any(t is None for t in txt):
+                    continue
+                n["title"], n["prompt"] = txt[0], txt[1]
+                n["options"] = [txt[2].split("|"), txt[3].split("|")]
+                n["duration_ms"], n["character_id"] = a[4], a[5]
+                n["portrait_mode"], n["timing2"] = a[6], a[7]
+
+
+def _vm_lowered_routines(seg_doc, scripts, force_scenes=None):
+    """ROUTINES THE STORY GRAPH CANNOT HOLD. A routine that takes arguments and
+    computes with run-time values that reach the screen (a turn-based fight's
+    hit points and damage rolls, a spell built from random syllables) is lifted
+    from the bytecode to IR (lift_routine) and emitted as `routines` + IR segments;
+    each story-level call becomes a frame call with its arguments, and tests of
+    its result become gates on a result variable. Selection, lifting and text
+    typing are all derived from the bytecode and the reference engine's yield
+    semantics -- nothing here is specific to an episode."""
+    segs = seg_doc.get("segments") or {}
+    routines = seg_doc.setdefault("routines", {})
+    next_var = [3900]
+    _LOWERED.clear()
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+            _fm = {MAIN} if (force_scenes == "all" or sidx in (force_scenes or ())) else set()
+            plan = plan_lowering(ins, force=_fm)
+            # a call site the decoded graph gives no anchor for (its caller shows
+            # nothing near the call) means the caller cannot stay a story
+            # routine: lower it too, until every site anchors
+            forced = set()
+            for _round in range(20):
+                grow = set()
+                if any(s_.get("caller") is None for s_ in plan["sites"]):
+                    grow.add(MAIN)
+                for site in plan["sites"]:
+                    if site.get("caller") is not None and \
+                            _splice_call(segs, "s%d" % sidx, ins,
+                                         {x.pc: k for k, x in enumerate(ins)},
+                                         plan["irs"][site["caller"]], site, None, (), (),
+                                         dry=True) is False:
+                        grow.add(site["caller"])
+                if not grow - forced:
+                    break
+                forced |= grow
+                plan = plan_lowering(ins, force=forced | _fm)
+        except Exception as ex:
+            print("[!] lowering s%d: %s" % (sidx, ex), file=sys.stderr)
+            continue
+        low = plan["lowered"]
+        _LOWERED[sidx] = (low, plan["irs"])
+        if not low:
+            continue
+        strings = _ChunkStrings(data)
+        _p = _kiwi_program(data)
+        # specialise the lowered code against the script's constant data: the
+        # JSON never carries VM memory -- data reads become constants or inline
+        # tables, the script's uninitialised words become VM scratch cells
+        try:
+            sp, _pdata, site_rid = specialize_lowered(
+                plan["irs"], low, _p.main_words, _p.gap_count, _p.extra_words,
+                plan["sites"], MAIN in low)
+            roots = set(site_rid.values()) | ({sp.keys[(MAIN, ())]} if MAIN in low else set())
+            res, (argless, folded), _warn = finalize_program(sp, _pdata, strings, roots)
+        except PEvalError as ex:
+            print("[!] s%d: lowered code not expressible without VM memory (%s); "
+                  "left as decoded" % (sidx, ex), file=sys.stderr)
+            _LOWERED[sidx] = (set(), plan["irs"])
+            continue
+        for w_ in _warn:
+            print("[!] s%d: %s" % (sidx, w_), file=sys.stderr)
+        tl, err = type_text(res, set(res), strings)
+        if err:
+            print("[i] s%d: %s" % (sidx, err), file=sys.stderr)
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+
+        def rname(rid, pref=pref, sp=sp):
+            ep, n = sp.name[rid]
+            base = "%s_main" % pref if ep == MAIN else "%s_r%d" % (pref, ep)
+            return base if n == 0 else "%s_%d" % (base, n)
+        argcs = {}
+        low_offs = set()
+        for ep in low:
+            low_offs.update(ins[by_pc[p]].byte_offset for p in plan["irs"][ep]["pcs"] if p in by_pc)
+        ir_segs = set()
+        for rid, ir in res.items():
+            ep = sp.name[rid][0]
+            rs, entry = ir_to_segments(ir, rname(rid), strings, tl, rname, argcs, key=rid)
+            segs.update(rs)
+            ir_segs.update(rs)
+            routines[rname(rid)] = {"entry": entry, "params": ir["params"],
+                                    "offset": str(ins[by_pc[plan["irs"][ep]["start"]]].byte_offset)}
+        if MAIN in low:
+            _ir_scene(seg_doc, segs, pref, sidx, rname(sp.keys[(MAIN, ())]), ir_segs)
+        head = seg_doc.get("_hub_head")
+        if head and head in segs:
+            # host schedule loop: a lowered halt that scheduled nothing returns
+            # to the loop head, like every decoded scene `end`
+            for nm in ir_segs:
+                nl = segs[nm]["nodes"]
+                if nl and nl[-1].get("type") == "end" and not any(
+                        x.get("type") == "yield" and x.get("yield") == 10 for x in nl):
+                    nl[-1] = {"type": "next", "next": head, "source": "scene_return_to_schedule"}
+        # story-level call sites
+        result_var = {}
+        for si, site in enumerate(plan["sites"]):
+            if site.get("unresolved") or site["caller"] is None:
+                print("[i] s%d: call to r%d outside any routine left as decoded"
+                      % (sidx, site["callee"]), file=sys.stderr)
+                continue
+            rid = site_rid[si]
+            args = [] if rid in argless else [0 if i in folded.get(rid, ()) else a
+                                              for i, a in enumerate(site["args"])]
+            for i in text_params(tl, rid, len(args)):
+                if args[i] in strings:
+                    args[i] = {"text": strings[args[i]]}
+            node = {"type": "call", "routine": rname(rid), "args": args,
+                    "offset": str(ins[by_pc[site["call_pc"]]].byte_offset)}
+            if site["store"] is not None:
+                key = (site["caller"], site["store"])
+                if key not in result_var:
+                    result_var[key] = next_var[0]
+                    next_var[0] += 1
+                node["result_var"] = str(result_var[key])
+            if not _splice_call(segs, pref, ins, by_pc, plan["irs"][site["caller"]],
+                                site, node, low_offs, ir_segs):
+                print("[!] s%d: no anchor for call at pc %d" % (sidx, site["call_pc"]),
+                      file=sys.stderr)
+        # the lowered routines' own code is no story content: any node the
+        # linear decode made from it (a fight routine's lines read as if they
+        # followed the scene's text) goes -- the routine runs as exact code
+        for nm, g in segs.items():
+            if not (nm == pref or nm.startswith(pref + "_")) or nm in ir_segs:
+                continue
+            nl = g.get("nodes") or []
+            kept = [n for n in nl if not (isinstance(n, dict)
+                                         and str(n.get("offset", "")).isdigit()
+                                         and int(n["offset"]) in low_offs
+                                         and n.get("type") not in ("call", "gate", "_lcall"))]
+            if len(kept) != len(nl):
+                g["nodes"] = kept or [{"type": "end"}]
+        # result tests -> gates (once per test)
+        done = set()
+        for site in plan["sites"]:
+            if site.get("store") is None or site["caller"] is None:
+                continue
+            var = result_var[(site["caller"], site["store"])]
+            for (if_pc, op, c, neg) in site["tests"]:
+                if if_pc in done:
+                    continue
+                done.add(if_pc)
+                q = by_pc.get(if_pc)
+                if q is None:
+                    continue
+                t_k = by_pc.get(ins[q].branch_target())
+                if t_k is None or t_k <= q + 1:
+                    continue
+                # 2b falls through when the comparison holds (neg), 2a when not
+                fop = op if neg else _GATE_INV[op]
+                _result_gate_emit(segs, pref, data, ins, by_pc, q, q - 2, t_k,
+                                  ("split", 0, [True, False]), [var], [[c, None]],
+                                  ins[q + 1].byte_offset, ins[t_k].byte_offset,
+                                  ops=[_GATE_OPS[fop]])
+
+
+def _ir_scene(seg_doc, segs, pref, sidx, main_name, ir_segs):
+    """The whole scene runs as lowered IR: its entry calls the lifted top-level
+    program (which reads the section register and dispatches exactly as the
+    original does). The scene's decoded story segments are replaced; links into
+    them from other scenes now enter the scene at its entry."""
+    entry = "%s_ir" % pref
+    old = {nm for nm in segs if (nm == pref or nm.startswith(pref + "_")) and nm not in ir_segs}
+    for nm in old:
+        del segs[nm]
+    segs[entry] = {"nodes": [{"type": "call", "routine": main_name, "args": []},
+                             {"type": "end"}]}
+    ir_segs.add(entry)
+
+    def fix(n):
+        if isinstance(n, dict):
+            for k, v in list(n.items()):
+                if isinstance(v, str) and v.replace(".json", "") in old:
+                    n[k] = entry
+                elif isinstance(v, (dict, list)):
+                    fix(v)
+        elif isinstance(n, list):
+            for x in n:
+                fix(x)
+    for nm, g in segs.items():
+        fix(g.get("nodes"))
+    se = seg_doc.get("scene_entries") or {}
+    se[str(sidx)] = entry
+    if seg_doc.get("entry") in old:
+        seg_doc["entry"] = entry
+    seg_doc.setdefault("ir_scenes", []).append(str(sidx))
+    if seg_doc.get("_hub_head") in old:
+        # the host schedule loop itself now runs as the original program: it
+        # schedules its own return exactly like the game, so the decoded
+        # scenes' modelled "return to the loop" goes back to a plain end
+        for g in segs.values():
+            for n in g.get("nodes") or []:
+                if isinstance(n, dict) and n.get("source") == "scene_return_to_schedule":
+                    n.clear()
+                    n["type"] = "end"
+                elif isinstance(n, dict) and n.get("type") == "return":
+                    n.pop("top_level_next", None)
+        seg_doc.pop("_hub_head", None)
+
+
+def _splice_call(segs, pref, ins, by_pc, caller_ir, site, node, low_offs, ir_segs=(),
+                 dry=False):
+    """Put `node` where the call happens in the decoded graph. The decoder left
+    a `_lcall` placeholder at the call's offset when it could; otherwise the
+    node goes right after the nearest yield before the call in the caller's
+    block (or before the nearest one after it) in every segment copy holding
+    it. Nodes that came from the lowered routines' own code are removed."""
+    _coff = str(ins[by_pc[site["call_pc"]]].byte_offset) if site["call_pc"] in by_pc else None
+    _hit = False
+    for nm, g in segs.items():
+        if not (nm == pref or nm.startswith(pref + "_")) or nm in ir_segs:
+            continue
+        nl = g.get("nodes") or []
+        for i_, n_ in enumerate(nl):
+            if isinstance(n_, dict) and n_.get("type") == "_lcall" \
+                    and str(n_.get("offset")) == _coff:
+                if dry:
+                    return True
+                nl[i_] = dict(node)
+                _hit = True
+    if _hit:
+        return True
+    blk = None
+    for b in caller_ir["blocks"].values():
+        for i_, st in enumerate(b["stmts"]):
+            if st.get("pc") == site["call_pc"] and "call" in st:
+                blk, pos = b, i_
+    if blk is None:
+        return False
+    offs_present = set()
+    for nm, g in segs.items():
+        if nm == pref or nm.startswith(pref + "_"):
+            for n in g.get("nodes", []):
+                if isinstance(n, dict) and str(n.get("offset", "")).isdigit():
+                    offs_present.add(int(n["offset"]))
+
+    def off(pc):
+        return ins[by_pc[pc]].byte_offset if pc in by_pc else None
+    before = [off(st["pc"]) for st in blk["stmts"][:pos] if "pc" in st]
+    after = [off(st["pc"]) for st in blk["stmts"][pos + 1:] if "pc" in st]
+    prev = next((o for o in reversed(before) if o in offs_present), None)
+    nxt = next((o for o in after if o in offs_present), None)
+    placed = False
+    for nm, g in list(segs.items()):
+        if not (nm == pref or nm.startswith(pref + "_")) or nm in ir_segs:
+            continue
+        nl = g.get("nodes") or []
+        idx = None
+        if prev is not None:
+            idx = next((i + 1 for i, n in enumerate(nl) if isinstance(n, dict)
+                        and str(n.get("offset", "")) == str(prev)), None)
+        elif nxt is not None:
+            idx = next((i for i, n in enumerate(nl) if isinstance(n, dict)
+                        and str(n.get("offset", "")) == str(nxt)), None)
+        if idx is None:
+            continue
+        if dry:
+            return True
+        # drop copies of the lowered routines' own lines right here
+        j = idx
+        while j < len(nl) and isinstance(nl[j], dict) and \
+                str(nl[j].get("offset", "")).isdigit() and int(nl[j]["offset"]) in low_offs:
+            j += 1
+        g["nodes"] = nl[:idx] + [dict(node)] + nl[j:]
+        placed = True
+    return placed
+
+
+def _vm_call_cascades(seg_doc, scripts):
+    """VARIABLE-DISPATCHED CALLS. `if var == c1: call R1; elif var == c2: call
+    R2; else call R3` (Magic School's failure screen: var2036 picks which
+    "You have failed" routine plays) -- the arms are only calls, so no line sits
+    inside them and the var-gate machinery saw nothing. Rebuild the cascade at
+    the end of the calling segment as gates whose arms CALL the routine's
+    segment, then continue where the cascade ends (or stop, when it ends at the
+    routine's own return). Only where the calling segment ends right at the
+    cascade and every routine has a segment of its own."""
+    segs = seg_doc.get("segments") or {}
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+        except Exception:
+            continue
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+        rng, offs = {}, []
+        for nm, g in segs.items():
+            if not (nm == pref or nm.startswith(pref + "_")):
+                continue
+            o = [(int(x["offset"]), ii) for ii, x in enumerate(g.get("nodes", []))
+                 if isinstance(x, dict) and str(x.get("offset", "")).lstrip("-").isdigit()]
+            if o:
+                rng[nm] = (min(o)[0], o[0])
+                offs += [(oo, nm) for oo, _ in o]
+        offs.sort()
+
+        def const(y):
+            if y.opcode == 0x1a:
+                return y.operand - 0x10000 if y.operand >= 0x8000 else y.operand
+            if y.opcode in (0x5a, 0x5b):
+                return y.opcode - 0x5a
+            return None
+
+        _OPN = {0x0a: None, 0x0b: "ne", 0x0c: "gt", 0x0d: "gte", 0x0e: "lt", 0x0f: "lte"}
+
+        def test(k):
+            # 1a V ; 1f 2d01 ; 21 ; <c> ; CMP ; 2b T ; 42 ; 29 R ; 28 E [; 28 E]
+            if k + 8 >= len(ins):
+                return None
+            a = ins[k:k + 9]
+            if not (a[0].opcode == 0x1a and a[1].opcode == 0x1f
+                    and (a[1].operand or 0) == 0x2d01 and a[2].opcode == 0x21
+                    and const(a[3]) is not None and a[4].opcode in _OPN
+                    and a[5].opcode == 0x2b and a[6].opcode == 0x42
+                    and a[7].opcode == 0x29 and a[8].opcode == 0x28):
+                return None
+            size = 9
+            if k + 9 < len(ins) and ins[k + 9].opcode == 0x28 \
+                    and ins[k + 9].branch_target() == a[8].branch_target():
+                size = 10
+            if a[5].branch_target() != ins[k + size - 1].pc + 1:
+                return None
+            return (a[0].operand, const(a[3]), a[7].branch_target(), a[8].branch_target(),
+                    _OPN[a[4].opcode], size)
+
+        def seg_at(off):
+            best = None
+            for nm, (lo, _f) in rng.items():
+                if 0 <= lo - off <= 64 and (best is None or lo < rng[best][0]):
+                    best = nm
+            return best
+
+        k = 0
+        while k < len(ins):
+            t0 = test(k)
+            if t0 is None:
+                k += 1
+                continue
+            k0_ = k
+            var, arms, end_pc, q = t0[0], [], t0[3], k
+            ops_ = []
+            while True:
+                t = test(q)
+                if t is None or t[3] != end_pc:
+                    break
+                arms.append((t[1], t[2]))
+                ops_.append((t[0], t[4]))
+                q += t[5]
+            else_pc = None
+            if q + 1 < len(ins) and ins[q].opcode == 0x42 and ins[q + 1].opcode == 0x29 \
+                    and (q + 2 < len(ins) and ins[q + 2].pc == end_pc):
+                else_pc = ins[q + 1].branch_target()
+                q += 2
+            k = q
+            if len(arms) + (1 if else_pc is not None else 0) < 2 or end_pc not in by_pc:
+                continue
+            c_off = ins[by_pc.get(arms[0][1], 0)].byte_offset if False else None
+            start_off = t0 and ins[k - 1].byte_offset
+            first_off = None
+            # caller: segment holding the last node before the cascade
+            import bisect as _b
+            cas_lo = ins[by_pc[t0[2]]].byte_offset if False else None
+            lo_off = ins[k0_].byte_offset
+            j2 = _b.bisect_left(offs, (lo_off, "")) - 1
+            if j2 < 0:
+                continue
+            caller = offs[j2][1]
+            cn = segs[caller]["nodes"]
+            last_o = max(int(x["offset"]) for x in cn
+                         if isinstance(x, dict) and str(x.get("offset", "")).lstrip("-").isdigit())
+            if last_o > lo_off:
+                # the linear walk ran on into one arm's routine body (it sits
+                # right after the cascade): split it off as that routine
+                _ii = next(ii for ii, x in enumerate(cn)
+                           if isinstance(x, dict)
+                           and str(x.get("offset", "")).lstrip("-").isdigit()
+                           and int(x["offset"]) > lo_off)
+                _fo = int(cn[_ii]["offset"])
+                _starts = [ins[by_pc[r]].byte_offset for _c, r in
+                           arms + ([(None, else_pc)] if else_pc is not None else [])
+                           if r in by_pc]
+                if not any(0 <= _fo - st_ <= 64 for st_ in _starts):
+                    continue
+                _nn = caller + "_rt"
+                while _nn in segs:
+                    _nn += "t"
+                segs[_nn] = {kk: vv for kk, vv in segs[caller].items() if kk != "nodes"}
+                segs[_nn]["nodes"] = cn[_ii:]
+                segs[caller]["nodes"] = cn = cn[:_ii] + [{"type": "end"}]
+                rng[_nn] = (_fo, None)
+            if not cn or not isinstance(cn[-1], dict) \
+                    or cn[-1].get("type") not in ("end", "return", "next"):
+                continue
+            callees = []
+            ok = True
+            for c, rpc in arms + ([(None, else_pc)] if else_pc is not None else []):
+                if rpc not in by_pc:
+                    ok = False; break
+                cs = seg_at(ins[by_pc[rpc]].byte_offset)
+                if not cs:
+                    ok = False; break
+                callees.append((c, cs))
+            if not ok:
+                continue
+            e_ins = ins[by_pc[end_pc]]
+            if e_ins.opcode == 0x22:
+                tail = dict(cn[-1]) if cn[-1].get("type") in ("end", "return") \
+                    else {"type": "end"}
+            else:
+                cont = seg_at(e_ins.byte_offset)
+                if not cont:
+                    continue
+                tail = {"type": "next", "next": cont}
+            base = "%s_vc%d" % (pref, lo_off)
+            def arm_seg(i, cs):
+                nm = "%s_%d" % (base, i)
+                segs[nm] = {"nodes": [{"type": "call", "segment": cs,
+                                        "offset": str(lo_off)}, dict(tail)]}
+                return nm
+            chain = []
+            else_nm = None
+            if else_pc is not None:
+                else_nm = arm_seg(len(callees) - 1, callees[-1][1])
+            else:
+                else_nm = "%s_x" % base
+                segs[else_nm] = {"nodes": [dict(tail)]}
+            gates = [(c, cs) for c, cs in callees if c is not None]
+            nxt = else_nm
+            for i in range(len(gates) - 1, -1, -1):
+                c, cs = gates[i]
+                then_nm = arm_seg(i, cs)
+                gnm = "%s_g%d" % (base, i)
+                gv, gop = ops_[i]
+                gn = {"type": "gate", "var": str(gv), "equals": str(c),
+                      "then": then_nm, "else": nxt, "offset": str(lo_off)}
+                if gop:
+                    gn["op"] = gop
+                segs[gnm] = {"nodes": [gn]}
+                nxt = gnm
+            cn[-1] = {"type": "next", "next": nxt, "source": "call_cascade"}
+
+
+def _vm_schedule_hub(seg_doc, scripts):
+    """HOST SCHEDULE LOOP (The New Girl). Some episodes keep a separate main
+    program that, every time a scene script RETURNS, advances a time-slot
+    counter (var3500) and looks the next scene value up in a table:
+    slot -> var1001 -> scene script (class, lunch, home, ... tryouts). The scene
+    scripts themselves never set 1001, so their returns decoded as `end` and
+    playback stopped after the first scene. Run the main program (reference-VM
+    semantics, _vm_first_shown) for every counter value, and model the loop as
+    a hub segment: counter += 1, dispatch on it, goto the scheduled scene with
+    its register value. Every scene `end` returns to the hub; the slot past
+    the table ends the episode. Only fires when the main program's scheduling
+    is driven by such a counter."""
+    segs = seg_doc.get("segments") or {}
+    if not scripts or "s1_hub" in segs:
+        return
+    try:
+        prog = _kiwi_program(scripts[0][1])
+    except Exception:
+        return
+    tr, reads = {}, []
+    try:
+        _vm_first_shown(prog, {}, trace=tr, reads=reads)
+    except Exception:
+        return
+    nb0 = tr.get("numbers") or {}
+    cands = [v for v in dict.fromkeys(r[0] for r in reads)
+             if v not in (1000, 1001) and nb0.get(v) == 1]
+    if len(cands) != 1:
+        return
+    ctr = cands[0]
+    table = {}
+    for k in range(0, 200):
+        tr = {}
+        try:
+            _vm_first_shown(prog, {ctr: k}, trace=tr)
+        except Exception:
+            break
+        nb = tr.get("numbers") or {}
+        if not tr.get("halted") or nb.get(ctr) != k + 1 or nb.get(1001) is None:
+            break
+        table[k + 1] = int(nb[1001])
+    if len(set(table.values())) < 3:
+        return
+    sds = seg_doc.get("section_dispatch") or {}
+    ents = seg_doc.get("scene_entries") or {}
+    owner = {}
+    for scn, sd in sds.items():
+        if isinstance(sd, dict):
+            for v in sd.get("valid_values") or []:
+                owner.setdefault(int(v), (scn, (sd.get("entry_by_value") or {}).get(str(v))))
+    arms = []
+    for j, v in sorted(table.items()):
+        scn, ent = owner.get(v, (None, None))
+        if scn is None and v == 1:
+            scn, ent = "1", ents.get("1")
+        tgt = ent or ents.get(str(scn))
+        if not tgt or tgt not in segs:
+            continue
+        nm = "s1_hub_%d" % j
+        segs[nm] = {"nodes": [
+            {"type": "var_set", "var": "1001", "value": v},
+            {"type": "goto_scene", "file": tgt,
+             "section_register": {"var": "1001", "value": str(v)}}]}
+        arms.append({"equals": str(j), "scene": nm})
+    if not arms:
+        return
+    # A scene script's sections are routines: content that follows a RETURN
+    # (22 43) in bytecode is never reached by falling through (New Girl scene 2:
+    # the first-day section returns right before "The next morning..." -- the
+    # next slot's section). Cut segments that run across a return.
+    import bisect as _bs
+    _rets = {}
+    for _i, (_lb, _dt) in enumerate(scripts):
+        if _i == 0:
+            continue
+        try:
+            _ins = _kiwi_program(_dt).instructions
+        except Exception:
+            continue
+        _rets[str(_i + 1)] = sorted(x.byte_offset for k2, x in enumerate(_ins[:-1])
+                                    if x.opcode == 0x22 and _ins[k2 + 1].opcode == 0x43)
+    # only where the node after the return OPENS another section (the first
+    # node of some register value's entry) -- helper routines placed between
+    # a caller's lines are not section boundaries
+    _sec_first = {}
+    for _scn, _sd in sds.items():
+        if not isinstance(_sd, dict):
+            continue
+        for _e in (_sd.get("entry_by_value") or {}).values():
+            for _n in (segs.get(_e) or {}).get("nodes") or []:
+                if isinstance(_n, dict) and _n.get("type") in (
+                        "dialogue", "narration", "title_card", "background",
+                        "music") and _n.get("offset") is not None:
+                    _sec_first.setdefault(str(_scn), set()).add(int(_n["offset"]))
+                    break
+    _cut_rest = []
+    for nm in list(segs):
+        m = re.match(r"s(\d+)", nm)
+        rl = _rets.get(m.group(1)) if m else None
+        if not rl:
+            continue
+        nl = segs[nm].get("nodes") or []
+        prev = None
+        for ii, n in enumerate(nl):
+            o = n.get("offset") if isinstance(n, dict) else None
+            if o is None or not str(o).lstrip("-").isdigit():
+                continue
+            o = int(o)
+            if prev is not None and prev < o:
+                k3 = _bs.bisect_right(rl, prev)
+                if k3 < len(rl) and rl[k3] < o \
+                        and o in _sec_first.get(m.group(1), ()):
+                    rest = nm + "_r"
+                    while rest in segs:
+                        rest += "r"
+                    segs[rest] = {k4: v4 for k4, v4 in segs[nm].items() if k4 != "nodes"}
+                    segs[rest]["nodes"] = nl[ii:]
+                    segs[nm]["nodes"] = nl[:ii] + [{"type": "end"}]
+                    _cut_rest.append(rest)
+                    break
+            prev = o
+    # a cut-off tail nobody enters (its content is the next section, entered
+    # by its own copy) is dropped
+    for _ in range(3):
+        _refs = set()
+        for _sg in segs.values():
+            _s = json.dumps(_sg)
+            for rest in _cut_rest:
+                if '"%s"' % rest in _s or '"%s.json"' % rest in _s:
+                    _refs.add(rest)
+        for rest in list(_cut_rest):
+            if rest not in _refs and rest in segs:
+                del segs[rest]
+                _cut_rest.remove(rest)
+    # The main program's own decode (scene 1: init, `counter >= N -> end
+    # card`, else schedule) is the loop head: its schedule goto becomes the
+    # hub, and scene returns go back to the head so the end check runs.
+    head = ents.get("1")
+    s1 = [nm for nm in segs if (nm == "s1" or nm.startswith("s1_"))
+          and not nm.startswith("s1_hub")]
+    hooked = False
+    for nm in s1:
+        nl = segs[nm].get("nodes") or []
+        if nl and isinstance(nl[-1], dict) and nl[-1].get("type") == "goto_scene":
+            nl[-1] = {"type": "next", "next": "s1_hub",
+                      "source": "host_schedule"}
+            hooked = True
+    if not hooked or head not in segs:
+        head = "s1_hub"
+    for nm, sg in segs.items():
+        nl = sg.get("nodes") or []
+        if any(isinstance(x, dict) and x.get("type") == "end_card" for x in nl):
+            if nl and isinstance(nl[-1], dict) and nl[-1].get("type") == "next" \
+                    and nl[-1].get("next") == head:
+                nl[-1] = {"type": "end"}
+            continue
+        if nl and isinstance(nl[-1], dict) and nl[-1].get("type") == "end":
+            nl[-1] = {"type": "next", "next": head,
+                      "source": "scene_return_to_schedule"}
+        for x in nl:
+            if isinstance(x, dict) and x.get("type") == "return":
+                x["top_level_next"] = head
+    seg_doc["_hub_head"] = head            # lowered code returns here too
+    segs["s1_hub_end"] = {"nodes": [{"type": "end"}]}
+    # the main program's own decode may already advance the counter (its
+    # `var = local + 1` write) on the way to the schedule
+    _has_inc = any(isinstance(x, dict) and x.get("type") == "var_add"
+                   and str(x.get("var")) == str(ctr)
+                   for nm in s1 for x in segs[nm].get("nodes", []))
+    segs["s1_hub"] = {"nodes": ([] if _has_inc else
+                                [{"type": "var_add", "var": str(ctr), "value": 1}]) + [
+        {"type": "dispatch", "state_var": str(ctr), "arms": arms,
+         "default": "s1_hub_end",
+         "note": ("byte-derived by execution: the host main program advances "
+                  "var%s after every scene and schedules the next scene "
+                  "value from its slot table" % ctr)}]}
+    if head == "s1_hub":
+        ents["1"] = "s1_hub"
+        seg_doc["scene_entries"] = ents
+        seg_doc["entry"] = "s1_hub"
+
+
+def _nv(reg, v):
+    """Register value for a section probe. The episode's first-run flag
+    (var1000) is set on every entry except the fresh start (value 0): a
+    re-entry never replays the host's one-time intro."""
+    d = {reg: int(v)}
+    if reg != 1000:
+        d[1000] = 1 if int(v) else 0
+    return d
+
+
+def _vm_section_entries(seg_doc, scripts):
+    """ENGINE-ACCURATE section entry per register value. For each scene with a
+    section dispatch, run its script with the reference VM's semantics for every
+    valid register value (_vm_first_shown) and map the first thing shown to the
+    segment holding it: section_dispatch[scene]["entry_by_value"] = {value: seg}.
+    Byte-derived by execution, so it does not depend on the dispatch-table walk
+    (which is off by one in some scenes -- Making Some Dough scene 2). Additive:
+    the existing `bindings` still drive segmentation."""
+    segs = seg_doc.get("segments") or {}
+    sds = seg_doc.get("section_dispatch") or {}
+    for scn, sd in sds.items():
+        if not isinstance(sd, dict) or sd.get("register") is None:
+            continue
+        try:
+            idx = int(scn) - 1
+            label, data = scripts[idx]
+            prog = _kiwi_program(data)
+        except Exception:
+            continue
+        pref = "s%s" % scn
+        mine = [s for s in segs if s == pref or s.startswith(pref + "_")]
+        where = {}
+        for s in mine:
+            for ii, n in enumerate(segs[s].get("nodes", [])):
+                if isinstance(n, dict) and n.get("offset") is not None:
+                    o = str(n["offset"])
+                    # prefer the segment where the node comes first
+                    if o not in where or ii < where[o][1]:
+                        where[o] = (s, ii)
+        reg = int(sd["register"])
+        # every node by offset (all copies), to pick up the executed prologue
+        by_off = {}
+        for s in mine:
+            for n in segs[s].get("nodes", []):
+                if isinstance(n, dict) and n.get("offset") is not None:
+                    by_off.setdefault(str(n["offset"]), n)
+        import copy as _cp
+        out = {}
+        _sel_at = {x.byte_offset: (x.operand or 0) >> 8 for x in prog.instructions
+                   if x.opcode == 0x1f}
+        for v in sd.get("valid_values") or []:
+            # A section that only shows cards and returns (New Girl's day
+            # banners: "Tuesday / Four days until tryouts!") runs to HALT with
+            # no player input: its entry IS the executed path, then the return.
+            _tr, _yl = {}, []
+            try:
+                _vm_first_shown(prog, _nv(reg, v), trace=_tr, yields=_yl)
+            except Exception:
+                _tr = {}
+            _sels = [_sel_at.get(o) for o in _yl]
+            if (_tr.get("halted") and 0x08 in _sels
+                    and all(x == 0x08 or x not in _VM_SHOW for x in _sels)):
+                _nodes, _seen = [], set()
+                for o in _yl:
+                    if str(o) in by_off and str(o) not in _seen:
+                        _seen.add(str(o))
+                        _nodes.append(_cp.deepcopy(by_off[str(o)]))
+                if any(n.get("type") == "title_card" for n in _nodes) and all(
+                        n.get("type") in ("title_card", "background", "music", "sfx",
+                                          "var_set", "var_add", "set_scene_value")
+                        for n in _nodes):
+                    name = "%s_enter_v%s" % (pref, v)
+                    segs[name] = {"nodes": _nodes + [{"type": "end"}]}
+                    out[str(v)] = name
+                    continue
+            ylds, lands = [], []
+            off = _vm_first_shown(prog, _nv(reg, v), yields=ylds, landings=lands)
+            if off is None:
+                continue
+            # keep only landings that do NOT depend on other state: re-run with
+            # every other variable at different values and keep the common
+            # prefix (Making Some Dough scene 2 picks the day's section from
+            # var2002 AFTER the register dispatch -- that part stays a gate)
+            for _dflt in (1, 2, 5):
+                _l2 = []
+                _vm_first_shown(prog, _nv(reg, v), landings=_l2, default=_dflt)
+                _k = 0
+                while _k < min(len(lands), len(_l2)) and lands[_k][0] == _l2[_k][0]:
+                    _k += 1
+                lands = lands[:_k]
+            # Enter at the section LANDING (the dispatch cascade's taken jump):
+            # what follows it can depend on other state (a first-visit gate), so
+            # it is left to the section's own nodes; only what executed before
+            # the landing is carried. No landing: fall back to the first shown.
+            # nothing past a RANDOM roll is state-independent: the engine's
+            # draw decides (Making Some Dough's Help Ads)
+            _ri = next((ii for ii, o in enumerate(ylds) if _sel_at.get(o) == 0x1b), None)
+            if _ri is not None:
+                lands = [l for l in lands if l[1] <= _ri]
+            n_common = len(lands)
+            # A variable read AFTER the state-independent landings that changes
+            # where the run goes is a nested cascade (Making Some Dough: register
+            # 1 -> day counter -> var2002 picks the day's section). Probe it.
+            _r1 = []
+            _vm_first_shown(prog, _nv(reg, v), landings=[], yields=[], reads=_r1)
+            cascade = None
+            _probed = set()
+            for _var, _ny, _nl in (_r1 if _ri is None else []):
+                if _var == reg or _nl < n_common or _var in _probed:
+                    continue
+                _probed.add(_var)
+                _vals = sorted({int(c["equals"]) for cc in (sd.get("cascades") or [])
+                                if str(cc.get("var")) == str(_var)
+                                for c in cc.get("cases", [])
+                                if str(c.get("equals", "")).lstrip("-").isdigit()}) \
+                    or list(range(0, 10))
+                arms = {}
+                for _k in _vals:
+                    _Lk, _Yk = [], []
+                    _sk = _vm_first_shown(prog, {reg: int(v), _var: _k},
+                                          landings=_Lk, yields=_Yk)
+                    if _sk is None:
+                        continue
+                    _land = _Lk[n_common][0] if len(_Lk) > n_common else None
+                    _cands = [(int(o), s2, i2) for o, (s2, i2) in where.items()
+                              if o.lstrip("-").isdigit() and _land is not None
+                              and _land <= int(o) <= _sk]
+                    _h = min(_cands)[1:] if _cands else where.get(str(_sk))
+                    if _h:
+                        arms[_k] = _h
+                if len({a for a in arms.values()}) >= 2:
+                    cascade = (_var, _ny, arms)
+                    break
+            if lands:
+                land_off, n_before = lands[-1]
+                ylds = ylds[:n_before]
+                cands = [(int(o), s2, i2) for o, (s2, i2) in where.items()
+                         if o.lstrip("-").isdigit() and land_off <= int(o) <= off]
+                hit = min(cands)[1:] if cands else where.get(str(off))
+            else:
+                hit = where.get(str(off))
+            if cascade is not None:
+                # entry = executed prefix up to the cascade read, then a dispatch
+                # on the cascade variable (arms entered at their first node)
+                _var, _ny, arms = cascade
+                _Yp = []
+                _vm_first_shown(prog, _nv(reg, v), yields=_Yp)
+                pre = []
+                seen_o = set()
+                for o in _Yp[:_ny]:
+                    n = by_off.get(str(o))
+                    if n is None or str(o) in seen_o or n.get("type") in (
+                            "choice", "gate", "next", "dispatch", "random",
+                            "goto_scene", "minigame", "_call_site"):
+                        continue
+                    seen_o.add(str(o))
+                    pre.append(_cp.deepcopy(n))
+                arm_segs = {}
+                for _k, (_s, _i) in arms.items():
+                    if _i == 0:
+                        arm_segs[_k] = _s
+                    else:
+                        _an = "%s_v%s_%s%s" % (pref, v, _var, _k)
+                        segs[_an] = {kk: vv for kk, vv in segs[_s].items() if kk != "nodes"}
+                        segs[_an]["nodes"] = _cp.deepcopy(segs[_s]["nodes"][_i:])
+                        arm_segs[_k] = _an
+                _ks = sorted(arm_segs)
+                name = "%s_enter_v%s" % (pref, v)
+                segs[name] = {"nodes": pre + [{
+                    "type": "dispatch", "state_var": str(_var),
+                    "arms": [{"equals": str(_k), "scene": arm_segs[_k]} for _k in _ks],
+                    "default": arm_segs[_ks[-1]],
+                    "note": ("byte-derived by execution: the scene opening reads "
+                             "var%s after the register dispatch" % _var)}]}
+                out[str(v)] = name
+                continue
+            if not hit:
+                continue
+            tgt, ii = hit
+            # The scene opening RUNS before it dispatches (Making Some Dough's
+            # day counter `var2001 += 1` sits there): carry the executed
+            # state changes into a per-value entry, then enter the section --
+            # at the first shown node, not at the head of a longer segment.
+            pre = []
+            seen_o = set()
+            tgt_nodes = segs[tgt]["nodes"]
+            tgt_offs = set()      # executed nodes before the landing ARE carried
+            for o in ylds:
+                n = by_off.get(str(o))
+                if n is None or str(o) in seen_o or str(o) in tgt_offs:
+                    continue
+                if n.get("type") in ("choice", "gate", "next", "dispatch", "random",
+                                     "goto_scene", "minigame", "_call_site"):
+                    continue
+                seen_o.add(str(o))
+                pre.append(_cp.deepcopy(n))
+            if not pre and ii == 0:
+                out[str(v)] = tgt
+                continue
+            name = "%s_enter_v%s" % (pref, v)
+            if ii == 0:
+                body = pre + [{"type": "next", "next": tgt}]
+            else:
+                body = pre + _cp.deepcopy(tgt_nodes[ii:])
+            segs[name] = {k: vv for k, vv in segs[tgt].items() if k != "nodes"}
+            segs[name]["nodes"] = body
+            out[str(v)] = name
+        if out:
+            sd["entry_by_value"] = out
+            # a goto into this scene with a KNOWN register value goes straight to
+            # that value's entry (runtimes that don't run section dispatch --
+            # e.g. a goto handler that just loads `file` -- land correctly too)
+            _scene_segs = set(mine) | set(out.values())
+            for g2 in segs.values():
+                for n2 in g2.get("nodes", []):
+                    if not (isinstance(n2, dict) and n2.get("type") == "goto_scene"):
+                        continue
+                    _sr = n2.get("section_register") or {}
+                    _f = str(n2.get("file") or "").replace(".json", "")
+                    if str(_sr.get("var")) == str(reg) and str(_sr.get("value")) in out \
+                            and _f in _scene_segs:
+                        n2["file"] = out[str(_sr["value"])]
+
+
+def _drop_dead_forwarders(seg_doc):
+    """Remove segments that are nothing but a `next` and that nothing references
+    (left behind when a repair pass re-points an option past its empty body).
+    They carry no content, so removing them loses nothing."""
+    segs = seg_doc.get("segments") or {}
+
+    def refs_of(v, out):
+        if isinstance(v, str):
+            out.add(v.replace(".json", ""))
+        elif isinstance(v, list):
+            for x in v:
+                refs_of(x, out)
+        elif isinstance(v, dict):
+            for k, x in v.items():
+                if k not in ("text", "type", "prompt", "label", "offset"):
+                    refs_of(x, out)
+
+    while True:
+        refs = set()
+        for nm, g in segs.items():
+            refs_of(g.get("nodes", []), refs)
+        refs_of(seg_doc.get("scene_entries") or {}, refs)
+        refs_of(seg_doc.get("start"), refs)
+        dead = [nm for nm, g in segs.items()
+                if nm not in refs and g.get("nodes")
+                and all(isinstance(n, dict) and n.get("type") == "next" for n in g["nodes"])]
+        if not dead:
+            return
+        for nm in dead:
+            del segs[nm]
+
+
+def _resolve_timeout_as_option(seg_doc):
+    """A timed choice whose timeout runs EXACTLY one option's path (it fails the
+    same answer tests) times out into that option. Resolve the marker to the
+    option's FINAL `next` -- after every repair pass has settled option targets --
+    so on_timeout never points at a stale pre-repair segment."""
+    for g in (seg_doc.get("segments") or {}).values():
+        for n in g.get("nodes", []):
+            if not (isinstance(n, dict) and n.get("type") == "choice"):
+                continue
+            k = n.pop("_timeout_as_option", None)
+            if k is None or n.get("on_timeout"):
+                continue
+            opt = next((o for o in n.get("options", [])
+                        if str(o.get("index")) == str(k)), None)
+            if opt and isinstance(opt.get("next"), str):
+                nx = opt["next"]
+                n["on_timeout"] = nx if nx.endswith(".json") else nx + ".json"
+
+
+def _vm_cut_at_jumps(seg_doc, scripts):
+    """A line followed (straight-line) by an unconditional jump FORWARD past
+    the segment's next line does not fall through into it: the skipped lines
+    belong to another path (Swim Team Retreat: "I guess you're not the one
+    who should be apologizing..." jumps over the "Wow. I'm surprised..."
+    branch). Cut there and continue at the jump target."""
+    segs = seg_doc.get("segments") or {}
+    import bisect as _b
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+        except Exception:
+            continue
+        offs = [x.byte_offset for x in ins]
+        by_pc = {x.pc: x for x in ins}
+        pref = "s%d" % sidx
+
+        def at_or_after(t):
+            best = None
+            for nm, g in segs.items():
+                if not (nm == pref or nm.startswith(pref + "_")):
+                    continue
+                for ii, n in enumerate(g.get("nodes") or []):
+                    o = n.get("offset") if isinstance(n, dict) else None
+                    if o is None or not str(o).lstrip("-").isdigit() \
+                            or n.get("type") in ("call", "_call_site", "return"):
+                        continue
+                    o = int(o)
+                    if o >= t and (best is None or o < best[0]
+                                   or (o == best[0] and ii < best[2])):
+                        best = (o, nm, ii)
+            return best
+        changed = True
+        guard = 0
+        while changed and guard < 500:
+            changed = False
+            guard += 1
+            for nm in [n for n in list(segs) if n == pref or n.startswith(pref + "_")]:
+                nl = segs[nm].get("nodes") or []
+                prev = None
+                for ii, n in enumerate(nl):
+                    o = n.get("offset") if isinstance(n, dict) else None
+                    if o is None or not str(o).lstrip("-").isdigit() \
+                            or n.get("type") in ("call", "_call_site", "gate", "choice",
+                                                 "minigame", "return"):
+                        prev = None if (isinstance(n, dict) and n.get("type") in
+                                        ("gate", "choice", "minigame")) else prev
+                        continue
+                    o = int(o)
+                    if prev is not None and o > prev:
+                        k = _b.bisect_right(offs, prev)
+                        jt = None
+                        while k < len(ins) and ins[k].byte_offset < o:
+                            y = ins[k]
+                            if y.opcode == 0x28:
+                                t = by_pc.get(y.branch_target())
+                                if t is not None and t.byte_offset > o:
+                                    jt = t.byte_offset
+                                break
+                            if y.opcode in (0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x5c,
+                                            0x33, 0x22, 0x42):
+                                break
+                            if y.opcode == 0x1f and (y.operand or 0) >> 8 in _VM_SHOW:
+                                break
+                            k += 1
+                        if jt is not None:
+                            best = at_or_after(jt)
+                            if best is None:
+                                break
+                            _o, tnm, pos = best
+                            if tnm == nm and pos <= ii:
+                                break
+                            if pos > 0:
+                                newnm = tnm + "_j"
+                                while newnm in segs:
+                                    newnm += "j"
+                                tn = segs[tnm]["nodes"]
+                                segs[newnm] = {kk: vv for kk, vv in segs[tnm].items()
+                                               if kk != "nodes"}
+                                segs[newnm]["nodes"] = tn[pos:]
+                                segs[tnm]["nodes"] = tn[:pos] + [{"type": "next",
+                                                                  "next": newnm}]
+                                tgt = newnm
+                                if tnm == nm:
+                                    nl = segs[nm]["nodes"]
+                            else:
+                                tgt = tnm
+                            rest = nm + "_k"
+                            while rest in segs:
+                                rest += "k"
+                            segs[rest] = {kk: vv for kk, vv in segs[nm].items() if kk != "nodes"}
+                            segs[rest]["nodes"] = nl[ii:]
+                            segs[nm]["nodes"] = nl[:ii] + [{"type": "next", "next": tgt,
+                                                            "source": "jump_skip"}]
+                            changed = True
+                            break
+                    prev = o
+                if changed:
+                    break
+
+
+def _vm_cut_at_returns(seg_doc, scripts):
+    """Content can't fall through a routine's RETURN. Where a segment's next
+    line is only reachable past a `22 43` that execution hits straight after
+    the previous line (no jump or branch in between), end the segment with
+    `return` there; the remainder becomes its own segment (the next routine,
+    reached by its calls). New Girl's first date with Keith ran on into the
+    second date this way."""
+    segs = seg_doc.get("segments") or {}
+    import bisect as _b
+    cut = 0
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+        except Exception:
+            continue
+        offs = [x.byte_offset for x in ins]
+        by_pc = {x.pc: x for x in ins}
+        pref = "s%d" % sidx
+        # call sites the graph already models (choice-outcome / dispatch-arm
+        # markers and call nodes)
+        modeled = set()
+        for _nm, _g in segs.items():
+            if _nm == pref or _nm.startswith(pref + "_"):
+                for _n in _g.get("nodes", []):
+                    if isinstance(_n, dict) and _n.get("type") in ("_call_site", "call") \
+                            and str(_n.get("offset", "")).lstrip("-").isdigit():
+                        modeled.add(int(_n["offset"]))
+        callers = {}
+        for x in ins:
+            if x.opcode == 0x29:
+                t = by_pc.get(x.branch_target())
+                if t is not None:
+                    callers.setdefault(t.byte_offset, []).append(x.byte_offset - 1)
+        starts = sorted(x.byte_offset for x in ins if x.opcode == 0x48)
+
+        def routine_ok(off):
+            # every call into the routine holding `off` is modeled
+            k2 = _b.bisect_right(starts, off) - 1
+            if k2 < 0:
+                return False
+            cs = callers.get(starts[k2])
+            if __import__("os").environ.get("DBG_CUT") and cs and starts[k2] == int(__import__("os").environ["DBG_CUT"]):
+                print("CUTDBG", starts[k2], cs, [c in modeled for c in cs], file=sys.stderr)
+            return bool(cs) and all(c in modeled for c in cs)
+        _todo = [n for n in list(segs) if n == pref or n.startswith(pref + "_")]
+        while _todo:
+            nm = _todo.pop(0)
+            nl = segs[nm].get("nodes") or []
+            prev = None
+            for ii, n in enumerate(nl):
+                o = n.get("offset") if isinstance(n, dict) else None
+                if o is None or not str(o).lstrip("-").isdigit() \
+                        or n.get("type") in ("call", "_call_site", "gate", "choice"):
+                    continue
+                o = int(o)
+                if prev is not None and o > prev:
+                    k = _b.bisect_right(offs, prev)
+                    hit = False
+                    while k < len(ins) and ins[k].byte_offset < o:
+                        y = ins[k]
+                        if y.opcode == 0x22 and k + 1 < len(ins) and ins[k + 1].opcode == 0x43:
+                            hit = True
+                            break
+                        if y.opcode in (0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e,
+                                        0x5c, 0x33, 0x42):
+                            break
+                        k += 1
+                    if hit and routine_ok(prev):
+                        rest = nm + "_rr"
+                        while rest in segs:
+                            rest += "r"
+                        segs[rest] = {kk: vv for kk, vv in segs[nm].items() if kk != "nodes"}
+                        segs[rest]["nodes"] = nl[ii:]
+                        segs[nm]["nodes"] = nl[:ii] + [{"type": "return",
+                                                         "source": "routine_return"}]
+                        cut += 1
+                        _todo.append(rest)
+                        break
+                prev = o
+    return cut
+
+
+_RAND_VAR = [3800]
+
+
+def _structure_routine(ins, by_pc, k0, by_off, _cp, if_at=None, choice_by_labels=None,
+                       smap=None, escape=False):
+    """Structured decompile of one routine (0x48 at k0) into nested nodes:
+    straight lines (decoded nodes by offset), call-site markers, var writes and
+    if/else blocks on variables (direct reads or routine locals loaded from a
+    variable). Returns (nodes, end_kind) or None when anything else appears.
+    Gate nodes carry inline `then` / `else` lists (materialized later)."""
+    OPS = {0x0a: "eq", 0x0b: "ne", 0x0c: "gt", 0x0d: "gte", 0x0e: "lt", 0x0f: "lte"}
+
+    def const(y):
+        if y.opcode == 0x1a:
+            return y.operand - 0x10000 if y.operand >= 0x8000 else y.operand
+        if y.opcode in (0x5a, 0x5b):
+            return y.opcode - 0x5a
+        return None
+    # routine end
+    kend = next((q for q in range(k0 + 2, len(ins) - 1)
+                 if ins[q].opcode == 0x22 and ins[q + 1].opcode == 0x43
+                 and (q + 2 >= len(ins) or ins[q + 2].opcode == 0x48)), None)
+    if kend is None:
+        return None
+    alias = {}
+    _rand_var = _RAND_VAR
+
+    def cond_at(k):
+        conds, q = [], k
+        _or = False
+        while q < kend:
+            y = ins[q]
+            if y.opcode == 0x1a and q + 2 < kend and ins[q + 1].opcode == 0x1f \
+                    and (ins[q + 1].operand or 0) == 0x2d01 and ins[q + 2].opcode == 0x21:
+                var, j = y.operand, q + 3
+            elif 0x5f <= y.opcode <= 0x62 and ins[q + 1].opcode == 0x3f \
+                    and (y.opcode - 0x5f) in alias:
+                var, j = alias[y.opcode - 0x5f], q + 2
+            elif y.opcode == 0x41 and y.operand in alias:
+                var, j = alias[y.operand], q + 1
+            else:
+                return None
+            if j + 1 >= kend or const(ins[j]) is None or ins[j + 1].opcode not in OPS:
+                return None
+            conds.append((var, OPS[ins[j + 1].opcode], const(ins[j])))
+            q = j + 2
+            while q < kend and ins[q].opcode in (0x2c, 0x2d, 0x12, 0x11):
+                if ins[q].opcode in (0x12, 0x11) and len(conds) < 2:
+                    return None
+                if ins[q].opcode == 0x11 or ins[q].opcode == 0x2c:
+                    _or = True
+                q += 1
+            if q < kend and ins[q].opcode == 0x2b:
+                if ins[q - 1].opcode not in (0x12, 0x11) and len(conds) > 1 \
+                        and ins[q - 1].opcode in OPS:
+                    return None
+                if _or and any(ins[qq].opcode == 0x12 for qq in range(k, q)):
+                    return None                 # mixed AND/OR: not modelled
+                return (("or",) + tuple(conds) if _or else conds), q
+        return None
+
+    def block(a, b):
+        r = _block(a, b)
+        if r is None and b == kend and escape:
+            # unsupported content running to the routine's end: continue in
+            # the decoded segments from there (they carry it linearly)
+            r2 = _block(a, b, stop_ok=True)
+            return r2
+        return r
+
+    def _block(a, b, stop_ok=False):
+        out, k = [], a
+        _fail = lambda: (out + [{"type": "_goto_off", "offset": ins[k].byte_offset}]) \
+            if stop_ok else None
+        while k < b:
+            y = ins[k]
+            op = y.opcode
+            if 0x5f <= op <= 0x62 and k + 6 < b and const(ins[k + 1]) is not None \
+                    and ins[k + 2].opcode == 0x1f and (ins[k + 2].operand or 0) == 0x1b01 \
+                    and ins[k + 3].opcode == 0x21 and ins[k + 4].opcode == 0x3e \
+                    and ins[k + 5].opcode == 0x15:
+                # local = RANDOM(n): a synthetic variable rolled here
+                sv = _rand_var[0]
+                _rand_var[0] += 1
+                alias[op - 0x5f] = sv
+                out.append({"type": "var_random", "var": str(sv), "min": 0,
+                            "max": const(ins[k + 1]) - 1,
+                            "offset": str(ins[k + 2].byte_offset)})
+                k += 6
+                continue
+            if 0x5f <= op <= 0x62 and k + 5 < b and ins[k + 1].opcode == 0x1a \
+                    and ins[k + 2].opcode == 0x1f and (ins[k + 2].operand or 0) == 0x2d01 \
+                    and ins[k + 3].opcode == 0x21 and ins[k + 4].opcode == 0x3e \
+                    and ins[k + 5].opcode == 0x15:
+                alias[op - 0x5f] = ins[k + 1].operand
+                k += 6
+                continue
+            if op == 0x42 and k + 1 < b and ins[k + 1].opcode == 0x29:
+                out.append({"type": "_call_site", "offset": y.byte_offset})
+                k += 2
+                continue
+            c = cond_at(k) if (op == 0x1a or 0x5f <= op <= 0x62 or op == 0x41) else None
+            if c is not None:
+                conds, jq = c
+                tk = by_pc.get(ins[jq].branch_target())
+                if tk is None or tk <= jq or tk > kend:
+                    return _fail()
+                then_end, else_rng, nxt = tk, None, tk
+                if ins[tk - 1].opcode == 0x28:
+                    ek = by_pc.get(ins[tk - 1].branch_target())
+                    if ek is None or ek < tk or ek > kend:
+                        return _fail()
+                    then_end, else_rng, nxt = tk - 1, (tk, ek), ek
+                    if ek == kend:
+                        else_rng, nxt = (tk, kend), kend
+                tb = block(jq + 1, then_end)
+                eb = block(*else_rng) if else_rng else []
+                if tb is None or eb is None:
+                    return _fail()
+                g = {"type": "gate", "_conds": conds, "then": tb, "else": eb,
+                     "offset": str(ins[jq].byte_offset)}
+                out.append(g)
+                if not else_rng:
+                    k = nxt
+                    continue
+                k = nxt
+                continue
+            if op == 0x28:
+                t = by_pc.get(y.branch_target())
+                if t == kend or (t is not None and t > k and t >= b):
+                    return out
+                return _fail()
+            if op in (0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x5c, 0x33, 0x43, 0x48):
+                return _fail()
+            if op == 0x1f:
+                sel = (y.operand or 0) >> 8
+                n0 = by_off.get(str(y.byte_offset))
+                if n0 is not None:
+                    n1 = _cp.deepcopy(n0)
+                    n1.pop("when", None)
+                    out.append(n1)
+                elif sel == 0x2c and k >= 2 and ins[k - 2].opcode == 0x1a \
+                        and const(ins[k - 1]) is not None:
+                    out.append({"type": "var_set", "var": str(ins[k - 2].operand),
+                                "value": const(ins[k - 1]), "offset": str(y.byte_offset)})
+                elif sel == 0x2c and k >= 5 and ins[k - 5].opcode == 0x1a \
+                        and 0x5f <= ins[k - 4].opcode <= 0x62 and ins[k - 3].opcode == 0x3f \
+                        and alias.get(ins[k - 4].opcode - 0x5f) == ins[k - 5].operand \
+                        and const(ins[k - 2]) is not None and ins[k - 1].opcode == 0x50:
+                    out.append({"type": "var_add", "var": str(ins[k - 5].operand),
+                                "value": const(ins[k - 2]), "offset": str(y.byte_offset)})
+                elif sel == 0x01 and choice_by_labels and smap is not None:
+                    # a choice: its outcomes are the decoded choice's own
+                    _ea = _eval_yield_args(ins, k, (y.operand or 0) & 0xFF)
+                    _ot = smap.get(_ea[1] * 2 + STRING_BASE) if _ea and len(_ea) > 1 \
+                        and _ea[1] is not None else None
+                    _labs = tuple(normalize_strings([(0, x_)])[0][1]
+                                  for x_ in _ot.split("|")) if _ot else None
+                    _ch = choice_by_labels.get(_labs)
+                    if _ch is None:
+                        return _fail()
+                    out.append(_cp.deepcopy(_ch))
+                    return out
+                elif sel in _VM_SHOW or sel in (0x0f, 0x41, 0x0d, 0x2c, 0x0a, 0x04, 0x01):
+                    return _fail()
+            k += 1
+        return out
+    if if_at is not None:
+        # one if-statement starting at instruction `if_at` (aliases from the
+        # routine's straight-line prologue up to it)
+        for q in range(k0 + 2, if_at):
+            y = ins[q]
+            if 0x5f <= y.opcode <= 0x62 and q + 5 < if_at and ins[q + 1].opcode == 0x1a \
+                    and ins[q + 2].opcode == 0x1f and (ins[q + 2].operand or 0) == 0x2d01 \
+                    and ins[q + 3].opcode == 0x21 and ins[q + 4].opcode == 0x3e:
+                alias[y.opcode - 0x5f] = ins[q + 1].operand
+        c = cond_at(if_at)
+        if c is None:
+            return None
+        conds, jq = c
+        tk = by_pc.get(ins[jq].branch_target())
+        if tk is None or tk <= jq or tk > kend:
+            return None
+        then_end, else_rng, nxt = tk, None, tk
+        if ins[tk - 1].opcode == 0x28:
+            ek = by_pc.get(ins[tk - 1].branch_target())
+            if ek is None or ek < tk or ek > kend:
+                return None
+            then_end, else_rng, nxt = tk - 1, (tk, ek), ek
+        tb = block(jq + 1, then_end)
+        eb = block(*else_rng) if else_rng else []
+        if tb is None or eb is None:
+            return None
+        tail = block(nxt, kend) if nxt < kend else []
+        return ({"type": "gate", "_conds": conds, "then": tb, "else": eb,
+                 "offset": str(ins[jq].byte_offset)}, nxt, tail)
+    body = block(k0 + 2, kend)
+    return body
+
+
+def _make_goto_seg(segs, pref):
+    """offset -> a segment starting at the first decoded node at/after it
+    (splitting the holder when that node is mid-segment)."""
+    def goto(off):
+        best = None
+        for nm, g in segs.items():
+            if not (nm == pref or nm.startswith(pref + "_")):
+                continue
+            for ii, n in enumerate(g.get("nodes") or []):
+                o = n.get("offset") if isinstance(n, dict) else None
+                if o is None or not str(o).lstrip("-").isdigit() or n.get("type") in (
+                        "call", "_call_site", "return", "gate"):
+                    continue
+                o = int(o)
+                if o >= off and (best is None or o < best[0]):
+                    best = (o, nm, ii)
+        if best is None or best[0] - off > 400:
+            return None
+        _o, nm, ii = best
+        if ii == 0:
+            return nm
+        new = nm + "_go%d" % off
+        if new not in segs:
+            tn = segs[nm]["nodes"]
+            segs[new] = {k: v for k, v in segs[nm].items() if k != "nodes"}
+            segs[new]["nodes"] = tn[ii:]
+            segs[nm]["nodes"] = tn[:ii] + [{"type": "next", "next": new}]
+        return new
+    return goto
+
+
+def _materialize(segs, base, nodes, cont, counter, goto_seg=None):
+    """Nested nodes (gates with inline then/else lists) -> segments. Returns
+    the entry segment name; each path ends at `cont` (or `return`)."""
+    for i, n in enumerate(nodes):
+        if isinstance(n, dict) and n.get("type") == "gate" and "_conds" in n:
+            rest = nodes[i + 1:]
+            rest_nm = _materialize(segs, base, rest, cont, counter, goto_seg) if rest else cont
+            then_nm = _materialize(segs, base, n["then"], rest_nm, counter, goto_seg)
+            else_nm = _materialize(segs, base, n["else"], rest_nm, counter, goto_seg) \
+                if n["else"] else rest_nm
+            if else_nm is None:
+                counter[0] += 1
+                else_nm = "%s_%d" % (base, counter[0])
+                segs[else_nm] = {"nodes": [{"type": "return"}]}
+            conds = n["_conds"]
+            if conds and conds[0] == "or":
+                # any condition true -> then
+                nxt_e = else_nm
+                for var, op, c in reversed(conds[1:]):
+                    counter[0] += 1
+                    gnm = "%s_%d" % (base, counter[0])
+                    g = {"type": "gate", "var": str(var), "equals": str(c),
+                         "then": then_nm, "else": nxt_e, "offset": n["offset"]}
+                    if op != "eq":
+                        g["op"] = op
+                    segs[gnm] = {"nodes": [g]}
+                    nxt_e = gnm
+                counter[0] += 1
+                nm = "%s_%d" % (base, counter[0])
+                segs[nm] = {"nodes": nodes[:i] + [{"type": "next", "next": nxt_e}]}
+                return nm
+            nxt_then = then_nm
+            for var, op, c in reversed(conds[1:]):
+                counter[0] += 1
+                gnm = "%s_%d" % (base, counter[0])
+                g = {"type": "gate", "var": str(var), "equals": str(c),
+                     "then": nxt_then, "else": else_nm, "offset": n["offset"]}
+                if op != "eq":
+                    g["op"] = op
+                segs[gnm] = {"nodes": [g]}
+                nxt_then = gnm
+            var, op, c = conds[0]
+            g = {"type": "gate", "var": str(var), "equals": str(c),
+                 "then": nxt_then, "else": else_nm, "offset": n["offset"]}
+            if op != "eq":
+                g["op"] = op
+            counter[0] += 1
+            nm = "%s_%d" % (base, counter[0])
+            segs[nm] = {"nodes": nodes[:i] + [g]}
+            return nm
+    if nodes and isinstance(nodes[-1], dict) and nodes[-1].get("type") == "_goto_off":
+        tgt = goto_seg(int(nodes[-1]["offset"])) if goto_seg else None
+        nodes = list(nodes[:-1]) + ([{"type": "next", "next": tgt}] if tgt
+                                    else [{"type": "return"}])
+    counter[0] += 1
+    nm = "%s_%d" % (base, counter[0])
+    if nodes and isinstance(nodes[-1], dict) and nodes[-1].get("type") in (
+            "choice", "goto_scene", "return", "end", "next", "dispatch"):
+        segs[nm] = {"nodes": list(nodes)}
+        return nm
+    segs[nm] = {"nodes": list(nodes) + ([{"type": "next", "next": cont}] if cont
+                                        else [{"type": "return"}])}
+    return nm
+
+
+def _vm_structure_random_sections(seg_doc, scripts):
+    """Sections the older passes could only approximate with a heuristic
+    `random` node (Making Some Dough's Help Ads: which ad shows is a 50/50 roll
+    between the two jobs of the current pairing, `var2003 == 0 or 3 -> roll ->
+    job A / job B`, ...). Where the whole routine decompiles structurally, use
+    that instead: the roll becomes a var_random the gates test, so a runtime
+    with the same random stream picks exactly what the engine picks."""
+    segs = seg_doc.get("segments") or {}
+    import copy as _cp
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+        except Exception:
+            continue
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+        smap = {o: t for o, t in find_strings(data)}
+        mine = [n for n in segs if n == pref or n.startswith(pref + "_")]
+        heads = [nm for nm in mine if any(isinstance(x, dict) and x.get("type") == "random"
+                                          for x in segs[nm].get("nodes", []))]
+        if not heads:
+            continue
+        by_off, cbl = {}, {}
+        for nm in mine:
+            for n in segs[nm].get("nodes", []):
+                if not isinstance(n, dict):
+                    continue
+                if n.get("type") == "choice":
+                    cbl.setdefault(tuple(o.get("label") for o in n.get("options", [])), n)
+                elif n.get("offset") is not None and n.get("type") not in (
+                        "gate", "minigame", "call", "return", "_call_site"):
+                    by_off.setdefault(str(n["offset"]), n)
+        starts = [k for k, x in enumerate(ins) if x.opcode == 0x48]
+        for nm in heads:
+            offs = [int(x["offset"]) for x in segs[nm].get("nodes", [])
+                    if isinstance(x, dict) and str(x.get("offset", "")).lstrip("-").isdigit()]
+            if not offs:
+                continue
+            k0 = max((k for k in starts if ins[k].byte_offset < min(offs)), default=None)
+            if k0 is None:
+                continue
+            try:
+                body = _structure_routine(ins, by_pc, k0, by_off, _cp,
+                                          choice_by_labels=cbl, smap=smap)
+            except Exception:
+                body = None
+            if not body:
+                continue
+            ent = _materialize(segs, nm + "_st", body, None, [0], _make_goto_seg(segs, pref))
+            segs[nm]["nodes"] = [{"type": "next", "next": ent,
+                                  "source": "structured_section"}]
+
+
+def _vm_region_structure(seg_doc, scripts):
+    """IF-STATEMENTS WHOSE ARMS CALL ROUTINES. `if var2007 == 0 { if var2008
+    == 1 { "...leaves the nerds"; call nerds } elif ... } else ...` (The
+    Fashionista's after-school clique pick): the line-based segmentation kept
+    the arms' lines as inline gates but left their calls outside, unguarded.
+    Decompile the whole if-statement structurally and splice it in place of
+    the lines it covers."""
+    segs = seg_doc.get("segments") or {}
+    import copy as _cp
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+        except Exception:
+            continue
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+        by_off = {}
+
+        def _idx(ns):
+            for _n in ns:
+                if not isinstance(_n, dict):
+                    continue
+                if _n.get("offset") is not None \
+                        and _n.get("type") not in ("gate", "choice", "minigame",
+                                                   "call", "return", "_call_site"):
+                    by_off.setdefault(str(_n["offset"]), _n)
+                if isinstance(_n.get("then"), list):
+                    _idx(_n["then"])
+        for _nm, _g in segs.items():
+            if _nm == pref or _nm.startswith(pref + "_"):
+                _idx(_g.get("nodes", []))
+        starts = [k for k, x in enumerate(ins) if x.opcode == 0x48]
+        q = 0
+        while q < len(ins):
+            y = ins[q]
+            if y.opcode != 0x1a or q + 2 >= len(ins) or ins[q + 1].opcode != 0x1f \
+                    or (ins[q + 1].operand or 0) != 0x2d01:
+                q += 1
+                continue
+            k0 = max((k for k in starts if k < q), default=None)
+            if k0 is None:
+                q += 1
+                continue
+            try:
+                r = _structure_routine(ins, by_pc, k0, by_off, _cp, if_at=q)
+            except Exception:
+                r = None
+            if not r:
+                q += 1
+                continue
+            gate, nxt, tail = r
+
+            def has_call(nl):
+                for n in nl:
+                    if isinstance(n, dict) and n.get("type") == "_call_site":
+                        return True
+                    if isinstance(n, dict) and n.get("type") == "gate" and \
+                            (has_call(n["then"]) or has_call(n["else"])):
+                        return True
+                return False
+            if not has_call([gate]):
+                q += 1
+                continue
+            lo, hi = y.byte_offset, (ins[nxt].byte_offset if nxt < len(ins) else 1 << 30)
+            # the lines the if-statement covers (anywhere in this scene)
+            _all = set()
+
+            def _collect(ns):
+                for _n in ns:
+                    if isinstance(_n, dict):
+                        if _n.get("type") in ("dialogue", "narration") \
+                                and str(_n.get("offset", "")).lstrip("-").isdigit() \
+                                and lo <= int(_n["offset"]) < hi:
+                            _all.add(int(_n["offset"]))
+                        if isinstance(_n.get("then"), list):
+                            _collect(_n["then"])
+            for _nm, _g in segs.items():
+                if _nm == pref or _nm.startswith(pref + "_"):
+                    _collect(_g.get("nodes", []))
+            # every segment holding this if-statement's lines/calls/gates
+            done_any = False
+            for nm in [n for n in list(segs) if n == pref or n.startswith(pref + "_")]:
+                nl = segs[nm].get("nodes") or []
+                idx = [ii for ii, n in enumerate(nl) if isinstance(n, dict)
+                       and str(n.get("offset", "")).lstrip("-").isdigit()
+                       and lo <= int(n["offset"]) < hi]
+                if not idx or idx != list(range(idx[0], idx[-1] + 1)):
+                    continue
+                # only where the whole statement was flattened into this one
+                # segment (inline gates + unguarded calls); split forms are
+                # already structured by the gate machinery
+                def _flat_offs(ns, acc):
+                    for n in ns:
+                        if isinstance(n, dict):
+                            if n.get("type") in ("dialogue", "narration") and \
+                                    str(n.get("offset", "")).lstrip("-").isdigit():
+                                acc.add(int(n["offset"]))
+                            if isinstance(n.get("then"), list):
+                                _flat_offs(n["then"], acc)
+                    return acc
+                _fo = _flat_offs(nl, set())
+                if not _all or min(_all) not in _fo or not any(
+                        isinstance(n, dict) and n.get("type") == "gate"
+                        and isinstance(n.get("then"), list) for n in nl[idx[0]:idx[-1] + 1]):
+                    continue
+                a0, a1 = idx[0], idx[-1]
+                rest = nl[a1 + 1:]
+                base = "%s_if%d" % (nm, lo)
+                if base + "_r" in segs:
+                    continue
+                if not rest and tail is not None:
+                    # the routine goes on past the statement (calls, then its
+                    # return) -- nothing of it was in this segment
+                    rest = tail + [{"type": "return"}]
+                segs[base + "_r"] = {"nodes": rest or [{"type": "end"}]}
+                ent = _materialize(segs, base, [gate], base + "_r", [0])
+                segs[nm]["nodes"] = nl[:a0] + [{"type": "next", "next": ent,
+                                                "source": "structured_if"}]
+                done_any = True
+            q = nxt if done_any else q + 1
+
+
+def _vm_dispatch_routines(seg_doc, scripts):
+    """PURE DISPATCH ROUTINES. A routine that shows nothing itself but picks
+    which routine to call from a variable (New Girl's phone calls: `local0 =
+    var1605` (dates with Keith so far); `if local0 == 0: call date1; var1501 =
+    1` / `elif == 1: call date2 ...`) has no line of its own, so the linear
+    decode gave it no segment and every call into it resolved to nothing.
+    Build it as a segment: a gate chain on the variable whose arms carry
+    call-site markers (resolved by _link_subroutine_calls like any other call)
+    and the arm's variable writes, then `return`."""
+    segs = seg_doc.get("segments") or {}
+    OPS = {0x0a: None, 0x0b: "ne", 0x0c: "gt", 0x0d: "gte", 0x0e: "lt", 0x0f: "lte"}
+    made = 0
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+        except Exception:
+            continue
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+        import copy as _cp
+        by_off = {}
+
+        def _idx(ns):
+            for _n in ns:
+                if not isinstance(_n, dict):
+                    continue
+                if _n.get("offset") is not None \
+                        and _n.get("type") not in ("gate", "choice", "minigame",
+                                                   "call", "return", "_call_site"):
+                    by_off.setdefault(str(_n["offset"]), _n)
+                if isinstance(_n.get("then"), list):
+                    _idx(_n["then"])
+        for _nm, _g in segs.items():
+            if _nm == pref or _nm.startswith(pref + "_"):
+                _idx(_g.get("nodes", []))
+
+        def const(y):
+            if y.opcode == 0x1a:
+                return y.operand - 0x10000 if y.operand >= 0x8000 else y.operand
+            if y.opcode in (0x5a, 0x5b):
+                return y.opcode - 0x5a
+            return None
+
+        # routines called from call sites the graph models (markers)
+        _marked = set()
+        for _nm, _g in segs.items():
+            if _nm == pref or _nm.startswith(pref + "_"):
+                for _n in _g.get("nodes", []):
+                    if isinstance(_n, dict) and _n.get("type") == "_call_site":
+                        _marked.add(int(_n["offset"]))
+        _called_marked = set()
+        _bo = {x.byte_offset: kk for kk, x in enumerate(ins)}
+        for _co in _marked:
+            _kk = _bo.get(_co)
+            if _kk is not None and _kk + 1 < len(ins) and ins[_kk + 1].opcode == 0x29:
+                _t = by_pc.get(ins[_kk + 1].branch_target())
+                if _t is not None:
+                    _called_marked.add(ins[_t].byte_offset)
+        for k0, y0 in enumerate(ins[:-1]):
+            if not (y0.opcode == 0x48 and ins[k0 + 1].opcode == 0x4a):
+                continue
+            k = k0 + 2
+            alias = {}
+            # prologue: local slots initialised (pushes) and loaded from vars
+            while k < len(ins):
+                y = ins[k]
+                if y.opcode in (0x5a, 0x5b) or (y.opcode == 0x1b and y.operand == 0):
+                    k += 1
+                    continue
+                if 0x5f <= y.opcode <= 0x62 and k + 5 < len(ins) \
+                        and ins[k + 1].opcode == 0x1a and ins[k + 2].opcode == 0x1f \
+                        and (ins[k + 2].operand or 0) == 0x2d01 \
+                        and ins[k + 3].opcode == 0x21 and ins[k + 4].opcode == 0x3e \
+                        and ins[k + 5].opcode == 0x15:
+                    alias[y.opcode - 0x5f] = ins[k + 1].operand
+                    k += 6
+                    continue
+                break
+            arms, else_body, end_k, ok = [], None, None, True
+
+            def test_at(k):
+                y = ins[k]
+                if y.opcode == 0x1a and k + 5 < len(ins) and ins[k + 1].opcode == 0x1f \
+                        and (ins[k + 1].operand or 0) == 0x2d01 and ins[k + 2].opcode == 0x21:
+                    var, j = y.operand, k + 3
+                elif 0x5f <= y.opcode <= 0x62 and k + 1 < len(ins) \
+                        and ins[k + 1].opcode == 0x3f and (y.opcode - 0x5f) in alias:
+                    var, j = alias[y.opcode - 0x5f], k + 2
+                elif y.opcode == 0x41 and y.operand in alias:
+                    var, j = alias[y.operand], k + 1
+                else:
+                    return None
+                if j + 2 >= len(ins) or const(ins[j]) is None \
+                        or ins[j + 1].opcode not in OPS or ins[j + 2].opcode != 0x2b:
+                    return None
+                return var, const(ins[j]), OPS[ins[j + 1].opcode], j + 3, \
+                    by_pc.get(ins[j + 2].branch_target())
+
+            def body_at(k, stop):
+                # straight-line code up to `stop` (or a `28 E` just before it):
+                # calls become call-site markers, yields their decoded nodes
+                items = []
+                while k < stop:
+                    y = ins[k]
+                    if y.opcode == 0x42 and k + 1 < len(ins) and ins[k + 1].opcode == 0x29:
+                        items.append({"type": "_call_site", "offset": y.byte_offset})
+                        k += 2
+                        continue
+                    if y.opcode == 0x28:
+                        if k + 2 == stop and ins[k + 1].opcode == 0x28 \
+                                and ins[k + 1].branch_target() == y.branch_target():
+                            return items, by_pc.get(y.branch_target()), k + 2
+                        if k + 1 != stop:
+                            return None
+                        return items, by_pc.get(y.branch_target()), k + 1
+                    if y.opcode in (0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x5c, 0x33,
+                                    0x22, 0x43, 0x48):
+                        return None
+                    if y.opcode == 0x1f:
+                        sel = (y.operand or 0) >> 8
+                        n0 = by_off.get(str(y.byte_offset))
+                        if n0 is not None:
+                            n1 = _cp.deepcopy(n0)
+                            n1.pop("when", None)
+                            items.append(n1)
+                        elif sel == 0x2c and k >= 2 and ins[k - 2].opcode == 0x1a \
+                                and const(ins[k - 1]) is not None:
+                            items.append({"type": "var_set", "var": str(ins[k - 2].operand),
+                                          "value": const(ins[k - 1]),
+                                          "offset": str(y.byte_offset)})
+                        elif sel == 0x2c and k >= 5 and ins[k - 5].opcode == 0x1a \
+                                and 0x5f <= ins[k - 4].opcode <= 0x62 \
+                                and ins[k - 3].opcode == 0x3f \
+                                and alias.get(ins[k - 4].opcode - 0x5f) == ins[k - 5].operand \
+                                and const(ins[k - 2]) is not None and ins[k - 1].opcode == 0x50:
+                            # var = local(var) + c  ->  var_add
+                            items.append({"type": "var_add", "var": str(ins[k - 5].operand),
+                                          "value": const(ins[k - 2]),
+                                          "offset": str(y.byte_offset)})
+                        elif sel in _VM_SHOW or sel in (0x0f, 0x41, 0x0d, 0x2c):
+                            return None       # content we cannot place
+                    k += 1
+                return items, None, k
+            while ok:
+                t = test_at(k)
+                if t is None:
+                    break
+                var, c, op, bk, nk = t
+                if nk is None:
+                    ok = False
+                    break
+                b = body_at(bk, nk)
+                if b is None or b[2] != nk or not b[0]:
+                    ok = False
+                    break
+                if b[1] is not None:
+                    if end_k is None:
+                        end_k = b[1]
+                    elif end_k != b[1]:
+                        ok = False
+                        break
+                arms.append((var, c, op, b[0], ins[bk - 1].byte_offset))
+                k = nk
+            def _try_general():
+                nonlocal made
+                if y0.byte_offset in _called_marked and ("%s_rt%d" % (pref, y0.byte_offset)) not in segs:
+                    try:
+                        _cbl = {}
+                        for _nm2, _g2 in segs.items():
+                            if _nm2 == pref or _nm2.startswith(pref + "_"):
+                                for _n2 in _g2.get("nodes", []):
+                                    if isinstance(_n2, dict) and _n2.get("type") == "choice":
+                                        _cbl.setdefault(tuple(o.get("label") for o in
+                                                              _n2.get("options", [])), _n2)
+                        body = _structure_routine(ins, by_pc, k0, by_off, _cp,
+                                                  choice_by_labels=_cbl,
+                                                  smap={o_: t_ for o_, t_ in find_strings(data)},
+                                                  escape=True)
+                    except Exception:
+                        body = None
+                    if body and any(isinstance(x, dict) and x.get("type") in ("gate", "choice")
+                                    for x in body):
+                        base = "%s_rt%d" % (pref, y0.byte_offset)
+                        ent = _materialize(segs, base + "_s", body, None, [0],
+                                           _make_goto_seg(segs, pref))
+                        segs[base] = {"nodes": [{"type": "next", "next": ent,
+                                                 "offset": str(y0.byte_offset)}]}
+                        seg_doc.setdefault("_dispatch_made", []).append(base)
+                        made += 1
+
+            if not ok or not arms:
+                _try_general()
+                continue
+            # else: calls/effects up to the common end (a return)
+            if end_k is None:
+                continue
+            b = body_at(k, end_k)
+            if b is None or b[2] != end_k:
+                _try_general()
+                continue
+            else_items = b[0]
+            # the shared end: bookkeeping up to the routine's return
+            r_k = end_k
+            while r_k < len(ins) and ins[r_k].opcode != 0x22:
+                r_k += 1
+            if r_k + 1 >= len(ins) or ins[r_k + 1].opcode != 0x43:
+                continue
+            tb = body_at(end_k, r_k)
+            if tb is None or any(x.get("type") == "_call_site" for x in tb[0]):
+                continue
+            tail_items = tb[0]
+            start = y0.byte_offset
+            base = "%s_rt%d" % (pref, start)
+            if base in segs:
+                continue
+
+            def arm_seg(nm, items):
+                nodes_ = items + _cp.deepcopy(tail_items) + [{"type": "return"}]
+                if not any(str(x.get("offset", "")).lstrip("-").isdigit() for x in nodes_):
+                    nodes_[-1]["offset"] = str(start)
+                segs[nm] = {"nodes": nodes_}
+                return nm
+            nxt = arm_seg(base + "_else", else_items)
+            for i in range(len(arms) - 1, -1, -1):
+                var, c, op, items, t_off = arms[i]
+                then_nm = arm_seg("%s_a%d" % (base, i), items)
+                g = {"type": "gate", "var": str(var), "equals": str(c),
+                     "then": then_nm, "else": nxt,
+                     "offset": str(start if i == 0 else t_off)}
+                if op:
+                    g["op"] = op
+                gnm = base if i == 0 else "%s_g%d" % (base, i)
+                segs[gnm] = {"nodes": [g]}
+                nxt = gnm
+            seg_doc.setdefault("_dispatch_made", []).append(base)
+            made += 1
+    return made
+
+
+def _drop_uncalled_dispatch(seg_doc):
+    """Synthesized dispatch routines nothing calls (e.g. the host loop's own
+    slot routine, already modelled by the schedule hub) are dropped."""
+    segs = seg_doc.get("segments") or {}
+    made = seg_doc.pop("_dispatch_made", None) or []
+    for base in made:
+        fam = [nm for nm in segs if nm == base or nm.startswith(base + "_")]
+        txt = json.dumps([g for nm, g in segs.items() if nm not in fam])
+        txt += json.dumps(seg_doc.get("scene_entries") or {})
+        if '"%s"' % base not in txt and '"%s.json"' % base not in txt:
+            for nm in fam:
+                segs.pop(nm, None)
+
+
+def _link_subroutine_calls(seg_doc, scripts):
+    """Add CALL edges the story graph is missing.
+
+    Per the reference VM, `0x42 PUSH_RET ; 0x29 JMPABS <target>` is a subroutine
+    call: 0x42 pushes the return address and the callee's `0x22 POPFRAME ; 0x43 RET`
+    resumes right after the jump. A section reached ONLY by calls (e.g. Making Some
+    Dough's shared "Ah, the folly of youth!" failure section, called from four
+    day-tasks) had no incoming edge, so a runtime walking the graph could never
+    play it. For each call whose callee is otherwise unreachable this inserts
+    `{"type": "call", "segment": <callee>}` at the call site and ends the callee's
+    last segment with `{"type": "return"}` (control returns to the caller rather
+    than falling into the next section). Purely bytecode-derived; callees the graph
+    already reaches are left untouched.
+    """
+    segs = seg_doc.get("segments") or {}
+    if not segs:
+        return 0
+
+    def links(n):
+        out = []
+        if not isinstance(n, dict):
+            return out
+        for k in ("next", "then", "else", "after", "on_timeout", "win", "lose",
+                  "default", "exhausted", "file", "segment"):
+            v = n.get(k)
+            if isinstance(v, str):
+                out.append(v.replace(".json", ""))
+            elif isinstance(v, (list, dict)):
+                for x in (v if isinstance(v, list) else [v]):
+                    out += links(x)
+        for o in n.get("options", []) or []:
+            if isinstance(o, dict):
+                for k in ("next", "scene", "fight"):
+                    if isinstance(o.get(k), str):
+                        out.append(o[k].replace(".json", ""))
+        for a in n.get("arms", []) or []:
+            if isinstance(a, dict) and isinstance(a.get("scene"), str):
+                out.append(a["scene"].replace(".json", ""))
+        return out
+
+    incoming = set()
+    for g in segs.values():
+        for n in g.get("nodes", []):
+            incoming.update(links(n))
+    incoming.update(str(v).replace(".json", "") for v in (seg_doc.get("scene_entries") or {}).values())
+
+    added = 0
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        try:
+            ins = _kiwi_program(data).instructions
+        except _KiwiFormatError:
+            continue
+        by_pc = {x.pc: k for k, x in enumerate(ins)}
+        pref = "s%d" % sidx
+        _mine = [s for s in segs if s == pref or s.startswith(pref + "_")]
+
+        def _ioff(n):
+            o = n.get("offset") if isinstance(n, dict) else None
+            return int(o) if o is not None and str(o).lstrip("-").isdigit() else None
+
+        _arm_targets = set()
+        for _xi, _x in enumerate(ins):
+            if _x.opcode in (0x28, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e):
+                _t = _x.branch_target()
+                if _t in by_pc:
+                    _arm_targets.add(ins[by_pc[_t]].byte_offset)
+            elif _x.opcode == 0x5c and _x.operand is not None:
+                _t = _x.pc + (_x.operand >> 8)
+                if _t in by_pc:
+                    _arm_targets.add(ins[by_pc[_t]].byte_offset)
+        rng = {}
+        for nm, g in segs.items():
+            if not (nm == pref or nm.startswith(pref + "_")):
+                continue
+            o = [int(x["offset"]) for x in g.get("nodes", [])
+                 if isinstance(x, dict) and str(x.get("offset", "")).lstrip("-").isdigit()]
+            if o:
+                rng[nm] = (min(o), max(o))
+
+        _DISPLAY_SEL = (0x00, 0x01, 0x04, 0x08, 0x0a, 0x0d, 0x0f, 0x41, 0x47, 0x58)
+
+        def _helper_effects(call_k, tpc_):
+            """Evaluate a small utility routine with the call's constant arguments
+            (reference VM frame layout: after PUSH_RET and the callee's
+            `0x48 ; 0x4a`, argument i of n sits at fp-(n+2-i)). Returns a list of
+            var_add / var_set nodes, [] for a routine with no visible effect, or
+            None when it displays anything or does something not modelled."""
+            args = []
+            q = call_k - 1
+            while q >= 0 and ins[q].opcode in (0x1a, 0x5a, 0x5b) and len(args) < 8:
+                v = ins[q].operand if ins[q].opcode == 0x1a else ins[q].opcode - 0x5a
+                args.insert(0, v - 0x10000 if v >= 0x8000 else v)
+                q -= 1
+            k0 = by_pc[tpc_]
+            if not (ins[k0].opcode == 0x48 and ins[k0 + 1].opcode == 0x4a):
+                return None
+            st, loc, res, eff = [], {}, None, []
+            n_a = len(args)
+
+            def arg(off):              # frame-relative word: <0 argument, >=0 local
+                if off >= 0:
+                    return loc.get(off, 0)
+                idx = n_a + (off + 2)          # fp-2 is the return addr, fp-1 old fp
+                return args[idx] if 0 <= idx < n_a else None
+
+            for y in ins[k0 + 2:k0 + 80]:
+                op = y.opcode
+                if op in (0x5a, 0x5b):
+                    st.append(op - 0x5a)
+                elif op == 0x1a:
+                    st.append(y.operand - 0x10000 if y.operand >= 0x8000 else y.operand)
+                elif 0x5f <= op <= 0x62:
+                    st.append(("addr", op - 0x5f))
+                elif op == 0x41:
+                    v = arg(y.operand - 0x10000 if y.operand >= 0x8000 else y.operand)
+                    if v is None:
+                        return None
+                    st.append(v)
+                elif op == 0x3f:
+                    if not st or not isinstance(st[-1], tuple):
+                        return None
+                    st.append(loc.get(st.pop()[1], 0))
+                elif op == 0x3e:
+                    if len(st) < 2 or not isinstance(st[-2], tuple):
+                        return None
+                    val = st.pop()
+                    addr = st.pop()
+                    loc[addr[1]] = val
+                    st.append(val)
+                elif 0x15 <= op <= 0x18:
+                    del st[-(op - 0x14):]
+                elif op in (0x50, 0x51):
+                    if len(st) < 2:
+                        return None
+                    r, l = st.pop(), st.pop()
+                    if isinstance(l, tuple) and l[0] == "var" and isinstance(r, int):
+                        st.append(("var", l[1], l[2] + (r if op == 0x50 else -r)))
+                    elif isinstance(l, int) and isinstance(r, int):
+                        st.append(l + r if op == 0x50 else l - r)
+                    else:
+                        return None
+                elif op == 0x21:
+                    if res is None:
+                        return None
+                    st.append(res)
+                    res = None
+                elif op == 0x1f:
+                    sel, argc = y.operand >> 8, y.operand & 0xFF
+                    if sel in _DISPLAY_SEL or len(st) < argc:
+                        return None
+                    a_ = st[len(st) - argc:] if argc else []
+                    if sel == 0x2d and argc == 1 and isinstance(a_[0], int):
+                        res = ("var", a_[0], 0)
+                    elif sel == 0x2c and argc == 2 and isinstance(a_[0], int):
+                        v = a_[1]
+                        if isinstance(v, tuple) and v[0] == "var" and v[1] == a_[0]:
+                            if v[2]:
+                                eff.append({"type": "var_add", "var": str(a_[0]),
+                                            "value": v[2]})
+                        elif isinstance(v, int):
+                            eff.append({"type": "var_set", "var": str(a_[0]), "value": v})
+                        else:
+                            return None
+                        res = None
+                    else:
+                        return None
+                    del st[len(st) - argc:]
+                elif op == 0x22:
+                    continue
+                elif op == 0x43:
+                    return eff
+                else:
+                    return None
+            return None
+
+        def _straight(tpc_, lo_off):
+            for _y in ins[by_pc[tpc_]:]:
+                if _y.byte_offset >= lo_off:
+                    return True
+                if _y.opcode in (0x43, 0x33, 0x28, 0x2b, 0x29):
+                    return False
+            return False
+
+        _depth = [0]
+
+        def _copy_routine(tpc_):
+            """A COPY of a called routine's content for a call from a choice
+            outcome, when the linear layout gave the routine no segment of its own.
+            Copies the segment holding the routine's first line from that line on
+            (reached straight-line from the entry), cut at the routine's own RET
+            (then ending in `return`); internal gates/choices keep their links.
+            Purely additive: nothing existing is re-cut or re-linked."""
+            import copy as _cp
+            k0 = by_pc[tpc_]
+            lo = ins[k0].byte_offset
+            end = next((y.byte_offset for y in ins[k0:] if y.opcode in (0x43, 0x33)), None)
+            best = None
+            for nm in rng:
+                for ii, n in enumerate(segs[nm].get("nodes", [])):
+                    o = n.get("offset") if isinstance(n, dict) else None
+                    if o is not None and str(o).lstrip("-").isdigit() and int(o) >= lo \
+                            and (end is None or int(o) < end) \
+                            and n.get("type") not in ("_call_site", "call", "return"):
+                        if best is None or int(o) < best[0]:
+                            best = (int(o), nm, ii)
+            if best is None or not _straight(tpc_, best[0]):
+                return None
+            o0, nm, ii = best
+            if ii == 0:
+                return nm                            # already a segment start
+            src_nodes = segs[nm]["nodes"][ii:]
+            nodes_ = []
+            cut = False
+            for n in src_nodes:
+                o = n.get("offset") if isinstance(n, dict) else None
+                if end is not None and o is not None and str(o).lstrip("-").isdigit() \
+                        and int(o) >= end:
+                    cut = True
+                    break
+                if isinstance(n, dict) and n.get("type") == "_call_site":
+                    continue
+                nodes_.append(_cp.deepcopy(n))
+            if not nodes_:
+                return None
+            last = nodes_[-1]
+            terminal = isinstance(last, dict) and last.get("type") in (
+                "next", "choice", "goto_scene", "end", "return", "dispatch")
+            if cut or not terminal:
+                # calls the routine makes after its last line, before its RET
+                # (Swim: the cave routine ends by calling the next section)
+                _lo2 = max((int(x["offset"]) for x in nodes_ if isinstance(x, dict)
+                            and str(x.get("offset", "")).lstrip("-").isdigit()), default=lo)
+                for _kk in range(k0, len(ins) - 1):
+                    _yy = ins[_kk]
+                    if end is not None and _yy.byte_offset >= end:
+                        break
+                    if _yy.byte_offset > _lo2 and _yy.opcode == 0x42 \
+                            and ins[_kk + 1].opcode == 0x29:
+                        _t2 = by_pc.get(ins[_kk + 1].branch_target())
+                        _cs = seg_starting(ins[_t2].byte_offset) if _t2 is not None else None
+                        if not _cs and _t2 is not None and _depth[0] < 4:
+                            _depth[0] += 1
+                            try:
+                                _cs = _copy_routine(ins[_kk + 1].branch_target())
+                            finally:
+                                _depth[0] -= 1
+                        if _cs:
+                            nodes_.append({"type": "call", "segment": _cs,
+                                           "offset": str(_yy.byte_offset)})
+                nodes_.append({"type": "return"})
+            name = "%s_rt%d" % (pref, lo)
+            if name not in segs:
+                segs[name] = {"nodes": nodes_}
+                rng[name] = (lo, o0)
+            return name
+
+        def seg_starting(off):
+            best = None
+            for nm, (lo, hi) in rng.items():
+                if 0 <= lo - off <= 64 and (best is None or lo < rng[best][0]):
+                    best = nm
+            return best
+
+        # the segment holding the LAST line at/before a call site -- the line the
+        # engine executed just before calling (segments' offset ranges interleave,
+        # so a first-offset lookup would attribute calls to the wrong segment)
+        _node_offs = sorted((int(n["offset"]), nm)
+                            for nm, g in segs.items() if nm in rng
+                            for n in g.get("nodes", [])
+                            if isinstance(n, dict) and n.get("offset") is not None
+                            and str(n.get("offset")).lstrip("-").isdigit())
+
+        def seg_containing(off):
+            import bisect
+            k2 = bisect.bisect_right(_node_offs, (off, "\uffff")) - 1
+            return _node_offs[k2][1] if k2 >= 0 else None
+
+        for k, x in enumerate(ins[:-1]):
+            if x.opcode != 0x42 or ins[k + 1].opcode != 0x29:
+                continue
+            tpc = ins[k + 1].branch_target()
+            if tpc not in by_pc:
+                continue
+            t_off = ins[by_pc[tpc]].byte_offset
+            # A parameterized utility routine that never displays anything (e.g.
+            # New Girl's `var[arg0] += arg1` helper) is not story content: never map
+            # it onto a segment (its body often sits right before a scene's first
+            # lines). Where it only touches variables, apply its effect at the call
+            # site as var_add / var_set nodes evaluated with the call's arguments.
+            _hx = _helper_effects(k, tpc)
+            if _hx is not None:
+                _marked = [(nm, ii) for nm in rng
+                           for ii, n in enumerate(segs[nm].get("nodes", []))
+                           if isinstance(n, dict) and n.get("type") == "_call_site"
+                           and int(n["offset"]) == x.byte_offset]
+                for nm, ii in sorted(_marked, key=lambda t: -t[1]):
+                    segs[nm]["nodes"][ii:ii + 1] = [dict(e, offset=str(x.byte_offset))
+                                                   for e in _hx]
+                if not _marked and _hx:
+                    # an ordinary call site: apply the effect where the engine
+                    # executes it (after the caller's last node before the site)
+                    caller = seg_containing(x.byte_offset)
+                    if caller:
+                        cn = segs[caller]["nodes"]
+                        pos = 0
+                        for i2, n in enumerate(cn):
+                            if isinstance(n, dict) and str(n.get("offset", "")).lstrip("-").isdigit() \
+                                    and int(n["offset"]) < x.byte_offset:
+                                pos = i2 + 1
+                        if not any(isinstance(n, dict) and str(n.get("offset")) == str(x.byte_offset)
+                                   for n in cn):
+                            cn[pos:pos] = [dict(e, offset=str(x.byte_offset)) for e in _hx]
+                continue
+            # A routine that IS a minigame (loading screen + word grid / action
+            # round, returning the pass/fail score in B -- New Girl's cheer
+            # tryouts) is played by the minigame fork that tests its result;
+            # a call edge into whatever segment sits at its body would play
+            # the scene head's stray cards instead.
+            _mgr = _talk = False
+            for _y in ins[by_pc[tpc]:]:
+                if _y.opcode == 0x43:
+                    break
+                if _y.opcode == 0x1f and (_y.operand or 0) >> 8 in (0x60, 0x47, 0x5e):
+                    _mgr = True
+                if _y.opcode == 0x1f and (_y.operand or 0) >> 8 in (0x0d, 0x41, 0x0f, 0x01, 0x04):
+                    _talk = True
+            _mgr = _mgr and not _talk
+            if _mgr:
+                continue
+            callee = seg_starting(t_off)
+            _is_marked = any(isinstance(n, dict) and n.get("type") == "_call_site"
+                             and int(n["offset"]) == x.byte_offset
+                             for nm in rng for n in segs[nm].get("nodes", []))
+            if _is_marked and (not callee or not _straight(tpc, rng[callee][0])):
+                # an option calls a routine that has no segment of its own (the
+                # linear layout buried it mid-segment: Halloween Dance's "Howard
+                # punches Nate!"). If the routine is STRAIGHT-LINE up to its own
+                # RET, give the call a COPY of exactly those lines ending in
+                # `return` -- purely additive, nothing existing is re-cut.
+                callee = _copy_routine(tpc) or callee
+            if not callee:
+                continue
+            # The callee must actually RUN into that segment: straight-line from the
+            # call target to the segment's first line, with no RET/HALT/branch in
+            # between. A helper that returns before any story line (fight rolls,
+            # checkpoint logic -- The Wrong Side of Town) has no story content and
+            # must not be mapped onto whatever segment happens to follow it.
+            _clo = rng[callee][0]
+            _ok = True
+            for _y in ins[by_pc[tpc]:]:
+                if _y.byte_offset >= _clo:
+                    break
+                if _y.opcode in (0x43, 0x33, 0x28, 0x2b, 0x29):
+                    _ok = False
+                    break
+            if not _ok:
+                continue
+            # Call sites the choice resolver placed inside an outcome (a marker in
+            # that outcome's lines) are authoritative -- replace every copy.
+            _marked = [(nm, ii) for nm in rng
+                       for ii, n in enumerate(segs[nm].get("nodes", []))
+                       if isinstance(n, dict) and n.get("type") == "_call_site"
+                       and int(n["offset"]) == x.byte_offset]
+            if _marked:
+                for nm, ii in _marked:
+                    segs[nm]["nodes"][ii] = {"type": "call", "segment": callee,
+                                             "offset": str(x.byte_offset)}
+                added += 1
+            else:
+                caller = seg_containing(x.byte_offset)
+                if not caller or caller == callee:
+                    continue
+                # Represent the call unless the CALLING segment already links to
+                # the callee (e.g. a scene prologue's dispatch arms). A call from
+                # inside an option body -- The Fashionista's clique visits, where
+                # each option calls its scene and returns -- must appear on that
+                # option's path even though the callee is reachable otherwise too.
+                if any(callee in links(n) for n in segs[caller].get("nodes", [])):
+                    continue
+                # insert the call after the caller's last node preceding the site
+                cn = segs[caller]["nodes"]
+                pos = 0
+                _prev_off = None
+                for i, n in enumerate(cn):
+                    if isinstance(n, dict) and str(n.get("offset", "")).lstrip("-").isdigit() \
+                            and int(n["offset"]) < x.byte_offset:
+                        pos = i + 1
+                        _prev_off = int(n["offset"])
+                # Only when execution FLOWS from that node into the call: a jump or
+                # dispatch landing in between makes the call a conditional arm (a
+                # scene prologue's op5c cascade selects ONE `call day; JMP end` stub
+                # per register value -- Making Some Dough / As Time Goes By), which
+                # must not be linearized into the segment.
+                if _prev_off is not None and any(_prev_off < t <= x.byte_offset
+                                                 for t in _arm_targets):
+                    continue
+                cn.insert(pos, {"type": "call", "segment": callee,
+                                "offset": str(x.byte_offset)})
+                added += 1
+            # the callee returns at its first POPFRAME;RET: end that segment with a
+            # return instead of a fall-through into the next section
+            j = by_pc[tpc]
+            while j < len(ins) and ins[j].opcode != 0x43:
+                j += 1
+            if j < len(ins):
+                ret_off = ins[j].byte_offset
+                tail = seg_containing(ret_off)
+                if tail:
+                    tn = segs[tail]["nodes"]
+                    if tn and isinstance(tn[-1], dict) and tn[-1].get("type") == "next":
+                        nxt = str(tn[-1].get("next") or "").replace(".json", "")
+                        if nxt in rng and rng[nxt][0] > ret_off:
+                            tn[-1] = {"type": "return"}
+                    elif not (tn and isinstance(tn[-1], dict)
+                              and tn[-1].get("type") in ("return", "end", "choice",
+                                                         "goto_scene", "gate")):
+                        tn.append({"type": "return"})
+            incoming.add(callee)
+    # markers for calls into helpers with no story content resolve to nothing
+    emptied = []
+    for nm, g in segs.items():
+        if any(isinstance(n, dict) and n.get("type") == "_call_site"
+               for n in g.get("nodes", [])):
+            g["nodes"] = [n for n in g["nodes"]
+                          if not (isinstance(n, dict) and n.get("type") == "_call_site")]
+            if all(isinstance(n, dict) and n.get("type") == "next" for n in g["nodes"]):
+                emptied.append(nm)
+    # a segment that held nothing but such a marker is now a bare forwarder; if
+    # nothing references it (a pass already routed the option past it), drop it
+    if emptied:
+        refs = set()
+        for g in segs.values():
+            for n in g.get("nodes", []):
+                refs.update(links(n))
+        refs.update(str(v).replace(".json", "")
+                    for v in (seg_doc.get("scene_entries") or {}).values())
+        for nm in emptied:
+            if nm not in refs:
+                del segs[nm]
+    return added
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Decode SHS .exp / .kiw files into transcripts.")
     ap.add_argument("input", help="Path to a .exp container or a .kiw script")
@@ -12353,6 +19232,12 @@ def main(argv=None):
                     help="Label choice option-branches (markdown only)")
     ap.add_argument("--cast-from", help="Borrow the cast table from another .kiw (for continuation scenes)")
     ap.add_argument("--cast", help="Comma-separated cast list, overriding any table (e.g. 'Dinah,Taylor,Paula,Linda')")
+    ap.add_argument("--exact", action="store_true",
+                    help="emit every scene as exact lowered IR (lifted from the "
+                         "bytecode) instead of the structured story graph")
+    ap.add_argument("--no-verify", action="store_true",
+                    help="skip self-verification (playing the original against "
+                         "the re-encoded decode and lowering scenes that differ)")
     ap.add_argument("--overlay", help="Per-episode overlay JSON of observed gameplay logic "
                     "(scene carving, per-option branches, effects, gates) merged by offset")
     ap.add_argument("--story-dir", help="Also write the episode as a folder of small "
@@ -12529,7 +19414,6 @@ def main(argv=None):
     all_lines = []
     scene_controls = {}
     minigame_banks = {}
-    name_vars = {}
     choice_dispatch = {}
     chapter_heads = {}
     var_gates = {}
@@ -12597,35 +19481,8 @@ def main(argv=None):
             status_vars[str(i)] = _svars
         _sd = resolve_section_dispatch(sc)
         _casc = resolve_sep_cascade_gates(sc)
-        _rand = resolve_random_selector(sc)
-        # The academic quiz's per-section question rolls are plain 1-of-N draws
-        # (no availability guard). Resolve them too, but exclude any roll offset
-        # the ad selector already claims (the Help Ads share the 1f1b opcode but
-        # add a "which items remain" guard, and are handled as `random_selectors`).
-        _quiz = [r for r in resolve_quiz_random(sc)
-                 if not any(r["at"] == s.get("at") for s in (_rand or []))]
-        if _sd or _casc or _rand or _quiz:
+        if _sd or _casc:
             _sd = dict(_sd or {"register": None, "valid_values": [], "cases": []})
-            if _quiz:
-                # Byte-derived question pools for the quiz's random draws (History,
-                # Science, English each roll one question of a few). Consumed during
-                # segmentation to emit a `random` node per section so the engine
-                # draws a question at runtime instead of always playing a fixed one.
-                _sd["quiz_random"] = _quiz
-            if _rand:
-                # A runtime RANDOM section selector (e.g. Making Some Dough's Help
-                # Ads: a randomly-chosen not-yet-done helpee each visit, falling
-                # through to a "no more ads" body when all are done). Recorded as
-                # byte-derived metadata; consumed during segmentation to emit a
-                # `random` node whose options/exhausted resolve to segments. The
-                # decoder cannot pick one static target for a random draw.
-                _sd["random_selectors"] = _rand
-                # Byte-derived per-ad done-flag writes (var2005/2006/2007), in
-                # bytecode order. Each ad sets its flag on entry to a distinguishing
-                # value; segmentation attaches these as per-option `done_when`
-                # guards so the engine can skip an already-run ad. A flag write is a
-                # `read var200X ; push V ; ADD/const ; write` where 2005<=var<=2007.
-                _sd["ad_flag_writes"] = _scan_ad_flag_writes(sc)
             if _casc:
                 # Reference-only: the byte-derived nested SEP-cascade mapping
                 # (a secondary variable dispatch inside a top-level case body,
@@ -12706,6 +19563,21 @@ def main(argv=None):
                 section_dispatch[label] = _sd3
             _sd3["timed_choices"] = {str(k): v for k, v in _tc.items()}
         _mg = resolve_minigame_gates(sc)
+        for _cm in resolve_call_minigames(sc):
+            _mg = list(_mg or [])
+            if not any(g.get("gate") == _cm["gate"] for g in _mg):
+                _mg.append({"trigger": _cm["call"], "gate": _cm["gate"],
+                            "pass_at": _cm["pass_at"], "fail_at": _cm["fail_at"],
+                            "win_threshold": _cm["win_threshold"],
+                            "kind": "content_fork", "via": "action",
+                            "minigame_id": None, "call_wrapped": True})
+        for _ag in ([] if any(g.get("bakery") or g.get("via") == "word_bank"
+                               for g in (_mg or []))
+                    else resolve_action_gates_exact(sc)):
+            _mg = list(_mg or [])
+            if not any(g.get("gate") == _ag["gate"]
+                       or str(g.get("trigger")) == str(_ag["trigger"]) for g in _mg):
+                _mg.append(_ag)
         if _mg:
             minigame_gates[label] = _mg
         _bws = resolve_buildword_scoring(sc)
@@ -12723,8 +19595,6 @@ def main(argv=None):
             if (len(_t0) < 40 and "%" not in _t0 and "|" not in _t0
                     and not _is_system(_t0)):
                 chapter_heads[label] = (_t0, _t1)
-        for var, default in extract_name_vars(sc).items():
-            name_vars.setdefault(var, default)
         all_lines.append(Line(f"Scene {i} ({label})", "__SCENE__", None))
         all_lines.extend(lines)
 
@@ -12737,7 +19607,7 @@ def main(argv=None):
                   backgrounds=not args.no_backgrounds, episode=episode,
                   branches=args.branches, main_characters=mains,
                   scene_controls=scene_controls, overlay=overlay, genders=genders,
-                  minigame_banks=minigame_banks, name_vars=name_vars,
+                  minigame_banks=minigame_banks,
                   choice_dispatch=choice_dispatch, chapter_heads=chapter_heads,
                   var_gates=var_gates, section_dispatch=section_dispatch,
                   minigame_gates=minigame_gates, buildword_scoring=buildword_scoring,
@@ -12808,6 +19678,12 @@ def main(argv=None):
         # Preserve the pack/season identity from the metadata chunk: pack_id is the
         # pack/season this episode belongs to and episode_id its number within that
         # pack. These are otherwise discarded (only the title string was kept).
+        _vm_structure_random_sections(seg_doc, scripts)
+        _vm_region_structure(seg_doc, scripts)
+        _vm_dispatch_routines(seg_doc, scripts)
+        _vm_cut_at_returns(seg_doc, scripts)
+        _link_subroutine_calls(seg_doc, scripts)
+        _resolve_timeout_as_option(seg_doc)
         if _ep_meta:
             if _ep_meta.get("pack_id") is not None:
                 seg_doc["pack_id"] = _ep_meta["pack_id"]
@@ -12816,52 +19692,30 @@ def main(argv=None):
             _lt = [t for t in (_ep_meta.get("titles") or []) if t]
             if len(set(_lt)) > 1:
                 seg_doc["localized_titles"] = _ep_meta["titles"]
-        # Runtime text variables: tokens like $Antagonist are rebound many times
-        # (once per fight) and their combat-HUD template is shared, so they cannot
-        # be baked into the text. Emit the per-scene binding SCHEDULE -- ordered
-        # (offset, name) pairs -- so the engine substitutes the name bound most
-        # recently (by bytecode offset) before the line it is rendering. Text
-        # nodes keep the literal "$Antagonist" placeholder and their `offset`.
-        _rtv = {}
-        for _lbl, (_st, _sch) in _per_scene.items():
-            if not _sch:
-                continue
-            _snum = _label_to_scene.get(_lbl)
-            if _snum is None:
-                continue
-            _rtv[str(_snum)] = {
-                _tok: [{"offset": _o, "name": _nm}
-                       for _o, _nm in sorted(_seq)]
-                for _tok, _seq in _sch.items()}
-        if _rtv:
-            seg_doc["runtime_text_vars"] = {
-                "note": ("Placeholders like $Antagonist are true runtime variables: "
-                         "the engine reassigns them as the story executes (a new "
-                         "opponent is bound before each fight via a 1f2e rename) and "
-                         "the combat-HUD template that reads the placeholder is "
-                         "SHARED -- every fight jumps into the same template, so the "
-                         "name is never baked in. Resolve it like a variable at "
-                         "RUNTIME: keep the current value of each token and update it "
-                         "whenever execution passes a binding; render the token with "
-                         "whatever value is current when a line is shown. The schedule "
-                         "below lists each binding as (bytecode offset, name) in "
-                         "bytecode order. Bytecode order is NOT execution order, so do "
-                         "not resolve by static offset; use the schedule to know the "
-                         "possible values and to set the variable when execution "
-                         "reaches each binding's offset. Text nodes keep the literal "
-                         "$Token and their own `offset`."),
-                "scenes": _rtv,
-            }
-        # Combat scenes: replace the flat combat dump with a playable turn-loop
-        # graph (byte-derived moves / damage rule / feedback; antagonist HP is a
-        # variable seeded by name). Runs AFTER runtime_text_vars so the fight's
-        # antagonist name is available for the HP lookup. General -- only fires on
-        # scenes detect_combat() recognises; non-combat episodes are untouched.
-        try:
-            import combat_decode
-            combat_decode.integrate_combat(seg_doc, scripts)
-        except Exception as _ce:
-            print(f"[!] combat integration skipped: {_ce}", file=sys.stderr)
+        # (Turn-based fights and other computing routines are lifted from the
+        # bytecode by _vm_lowered_routines below -- no pattern recogniser.)
+        _resolve_choice_aliases(seg_doc)        # after every repair/splice pass
+        _drop_dead_forwarders(seg_doc)          # after every repair/splice pass
+        _vm_section_entries(seg_doc, scripts)
+        _drop_uncalled_dispatch(seg_doc)
+        _attach_builder_guards(seg_doc, scripts)
+        _vm_effective_gotos(seg_doc, scripts)
+        _vm_b_gates(seg_doc, scripts)
+        _vm_local_gates(seg_doc, scripts)
+        _vm_answer_gates(seg_doc, scripts)
+        _vm_return_jumps(seg_doc, scripts)
+        _vm_call_cascades(seg_doc, scripts)
+        _vm_schedule_hub(seg_doc, scripts)
+        _vm_word_game_args(seg_doc, scripts)
+        _vm_scene_setup(seg_doc, scripts)
+        import copy as _copy
+        _pre_lower = _copy.deepcopy(seg_doc)
+        seg_doc = _lower_and_finish(_pre_lower, scripts, "all" if args.exact else None)
+        if not args.no_verify and not args.exact:
+            seg_doc = _verify_decode(_pre_lower, seg_doc, scripts)
+        _drop_unreachable_segments(seg_doc)
+        _state_index(seg_doc)
+        _speaker_hints(seg_doc)
         text = json.dumps(strip_notes(restore_int_values(stringify_numbers(seg_doc))),
                           indent=2, ensure_ascii=False)
     if args.output:

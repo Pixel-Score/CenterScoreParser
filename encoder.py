@@ -99,6 +99,9 @@ class _Asm:
     def __init__(self):
         self.ins = []          # list of (opcode, operand_or_None, label_or_None)
         self.labels = {}       # name -> pc index
+        self.verbatim = set()  # instruction indexes reproduced from the original
+                               # bytecode (lowered IR yields): exempt from the
+                               # generated-code arity guard
 
     def emit(self, opcode, operand=None, target_label=None):
         self.ins.append([opcode, operand, target_label])
@@ -144,6 +147,7 @@ class _StringTable:
     def __init__(self):
         self.buf = bytearray()
         self.refs = {}         # text -> ref
+        self.base = 0          # data address of buf[0]
 
     def intern(self, text):
         if text is None:
@@ -158,7 +162,7 @@ class _StringTable:
         if pos % 2 != 0:
             self.buf.append(0)         # pad byte
             pos += 1
-        ref = pos // 2
+        ref = self.base + pos // 2
         self.buf.extend(text.encode("latin1", "replace"))
         self.buf.append(0)             # NUL terminator
         self.refs[text] = ref
@@ -177,7 +181,7 @@ class _StringTable:
         (word_grid problems/symbols) that instruction args address directly."""
         if len(self.buf) % 2 != 0:
             self.buf.append(0)
-        start_word = len(self.buf) // 2
+        start_word = self.base + len(self.buf) // 2
         for w in words:
             self.buf.append((w >> 8) & 0xFF)
             self.buf.append(w & 0xFF)
@@ -246,6 +250,52 @@ def _norm_field(node, *names, default=None):
     return default
 
 
+_VE_BIN = {"==": 0x0A, "!=": 0x0B, ">": 0x0C, ">=": 0x0D, "<": 0x0E, "<=": 0x0F,
+           "or": 0x11, "and": 0x12, "+": 0x50, "-": 0x51, "*": 0x52, "/": 0x53, "%": 0x54}
+
+
+def _emit_var_expr(asm, e):
+    """Story-level expression over variables: int | {"var": key} |
+    {"op": o, "a": e, "b": e} | {"op": "neg"|"not", "a": e}."""
+    if isinstance(e, bool):
+        e = int(e)
+    if isinstance(e, (int, str)):
+        asm.emit(PUSH, int(str(e), 0) & 0xFFFF)
+    elif "var" in e:
+        asm.emit(PUSH, int(str(e["var"]), 0) & 0xFFFF)
+        asm.emit(SYS, (S_VAR_READ << 8) | 1)
+        asm.emit(0x21)
+    elif e.get("op") == "neg":
+        _emit_var_expr(asm, e["a"])
+        asm.emit(0x24)
+    elif e.get("op") == "not":
+        _emit_var_expr(asm, e["a"])
+        asm.emit(0x13)
+    else:
+        _emit_var_expr(asm, e["a"])
+        _emit_var_expr(asm, e["b"])
+        asm.emit(_VE_BIN[e["op"]])
+
+
+def _emit_text(node, asm, st, text):
+    """Push the text reference a display yield shows: the interned text, or --
+    when the node carries `format` {pattern, args} -- the engine's formatted
+    string (yield 0: pattern + values, result = dynamic string ref)."""
+    fm = node.get("format")
+    if isinstance(fm, dict) and fm.get("pattern") is not None:
+        args = fm.get("args") or []
+        asm.emit(PUSH, st.intern(fm["pattern"]))
+        for a in args:
+            if isinstance(a, dict) and "text" in a:
+                asm.emit(PUSH, st.intern(a["text"]))
+            else:
+                _emit_var_expr(asm, a)
+        asm.emit(SYS, (0x00 << 8) | (1 + len(args)))
+        asm.emit(0x21)
+    else:
+        asm.emit(PUSH, st.intern(text))
+
+
 def _gen_node(node, asm, st, cast):
     """Emit instructions for one story node.
 
@@ -258,15 +308,26 @@ def _gen_node(node, asm, st, cast):
     if not isinstance(node, dict):
         return                              # skip stray non-node entries
     t = _TYPE_ALIASES.get(node.get("type"), node.get("type"))
+    if t == "_jump":
+        # a link to another segment inside a graph-compiled scene
+        if _GCTX is not None:
+            _g_jump(_GCTX, node.get("to"))
+        else:
+            asm.emit(HALT)
+        return
 
     if t == "narrate":
         # Narration (yield 0x41) takes 3 args: [character_id, text_ref, override].
         # The text is the SECOND arg; character 0 and override -1 mean "no speaker,
         # no expression override" (engine reads text at index 1).
-        ref = st.intern(node["text"])
-        asm.emit(PUSH0)                     # character_id (unused for narration)
-        asm.emit(PUSH, ref)                 # text ref (read at index 1)
-        asm.emit(PUSH, 0xFFFF)              # override = -1 (0x1a pushes signed16)
+        if node.get("character_id") is not None:
+            asm.emit(PUSH, _int(node["character_id"]) & 0xFFFF)
+        elif _NARRATOR[0] is not None:
+            asm.emit(PUSH, _NARRATOR[0] & 0xFFFF)   # the scene's narrator (yield 75)
+        else:
+            asm.emit(PUSH0)
+        _emit_text(node, asm, st, node["text"])   # text ref (read at index 1)
+        asm.emit(PUSH, (_int(node["expression"]) if node.get("expression") is not None else -1) & 0xFFFF)
         asm.emit(SYS, (S_NARRATION << 8) | 3)
 
     elif t == "say":
@@ -274,27 +335,44 @@ def _gen_node(node, asm, st, cast):
         ref = st.intern(node["text"])
         speaker = node.get("speaker")
         spk = _cast_index(cast, speaker)
+        if _int(node.get("via"), 0) == 15 and speaker:
+            spk = None                          # decoded from a named-speaker line (yield 15)
         if spk is None and speaker:
             # A one-off named speaker not in the cast (e.g. "Voice") uses the
             # custom-speaker op 1f 0f, which carries the name as a string:
             # push name_ref; push text_ref; push pair; 1f 0f 04.
             asm.emit(PUSH, st.intern(speaker))
-            asm.emit(PUSH, ref)
-            asm.emit(PAIR, 0xFF00)
+            _emit_text(node, asm, st, node["text"])
+            asm.emit(PUSH, _int(node.get("character_id"), 0) & 0xFFFF)
+            asm.emit(PUSH, (_int(node["expression"]) if node.get("expression") is not None else -1) & 0xFFFF)
             asm.emit(SYS, (0x0F << 8) | 4)
         else:
-            asm.emit(PUSH, ref)                 # text ref
-            if spk is None:
+            # [mode?, text, character, expression?] exactly as decoded
+            # (character_id / mode / expression), else text + cast index
+            n_args = 2
+            if node.get("mode") is not None:
+                asm.emit(PUSH, _int(node["mode"]) & 0xFFFF)
+                n_args += 1
+            _emit_text(node, asm, st, node["text"])   # text ref
+            if node.get("character_id") is not None:
+                asm.emit(PUSH, _int(node["character_id"]) & 0xFFFF)
+            elif spk is None:
                 asm.emit(PUSH0)
             else:
                 asm.emit(PUSH, spk)             # speaker (cast index)
-            asm.emit(SYS, (S_DIALOGUE << 8) | 2)
+            if node.get("expression") is not None:
+                asm.emit(PUSH, _int(node["expression"]) & 0xFFFF)
+                n_args += 1
+            asm.emit(SYS, (S_DIALOGUE << 8) | n_args)
 
     elif t == "set":
         var = int(node["var"])
-        val = int(_norm_field(node, "value", default=0))
         asm.emit(PUSH, var)
-        asm.emit(PUSH, val)
+        if node.get("expr") is not None:
+            # value computed from other variables (decoder: var_set.expr)
+            _emit_var_expr(asm, node["expr"])
+        else:
+            asm.emit(PUSH, int(_norm_field(node, "value", default=0)))
         asm.emit(SYS, (S_VAR_WRITE << 8) | 2)
 
     elif t == "add":
@@ -360,27 +438,39 @@ def _gen_node(node, asm, st, cast):
 
     elif t == "background":
         bg = _int(_norm_field(node, "asset_id", "id"), 0)
-        if node.get("style") == "custom":
-            # Packaged PNG background (asset >= ~26000) via 1f 23 04.
+        variant = _int(node.get("variant"), 0)
+        if node.get("style") == "custom" or _int(node.get("via"), 0) == 35:
+            # yield 35 [character, variant, base, expression]: background (and
+            # the panel's character / expression), as the reference engine
+            # reads it
+            asm.emit(PUSH, _int(node.get("character_id"), -1) & 0xFFFF)
+            asm.emit(PUSH, variant & 0xFFFF)
             asm.emit(PUSH, bg & 0xFFFF)
-            asm.emit(PUSH, 0xFFFF)
-            asm.emit(PAIR, 0xFFFF)
+            asm.emit(PUSH, _int(node.get("expression"), -1) & 0xFFFF)
             asm.emit(SYS, (0x23 << 8) | 4)
         else:
-            asm.emit(PUSH0)
+            # yield 11 [variant, base, -1]
+            asm.emit(PUSH, variant & 0xFFFF)
             asm.emit(PUSH, bg & 0xFFFF)
             asm.emit(PUSH, 0xFFFF)              # -1 sentinel
             asm.emit(SYS, (S_BACKGROUND << 8) | 3)
 
     elif t == "music":
         if node.get("action") == "stop" or _norm_field(node, "track_id", "id") == "stop":
-            asm.emit(PUSH0)                      # stop/fade current music (1f 51)
+            asm.emit(PUSH, _int(node.get("fade_ms"), 0) & 0xFFFF)   # fade duration (1f 51)
             asm.emit(SYS, (0x51 << 8) | 1)
         else:
             mid = _int(_norm_field(node, "track_id", "id"), 0)
             asm.emit(PUSH, mid & 0xFFFF)
-            asm.emit(PUSH0)
+            asm.emit(PUSH1 if node.get("loop") else PUSH0)     # loop flag
             asm.emit(SYS, (S_MUSIC << 8) | 2)
+
+    elif t == "set_expression":
+        # yield 5 [character, expression]: the expression the character's later
+        # lines show unless they override it
+        asm.emit(PUSH, _int(node.get("character_id"), 0) & 0xFFFF)
+        asm.emit(PUSH, _int(node.get("expression"), 0) & 0xFFFF)
+        asm.emit(SYS, (0x05 << 8) | 2)
 
     elif t == "sfx":
         sid = _int(_norm_field(node, "sfx_id", "id"), 0)
@@ -418,6 +508,14 @@ def _gen_node(node, asm, st, cast):
         # yield 91, need(1): show/hide the loading screen (arg is blocking flag).
         asm.emit(PUSH, 1 if node.get("blocking", True) else 0)
         asm.emit(SYS, (0x5B << 8) | 1)
+
+    elif t == "string_default":
+        # yield 47, need(3): [key_ref, default_ref, ~slot]; stores the default
+        # under the key when the key is unset (a $TOKEN substitution binding)
+        asm.emit(PUSH, st.intern(str(node.get("key", ""))))
+        asm.emit(PUSH, st.intern(str(node.get("default", ""))))
+        asm.emit(PUSH, _int(node.get("slot"), -1) & 0xFFFF)
+        asm.emit(SYS, (0x2F << 8) | 3)
 
     elif t == "set_string":
         # yield 46, need(2): [key_ref, value_ref]. String variable assignment.
@@ -519,7 +617,7 @@ def _gen_node(node, asm, st, cast):
                 else int(fname or 1)
         chunk = SCENE_CHUNK_BASE + (scene_num - 1)
         asm.emit(PUSH, chunk)
-        asm.emit(PUSH0)
+        asm.emit(PUSH1 if _int(node.get("flag"), 0) else PUSH0)
         asm.emit(SYS, (S_GOTO << 8) | 2)
 
     elif t == "goto_scene":
@@ -531,8 +629,9 @@ def _gen_node(node, asm, st, cast):
         sub = node.get("subtitle", "")
         asm.emit(PUSH, st.intern(text))
         asm.emit(PUSH, st.intern(sub))
-        asm.emit(PUSH, int(node.get("style", 0)) & 0xFFFF)
-        asm.emit(PUSH, int(node.get("param", 0)) & 0xFFFF)
+        # yield 8 [title, subtitle, asset, flag]
+        asm.emit(PUSH, _int(node.get("asset_id", node.get("style")), 0) & 0xFFFF)
+        asm.emit(PUSH, _int(node.get("flag", node.get("param")), 0) & 0xFFFF)
         asm.emit(SYS, (0x08 << 8) | 4)
 
     elif t == "end_card":
@@ -553,20 +652,57 @@ def _gen_node(node, asm, st, cast):
             asm.emit(SYS, (0x58 << 8) | 1)
 
     elif t == "status":
-        # On-screen status/HUD line via 1f 00. Carries a printf-style template the
-        # engine fills at runtime; optionally a value_from var supplies the %d.
+        # On-screen status/HUD line. Reference engine: yield 0 is FORMAT_STRING
+        # (args: pattern, values...), returning a dynamic-string reference; it
+        # displays nothing. The original formats and then shows the result as
+        # narration (yield 65 [character, text, expr]) or dialogue (yield 13):
+        #   push <pattern> ; push <value> ; 1f 00 ; push_res ; ... ; 1f 41
         txt = _norm_field(node, "text", default="")
-        if txt:
+        if not txt:
+            return
+        _nid = _int(node["character_id"]) if node.get("character_id") is not None \
+            else (_NARRATOR[0] if _NARRATOR[0] is not None else 0)
+        _expr = _int(node["expression"]) if node.get("expression") is not None else -1
+
+        def push_text():
+            if isinstance(node.get("format"), dict):
+                _emit_text(node, asm, st, txt)
+                return
             vf = node.get("value_from")
             if isinstance(vf, dict) and vf.get("var") is not None:
+                asm.emit(PUSH, st.intern(txt))  # pattern
+                # the %d value: var, or (minus_from - var), optionally * multiply
+                # (Making Some Dough's "Kim has %d days left." = 10 - var2001)
+                if vf.get("minus_from") is not None:
+                    asm.emit(PUSH, _int(vf["minus_from"]) & 0xFFFF)
                 asm.emit(PUSH, _int(vf["var"]))
                 asm.emit(SYS, (S_VAR_READ << 8) | 1)
-                asm.emit(0x21)                  # push_result (the value)
-                asm.emit(PUSH, st.intern(txt))
-                asm.emit(SYS, (0x00 << 8) | 2)
+                asm.emit(0x21)                  # the var's value
+                if vf.get("minus_from") is not None:
+                    asm.emit(SUB)               # minus_from - var
+                if vf.get("multiply") is not None:
+                    asm.emit(PUSH, _int(vf["multiply"]) & 0xFFFF)
+                    asm.emit(MUL)
+                asm.emit(SYS, (0x00 << 8) | 2)  # format -> dynamic string ref
+                asm.emit(0x21)                  # push the formatted ref
             else:
                 asm.emit(PUSH, st.intern(txt))
-                asm.emit(SYS, (0x00 << 8) | 1)
+        if _int(node.get("via"), 65) == 13:
+            n_args = 2
+            if node.get("mode") is not None:
+                asm.emit(PUSH, _int(node["mode"]) & 0xFFFF)
+                n_args += 1
+            push_text()
+            asm.emit(PUSH, _nid & 0xFFFF)
+            if node.get("expression") is not None:
+                asm.emit(PUSH, _expr & 0xFFFF)
+                n_args += 1
+            asm.emit(SYS, (S_DIALOGUE << 8) | n_args)
+        else:
+            asm.emit(PUSH, _nid & 0xFFFF)       # narration character (the narrator)
+            push_text()
+            asm.emit(PUSH, _expr & 0xFFFF)      # expression override
+            asm.emit(SYS, (S_NARRATION << 8) | 3)
 
     elif t == "pov_change":
         # "Now playing as X" -- set the POV character via 1f 4a by cast index.
@@ -636,6 +772,8 @@ def _flatten_covered_segments(segments, entry):
                 for o in n.get("options", []) or []:
                     if isinstance(o, dict) and isinstance(o.get("next"), str):
                         dq.append(o["next"])
+                if isinstance(n.get("on_timeout"), str):
+                    dq.append(n["on_timeout"])
             elif n.get("type") == "random_encounter":
                 for o in n.get("options", []) or []:
                     if isinstance(o, dict) and isinstance(o.get("fight"), str):
@@ -671,6 +809,8 @@ def _flatten_segment_graph(segments, entry):
                 for o in n.get("options", []) or []:
                     if isinstance(o, dict) and isinstance(o.get("next"), str):
                         out.append(o["next"])
+                if isinstance(n.get("on_timeout"), str):
+                    out.append(n["on_timeout"])
             elif n.get("type") == "random_encounter":
                 for o in n.get("options", []) or []:
                     if isinstance(o, dict) and isinstance(o.get("fight"), str):
@@ -697,6 +837,24 @@ def _flatten_segment_graph(segments, entry):
     def norm_target(name):
         return name.replace(".json", "") if isinstance(name, str) else name
 
+    def _arm_body(v, sub_stop):
+        """Body for a gate arm that may be a segment name, an inline node list, or
+        a chained gate dict (nest_gates output)."""
+        if isinstance(v, str):
+            return inline(norm_target(v), sub_stop)[0]
+        if isinstance(v, dict):
+            v = [v]
+        if isinstance(v, list):
+            return [(_inline_gate(x, sub_stop) if x.get("type") == "gate" else x)
+                    for x in v if isinstance(x, dict)]
+        return []
+
+    def _inline_gate(n, sub_stop):
+        return {"type": "gate", "var": n.get("var"), "op": n.get("op", "eq"),
+                "value": _int(n.get("equals", n.get("value", 0))),
+                "then": _arm_body(n.get("then"), sub_stop),
+                "else": _arm_body(n.get("else"), sub_stop)}
+
     def inline(seg_id, stop_at):
         """Emit seg_id's nodes as a flat list, stopping (returning the id) when we
         reach a segment in `stop_at` (a shared merge) rather than descending."""
@@ -717,12 +875,21 @@ def _flatten_segment_graph(segments, entry):
                 if nt == "next":
                     nxt = norm_target(n.get("next"))
                 elif nt == "gate":
-                    then_id = norm_target(n.get("then"))
-                    else_id = norm_target(n.get("else"))
+                    t_raw, e_raw = n.get("then"), n.get("else")
+                    if not isinstance(t_raw, str) and not isinstance(e_raw, str):
+                        # INLINE gate (nested var-gate chain): both arms carry
+                        # their nodes inline (a list, or a chained gate dict) and
+                        # the gate sits MID-segment -- the segment's following
+                        # nodes are the shared continuation, so keep reading them
+                        # rather than stopping at the gate.
+                        out.append(_inline_gate(n, stop_at))
+                        continue
+                    then_id = norm_target(t_raw) if isinstance(t_raw, str) else None
+                    else_id = norm_target(e_raw) if isinstance(e_raw, str) else None
                     merge = _find_merge(then_id, else_id, succ, refs)
                     sub_stop = stop_at | ({merge} if merge else set())
-                    then_body, _ = inline(then_id, sub_stop) if then_id else ([], None)
-                    else_body, _ = inline(else_id, sub_stop) if else_id else ([], None)
+                    then_body = _arm_body(t_raw, sub_stop)
+                    else_body = _arm_body(e_raw, sub_stop)
                     gnode = {"type": "gate", "var": n.get("var"),
                              "op": n.get("op", "eq"),
                              "value": int(n.get("equals", n.get("value", 0))),
@@ -732,17 +899,74 @@ def _flatten_segment_graph(segments, entry):
                     break
                 elif nt == "choice":
                     opt_ids = [norm_target(o.get("next")) for o in n.get("options", [])]
-                    merge = _find_merge_many(opt_ids, succ, refs)
+                    tmo_id = norm_target(n.get("on_timeout")) \
+                        if isinstance(n.get("on_timeout"), str) else None
+                    after_id = norm_target(n.get("after")) \
+                        if isinstance(n.get("after"), str) else None
+                    if not any(opt_ids) and not tmo_id and not after_id:
+                        # LINEAR choice: no option leads anywhere of its own -- every
+                        # pick continues with the segment's following nodes. Emit the
+                        # menu and keep reading instead of ending the segment here.
+                        _lin = {"type": "choice",
+                                "prompt": n.get("prompt", "Make your choice!"),
+                                "options": [{"label": o.get("label", ""), "body": []}
+                                            for o in n.get("options", [])]}
+                        for _tk in ("timeout_ms", "timer_ms", "timeout_result", "text", "menu"):
+                            if n.get(_tk) is not None:
+                                _lin[_tk] = n[_tk]
+                        out.append(_lin)
+                        continue
+                    # The decoder records each choice's convergence point in
+                    # `after`; trust it rather than re-deriving the merge from the
+                    # graph (inference can miss it, dropping the continuation).
+                    merge = after_id or _find_merge_many(
+                        opt_ids + ([tmo_id] if tmo_id else []), succ, refs)
                     sub_stop = stop_at | ({merge} if merge else set())
                     cnode = {"type": "choice",
                              "prompt": n.get("prompt", "Make your choice!"),
                              "options": []}
+                    for _tk in ("timeout_ms", "timer_ms", "timeout_result", "text", "menu"):
+                        if n.get(_tk) is not None:
+                            cnode[_tk] = n[_tk]
+                    if tmo_id:
+                        cnode["timeout_body"], _ = inline(tmo_id, sub_stop)
                     for o in n.get("options", []):
                         oid = norm_target(o.get("next"))
                         body, _ = inline(oid, sub_stop) if oid else ([], None)
                         cnode["options"].append({"label": o.get("label", ""),
                                                  "body": body})
+                    if cnode.get("timeout_body"):
+                        # The original can ALSO route the timeout through an
+                        # option's path via a `score == 1000` gate (the explicit
+                        # form). With the timeout body now in the fall-through,
+                        # that gate is unreachable inside an `answer == i` branch;
+                        # keep only its real (else) content so it doesn't linger as
+                        # dead code (and mislead re-decoding).
+                        for _o in cnode["options"]:
+                            _b = _o.get("body") or []
+                            if _b and isinstance(_b[0], dict) \
+                                    and _b[0].get("type") == "gate" \
+                                    and str(_b[0].get("var")) == "score" \
+                                    and str(_b[0].get("equals", _b[0].get("value"))) == "1000":
+                                _else = _b[0].get("else")
+                                _o["body"] = (list(_else) if isinstance(_else, list)
+                                              else []) + _b[1:]
                     out.append(cnode)
+                    nxt = merge
+                    break
+                elif nt == "minigame" and (isinstance(n.get("win"), str)
+                                           or isinstance(n.get("lose"), str)):
+                    # A minigame BRANCHES on its result (win / lose): inline both
+                    # outcomes like a gate's arms instead of treating the node as
+                    # plain content (which left everything behind it unreached).
+                    w_id = norm_target(n["win"]) if isinstance(n.get("win"), str) else None
+                    l_id = norm_target(n["lose"]) if isinstance(n.get("lose"), str) else None
+                    merge = _find_merge(w_id, l_id, succ, refs) if (w_id and l_id) else None
+                    sub_stop = stop_at | ({merge} if merge else set())
+                    m = dict(n)
+                    m["win"] = inline(w_id, sub_stop)[0] if w_id else (n.get("win") or [])
+                    m["lose"] = inline(l_id, sub_stop)[0] if l_id else (n.get("lose") or [])
+                    out.append(m)
                     nxt = merge
                     break
                 elif nt == "goto_scene":
@@ -773,9 +997,13 @@ def _flatten_segment_graph(segments, entry):
             for k in ("then", "else"):
                 if isinstance(n.get(k), list):
                     _emitted_text_ids(n[k], acc)
+                elif isinstance(n.get(k), dict):
+                    _emitted_text_ids([n[k]], acc)
             for o in n.get("options", []) or []:
                 if isinstance(o, dict) and isinstance(o.get("body"), list):
                     _emitted_text_ids(o["body"], acc)
+            if isinstance(n.get("timeout_body"), list):
+                _emitted_text_ids(n["timeout_body"], acc)
         return acc
 
     emitted_text = _emitted_text_ids(body, set())
@@ -786,7 +1014,11 @@ def _flatten_segment_graph(segments, entry):
         seg_text = {n["text"] for n in seg.get("nodes", [])
                     if isinstance(n, dict)
                     and n.get("type") in ("dialogue", "narration") and n.get("text")}
-        if not seg_text or seg_text <= emitted_text:
+        if sid in emitted and (not seg_text or seg_text <= emitted_text):
+            continue
+        if sid not in emitted and not seg_text and not any(
+                isinstance(x, dict) and x.get("type") not in ("next", "end")
+                for x in seg.get("nodes", [])):
             continue
         for n in seg.get("nodes", []):
             if isinstance(n, dict) and n.get("type") not in ("next", "_goto_seg"):
@@ -965,6 +1197,34 @@ def _gen_score_tier(node, asm, st, cast):
     asm.label(end_lbl)
 
 
+def _gen_outcome_fork(node, asm, st, cast):
+    """A minigame whose game can't be regenerated (its word bank lives in a data
+    block we don't rebuild): keep the ORIGINAL branch structure -- show the prompt,
+    then branch on the minigame result slot (score >= win_threshold -> win, else
+    lose) -- so both outcomes stay reachable instead of silently keeping only the
+    win path."""
+    prompt = node.get("prompt") or node.get("heading")
+    if prompt:
+        _gen_node({"type": "narrate", "text": prompt}, asm, st, cast)
+    thr = _int(node.get("win_threshold"), 1)
+    lose_lbl = asm.new_label("oflose")
+    end_lbl = asm.new_label("ofend")
+    asm.emit(0x5F)                              # result slot @fp0
+    asm.emit(0x3F)                              # load
+    asm.emit(PUSH, thr & 0xFFFF)
+    asm.emit(CMP_GE)
+    asm.emit(JMPF, target_label=lose_lbl)
+    for n in (node.get("win") or []):
+        if isinstance(n, dict):
+            _gen_node(n, asm, st, cast)
+    asm.emit(JMP, target_label=end_lbl)
+    asm.label(lose_lbl)
+    for n in (node.get("lose") or []):
+        if isinstance(n, dict):
+            _gen_node(n, asm, st, cast)
+    asm.label(end_lbl)
+
+
 def _gen_minigame(node, asm, st, cast):
     """Emit a pick-word minigame (yield 71 / 0x47) and its win/lose score gate.
 
@@ -993,10 +1253,7 @@ def _gen_minigame(node, asm, st, cast):
         # Only pick_word is generatable so far; other types (build_word, football,
         # word_grid, action_tap) need their own generators. Emit the prompt as a
         # narration so nothing is silently dropped, then run the win body.
-        prompt = node.get("prompt") or "(minigame)"
-        _gen_node({"type": "narrate", "text": prompt}, asm, st, cast)
-        for n in (node.get("win") or []):
-            _gen_node(n, asm, st, cast)
+        _gen_outcome_fork(node, asm, st, cast)
         return
 
     correct = node.get("correct") or []
@@ -1013,11 +1270,7 @@ def _gen_minigame(node, asm, st, cast):
         # word bank lived in a separate data block). Degrade to a prompt + win body
         # rather than fail the whole episode, so the round-trip still produces a
         # playable file.
-        prompt = node.get("prompt") or "(minigame)"
-        _gen_node({"type": "narrate", "text": prompt}, asm, st, cast)
-        for n in (node.get("win") or []):
-            if isinstance(n, dict):
-                _gen_node(n, asm, st, cast)
+        _gen_outcome_fork(node, asm, st, cast)
         return
     title = node.get("title", "Make your choice!")
     prompt = node.get("prompt", "")
@@ -1027,8 +1280,11 @@ def _gen_minigame(node, asm, st, cast):
     threshold = int(node.get("win_threshold", len(correct)))
     timing2 = int(node.get("timing2", 3000))
     spk = _cast_index(cast, node.get("speaker"))
-    portrait_mode = int(node.get("portrait_mode", 13))
-    char_id = spk if spk is not None else 1
+    portrait_mode = int(node.get("portrait_mode", 1))
+    if node.get("character_id") is not None:
+        char_id = int(node["character_id"])
+    else:
+        char_id = spk if spk is not None else 13
 
     title_ref = st.intern(title)
     prompt_ref = st.intern(prompt)
@@ -1042,7 +1298,8 @@ def _gen_minigame(node, asm, st, cast):
     asm.emit(PUSH, correct_ref)                 # args[2] correct words
     asm.emit(PUSH, decoy_ref)                   # args[3] decoy words
     asm.emit(PUSH, duration & 0xFFFF)           # args[4] duration ms
-    asm.emit(PAIR, (char_id << 8) | (portrait_mode & 0xFF))  # args[5],[6]
+    asm.emit(PUSH, char_id & 0xFFFF)            # args[5] character id
+    asm.emit(PUSH, portrait_mode & 0xFFFF)      # args[6] portrait mode
     asm.emit(PUSH, timing2 & 0xFFFF)            # args[7] timing2
     asm.emit(SYS, (0x47 << 8) | 8)              # 1f 47 08 -> word minigame
     # store the returned score into the frame slot, then gate on it
@@ -1114,11 +1371,7 @@ def _gen_build_word(node, asm, st, cast):
         # A decoded by_id build_word has its word bank in a separate block, so no
         # direct words/alphabet here. Degrade to a prompt + win body rather than
         # failing the whole episode.
-        prompt = node.get("prompt") or node.get("heading") or "(word game)"
-        _gen_node({"type": "narrate", "text": prompt}, asm, st, cast)
-        for n in (node.get("win") or []):
-            if isinstance(n, dict):
-                _gen_node(n, asm, st, cast)
+        _gen_outcome_fork(node, asm, st, cast)
         return
     width = int(node.get("width", 3))
     height = int(node.get("height", 2))
@@ -1179,6 +1432,588 @@ def _gen_build_word(node, asm, st, cast):
     asm.label(end_lbl)
 
 
+# --------------------------------------------------------------------------- #
+# Graph compiler (decoder-format specs)
+# --------------------------------------------------------------------------- #
+# A decoded episode is a GRAPH of segments. Compiling it by first folding it into
+# a nested tree loses anything a tree can't express (sections reached by in-scene
+# dispatch, shared continuations) -- those end up present but unreachable. So a
+# decoder-format scene is compiled AS a graph: every segment becomes one labeled
+# code block, emitted exactly once, and every link (next, gate arms, choice
+# options / after / on_timeout, minigame win/lose, dispatch & random arms, combat
+# fights) is a jump to that label. A target not yet emitted is placed inline at
+# its first reference -- reproducing the original layout (option bodies right
+# after their test, a timeout body in the fall-through) -- otherwise it is jumped
+# to. Cross-scene links set the section register and goto the other scene.
+
+import sys as _sys
+_sys.setrecursionlimit(max(_sys.getrecursionlimit(), 20000))
+
+_GCTX = None          # active graph context while compiling a graph scene
+
+
+def _seg_links(n):
+    """Every segment name a node links to (strings only; recurses into inline
+    gate arms)."""
+    out = []
+    if not isinstance(n, dict):
+        return out
+    t = n.get("type")
+    for k in ("next", "then", "else", "after", "on_timeout", "win", "lose",
+              "default", "exhausted"):
+        v = n.get(k)
+        if isinstance(v, str):
+            out.append(v)
+        elif isinstance(v, dict):
+            out += _seg_links(v)
+        elif isinstance(v, list):
+            for x in v:
+                out += _seg_links(x)
+    for o in n.get("options", []) or []:
+        if isinstance(o, dict):
+            for k in ("next", "scene", "fight"):
+                if isinstance(o.get(k), str):
+                    out.append(o[k])
+    for a in n.get("arms", []) or []:
+        if isinstance(a, dict) and isinstance(a.get("scene"), str):
+            out.append(a["scene"])
+    if t == "goto_scene" and isinstance(n.get("file"), str):
+        out.append(n["file"])
+    return [x.replace(".json", "") for x in out]
+
+
+class _GraphCtx:
+    def __init__(self, segments, members, scene_of, asm, st, cast):
+        self.segments, self.members, self.scene_of = segments, members, scene_of
+        self.asm, self.st, self.cast = asm, st, cast
+        self.labels, self.emitted, self.pending = {}, set(), []
+        self.routines = _ROUTINES
+        self.routines_emitted = set()
+
+    def label(self, sid):
+        if sid not in self.labels:
+            self.labels[sid] = "seg:%s:%d" % (sid, len(self.labels))
+        return self.labels[sid]
+
+
+def _g_goto_other(ctx, target, register=None):
+    """Leave this scene for the scene that owns `target`."""
+    num = ctx.scene_of.get(target) or _seg_scene_num(target)
+    if register and register.get("var") is not None:
+        ctx.asm.emit(PUSH, _int(register["var"]) & 0xFFFF)
+        ctx.asm.emit(PUSH, _int(register.get("value")) & 0xFFFF)
+        ctx.asm.emit(SYS, (S_VAR_WRITE << 8) | 2)
+    if num:
+        _emit_goto_scene_num(ctx.asm, num)
+    ctx.asm.emit(HALT)
+
+
+def _g_jump(ctx, target, allow_inline=True):
+    t = target.replace(".json", "") if isinstance(target, str) else None
+    if not t or t not in ctx.segments:
+        ctx.asm.emit(HALT)
+        return
+    if t in ctx.members:
+        if t not in ctx.emitted and allow_inline:
+            _g_emit_segment(ctx, t)
+        else:
+            if t not in ctx.emitted:
+                ctx.pending.append(t)
+            ctx.asm.emit(JMP, target_label=ctx.label(t))
+    else:
+        _g_goto_other(ctx, t)
+
+
+def _g_arm(v):
+    """A gate/minigame arm as an inline node list: a segment name becomes a
+    `_jump`; inline lists / chained gate dicts are kept (recursively)."""
+    if isinstance(v, str):
+        return [{"type": "_jump", "to": v}]
+    if isinstance(v, dict):
+        v = [v]
+    if isinstance(v, list):
+        return [_g_conv(x) for x in v if isinstance(x, dict)]
+    return []
+
+
+def _g_conv(n):
+    if n.get("type") == "gate":
+        g = dict(n)
+        g["then"], g["else"] = _g_arm(n.get("then")), _g_arm(n.get("else"))
+        return g
+    return n
+
+
+def _g_dispatch_to(ctx, pairs, default):
+    """Register A already holds the selector. `pairs` = [(match, target)]. Emit
+    the op5c cascade to local stubs (never inlined, so the 8-bit dispatch
+    distances stay in range), the default, then the stubs."""
+    asm = ctx.asm
+    stubs = []
+    for match, tgt in pairs:
+        lbl = asm.new_label("gdarm")
+        stubs.append((lbl, tgt))
+        asm.emit_dispatch(int(match) & 0xFF, lbl)
+    if isinstance(default, str):
+        _g_jump(ctx, default, allow_inline=False)
+    else:
+        asm.emit(HALT)
+    for lbl, tgt in stubs:
+        asm.label(lbl)
+        _g_jump(ctx, tgt, allow_inline=False)
+
+
+# Reserved variable tracking call depth for decoder `call` / `return` nodes
+# (outside the ranges any shipped episode uses).
+CALL_DEPTH_VAR = 3999
+
+
+
+# --------------------------------------------------------------------------- #
+# Lowered routines (decoder `routines` + IR nodes: let / yield / if / call with
+# args / ret). Frame layout matches the KiWi VM: a caller pushes the arguments
+# and PUSH_RET; the routine runs `0x48 0x4a`, reserves its locals, and returns
+# with `0x22 0x43`; locals are frame cells fp+k (k < 0: arguments).
+# --------------------------------------------------------------------------- #
+_ROUTINES = {}
+_NARRATOR = [None]      # the scene's narrator id (setup ui_defaults 75), per scene
+_IR_BIN = {"==": CMP_EQ, "!=": CMP_NE, ">": CMP_GT, ">=": CMP_GE, "<": CMP_LT,
+           "<=": CMP_LE, "or": 0x11, "and": 0x12, "+": ADD, "-": SUB, "*": MUL,
+           "/": 0x53, "%": 0x54}
+
+
+def _ir_int(v):
+    if isinstance(v, bool):
+        return int(v)
+    if isinstance(v, int):
+        return v
+    return int(str(v), 0)
+
+
+def _g_addr(asm, k):
+    k = _ir_int(k)
+    if 0 <= k <= 3:
+        asm.emit(0x5F + k)
+    else:
+        asm.emit(0x23, k & 0xFFFF)
+
+
+def _g_expr(ctx, e):
+    asm = ctx.asm
+    if isinstance(e, (int, str)) and not isinstance(e, bool) or isinstance(e, bool):
+        v = _ir_int(e)
+        if v in (0, 1):
+            asm.emit(0x5A + v)
+        else:
+            asm.emit(PUSH, v & 0xFFFF)
+        return
+    if "text" in e:
+        asm.emit(PUSH, ctx.st.intern(e["text"]))
+    elif "local" in e:
+        asm.emit(0x41, _ir_int(e["local"]) & 0xFFFF)
+    elif "addr" in e:
+        _g_addr(asm, e["addr"])
+    elif "reg" in e:
+        asm.emit(0x07 if e["reg"] == "A" else 0x08)
+    elif "deref" in e:
+        _g_expr(ctx, e["deref"])
+        asm.emit(0x3F)
+    elif "table" in e:
+        # a constant word array: laid out in the scene's data, its address pushed
+        asm.emit(PUSH, _g_table(ctx, e["table"]))
+    elif "scratch_addr" in e:
+        _g_scratch_addr(ctx, e["scratch_addr"])
+    elif "scratch" in e:
+        _g_scratch_addr(ctx, e["scratch"])
+        asm.emit(0x3F)
+    elif "mem" in e:
+        asm.emit(0x40, _ir_int(e["mem"]) & 0xFFFF)
+    elif "op" in e:
+        o = e["op"]
+        _g_expr(ctx, e["a"])
+        if o == "neg":
+            asm.emit(0x24)
+        elif o == "not":
+            asm.emit(0x13)
+        else:
+            _g_expr(ctx, e["b"])
+            asm.emit(_IR_BIN[o])
+    else:
+        raise ValueError("unsupported IR expression %r" % (e,))
+
+
+def _g_table(ctx, entries):
+    words = tuple(ctx.st.intern(x["text"]) if isinstance(x, dict) and "text" in x
+                  else _ir_int(x) & 0xFFFF for x in entries)
+    cache = ctx.asm.__dict__.setdefault("tables", {})
+    if words not in cache:
+        cache[words] = ctx.st.append_words(list(words))
+    return cache[words]
+
+
+def _g_scratch_addr(ctx, i):
+    """VM scratch cell i lives in the scene's uninitialised data words (the
+    gap after the string table); its address is bound when the table is final"""
+    asm = ctx.asm
+    if isinstance(i, int) and not isinstance(i, bool):
+        asm.scratch = max(getattr(asm, "scratch", 0), i + 1)
+        asm.emit(PUSH, ("scratch", i))
+        return
+    asm.scratch = max(getattr(asm, "scratch", 0), 1)
+    asm.emit(PUSH, ("scratch", 0))
+    _g_expr(ctx, i)
+    asm.emit(ADD)
+
+
+def _g_drop(asm, n):
+    if n <= 0:
+        return
+    if n <= 4:
+        asm.emit(0x14 + n)
+    else:
+        asm.emit(0x19, n)
+
+
+def _g_ir_node(ctx, n):
+    """IR nodes of lowered routines. Returns (handled, terminal)."""
+    asm, t = ctx.asm, n.get("type")
+    if t == "let":
+        to = n["to"]
+        if "reg" in to:
+            _g_expr(ctx, n["value"])
+            asm.emit(0x03 if to["reg"] == "A" else 0x04)
+            return True, False
+        if "local" in to:
+            _g_addr(asm, to["local"])
+        elif "scratch" in to:
+            _g_scratch_addr(ctx, to["scratch"])
+        else:
+            _g_expr(ctx, to["deref"])
+        _g_expr(ctx, n["value"])
+        asm.emit(0x3E)
+        asm.emit(0x15)
+        return True, False
+    if t == "yield":
+        args = n.get("args") or []
+        if n.get("to") is not None:
+            _g_addr(asm, n["to"])
+        for a in args:
+            _g_expr(ctx, a)
+        asm.verbatim.add(len(asm.ins))
+        asm.emit(SYS, (_ir_int(n["yield"]) << 8) | len(args))
+        if n.get("to") is not None:
+            asm.emit(0x21)
+            asm.emit(0x3E)
+            asm.emit(0x15)
+        return True, False
+    if t == "if":
+        els = n["else"]
+        if els not in ctx.emitted:
+            ctx.pending.append(els)
+        _g_expr(ctx, n["cond"])
+        asm.emit(JMPF, target_label=ctx.label(els))
+        _g_jump(ctx, n["then"])
+        return True, True
+    if t == "ret":
+        asm.emit(POP_FRAME)
+        asm.emit(RET)
+        return True, True
+    if t == "pause":
+        asm.emit(0x32)
+        return True, False
+    if t == "call" and n.get("routine"):
+        name = n["routine"]
+        r = ctx.routines.get(name)
+        if r is None:
+            return True, False
+        args = n.get("args") or []
+        for a in args:
+            _g_expr(ctx, a)
+        asm.emit(PUSH_RET)
+        if name not in ctx.routines_emitted:
+            ctx.routines_emitted.add(name)
+            ctx.pending.append(("__routine__", name))
+        asm.emit(JMP, target_label="routine:" + name)
+        _g_drop(asm, len(args))
+        if n.get("result_var") is not None:
+            asm.emit(PUSH, _ir_int(n["result_var"]) & 0xFFFF)
+            asm.emit(0x08)
+            asm.emit(SYS, (S_VAR_WRITE << 8) | 2)
+        return True, False
+    return False, False
+
+
+def _routine_frame(ctx, entry):
+    """frame cells a routine uses (the highest local / address / yield result
+    index in its IR segments, +1)"""
+    seen, work, mx = set(), [entry], -1
+
+    def w(e):
+        nonlocal mx
+        if isinstance(e, dict):
+            for k in ("local", "addr"):
+                if isinstance(e.get(k), int) and not isinstance(e.get(k), bool):
+                    mx = max(mx, e[k])
+            for v in e.values():
+                w(v)
+        elif isinstance(e, list):
+            for v in e:
+                w(v)
+    while work:
+        sid = work.pop()
+        if sid in seen or sid not in ctx.segments:
+            continue
+        seen.add(sid)
+        for n in ctx.segments[sid].get("nodes") or []:
+            if n.get("type") in ("let", "yield", "if", "call", "ret", "pause", "next", "end"):
+                w({k: v for k, v in n.items() if k in ("to", "value", "args", "cond")})
+                if n.get("type") == "yield" and isinstance(n.get("to"), int):
+                    mx = max(mx, n["to"])
+            for k in ("next", "then", "else"):
+                if isinstance(n.get(k), str):
+                    work.append(n[k])
+    return mx + 1
+
+
+def _g_emit_routine(ctx, name):
+    r = ctx.routines[name]
+    asm = ctx.asm
+    asm.label("routine:" + name)
+    asm.emit(PUSH_FP)
+    asm.emit(SET_FP)
+    for _ in range(_routine_frame(ctx, r["entry"])):
+        asm.emit(0x5A)
+    _g_jump(ctx, r["entry"], allow_inline=True)
+
+
+def _g_node(ctx, n):
+    """Emit one node of a graph scene. Returns True if control never falls
+    through past it."""
+    asm, st, cast = ctx.asm, ctx.st, ctx.cast
+    t = n.get("type")
+    _h, _term = _g_ir_node(ctx, n)
+    if _h:
+        return _term
+    if t == "call":
+        # Subroutine call: PUSH_RET pushes its own pc+1 (the jump right after it)
+        # and RET resumes one past that, exactly the original `0x42 ; 0x29` pair.
+        # The callee is its own labelled segment (never inlined).
+        tgt = n.get("segment")
+        tgt = tgt.replace(".json", "") if isinstance(tgt, str) else None
+        if tgt and tgt in ctx.members:
+            _gen_node({"type": "var_add", "var": CALL_DEPTH_VAR, "value": 1}, asm, st, cast)
+            asm.emit(PUSH_RET)
+            if tgt not in ctx.emitted and tgt not in ctx.pending:
+                ctx.pending.append(tgt)
+            asm.emit(JMP, target_label=ctx.label(tgt))
+        return False
+    if t == "return":
+        # A `return` reached with no active call ends the scene (decoder contract),
+        # so guard the RET with the call-depth counter instead of underflowing.
+        ok = asm.new_label("gret")
+        asm.emit(PUSH, CALL_DEPTH_VAR)
+        asm.emit(SYS, (S_VAR_READ << 8) | 1)
+        asm.emit(0x21)
+        asm.emit(PUSH, 0)
+        asm.emit(CMP_EQ)
+        asm.emit(JMPF, target_label=ok)
+        if isinstance(n.get("top_level_next"), str):
+            # no active call: the scene's own return, which (decoder contract)
+            # goes back to the host schedule loop at `top_level_next`
+            _g_jump(ctx, n["top_level_next"], allow_inline=False)
+        else:
+            asm.emit(HALT)
+        asm.label(ok)
+        _gen_node({"type": "var_add", "var": CALL_DEPTH_VAR, "value": -1}, asm, st, cast)
+        asm.emit(RET)
+        return True
+    if t == "next":
+        _g_jump(ctx, n.get("next"))
+        return True
+    if t == "end":
+        asm.emit(HALT)
+        return True
+    if t == "checkpoint_replay":
+        if isinstance(n.get("next"), str):
+            _g_jump(ctx, n["next"])
+            return True
+        return False
+    if t == "goto_scene":
+        f = n.get("file") if isinstance(n.get("file"), str) else None
+        f = f.replace(".json", "") if f else None
+        if f and f in ctx.members:
+            _g_jump(ctx, f)
+        elif f:
+            _g_goto_other(ctx, f, n.get("section_register"))
+        else:
+            _gen_node(n, asm, st, cast)
+            asm.emit(HALT)
+        return True
+    if t == "gate":
+        both_links = isinstance(n.get("then"), str) and isinstance(n.get("else"), str)
+        _gen_node(_g_conv(n), asm, st, cast)
+        return both_links
+    if t == "choice":
+        c = {"type": "choice", "prompt": n.get("prompt", "Make your choice!"),
+             "options": []}
+        for k in ("timeout_ms", "timer_ms", "timeout_result", "text", "menu"):
+            if n.get(k) is not None:
+                c[k] = n[k]
+        for o in n.get("options", []):
+            nx = o.get("next") if isinstance(o, dict) else None
+            c["options"].append({"label": (o or {}).get("label", ""),
+                                 "body": [{"type": "_jump", "to": nx}]
+                                 if isinstance(nx, str) else [],
+                                 **({"when": o["when"]} if isinstance(o, dict)
+                                    and o.get("when") else {})})
+        if isinstance(n.get("on_timeout"), str):
+            c["timeout_body"] = [{"type": "_jump", "to": n["on_timeout"]}]
+        _gen_node(c, asm, st, cast)
+        return False
+    if t == "minigame":
+        m = dict(n)
+        for k in ("win", "lose"):
+            if isinstance(n.get(k), str):
+                m[k] = [{"type": "_jump", "to": n[k]}]
+                if n[k].replace(".json", "") in ctx.members:
+                    ctx.pending.append(n[k].replace(".json", ""))
+        _gen_node(m, asm, st, cast)
+        return isinstance(n.get("win"), str)
+    if t == "dispatch":
+        var = _int(n.get("state_var"), 0)
+        asm.emit(PUSH, var)
+        asm.emit(SYS, (S_VAR_READ << 8) | 1)
+        asm.emit(0x21)
+        asm.emit(0x03)                          # A = register
+        _g_dispatch_to(ctx, [(_int(a.get("equals")), a.get("scene"))
+                             for a in n.get("arms", []) or []
+                             if isinstance(a, dict) and isinstance(a.get("scene"), str)],
+                       n.get("default"))
+        return True
+    if t in ("random", "random_encounter"):
+        key = "scene" if t == "random" else "fight"
+        opts = [o for o in n.get("options", []) or []
+                if isinstance(o, dict) and isinstance(o.get(key), str)]
+        if not opts:
+            _gen_node(n, asm, st, cast)
+            return False
+        if t == "random_encounter" and n.get("time_var") is not None:
+            _gen_node({"type": "var_random", "var": _int(n["time_var"]),
+                       "min": 0, "max": _int(n.get("roll_max") or n.get("time_total"))},
+                      asm, st, cast)
+        asm.emit(PUSH, len(opts))
+        asm.emit(SYS, (0x1B << 8) | 1)          # RANDOM in [0, n)
+        asm.emit(0x21)
+        asm.emit(0x03)                          # A = roll
+        _g_dispatch_to(ctx, [(i, o[key]) for i, o in enumerate(opts)],
+                       n.get("exhausted"))
+        return True
+    _gen_node(n, asm, st, cast)
+    return False
+
+
+def _g_emit_segment(ctx, sid):
+    ctx.emitted.add(sid)
+    ctx.asm.label(ctx.label(sid))
+    nodes = [n for n in ctx.segments[sid].get("nodes", []) if isinstance(n, dict)]
+    done = False
+    for i, n in enumerate(nodes):
+        done = _g_node(ctx, n)
+        if done:
+            break
+    if not done:
+        # A choice that ends the segment continues at its convergence point.
+        last = nodes[-1] if nodes else {}
+        if last.get("type") == "choice" and isinstance(last.get("after"), str):
+            _g_jump(ctx, last["after"])
+        else:
+            ctx.asm.emit(HALT)
+
+
+def _emit_graph_scene(graph, asm, st, cast):
+    """Compile one scene of a decoder-format spec as a segment graph."""
+    global _GCTX
+    segments, entry, members, scene_of = graph[:4]
+    section_entries = graph[4] if len(graph) > 4 else []
+    ctx = _GraphCtx(segments, members, scene_of, asm, st, cast)
+    prev, _GCTX = _GCTX, ctx
+    try:
+        # Section entry. Other scenes enter this one mid-way by setting a section
+        # register and going to this scene (goto_scene file=<section> with
+        # section_register); the original scene prologue reads that register and
+        # dispatches to the section. Reproduce it: read each register, dispatch
+        # value -> section, and fall through to the normal entry otherwise.
+        by_var = {}
+        for var, value, target in section_entries:
+            by_var.setdefault(var, [])
+            if (value, target) not in by_var[var]:
+                by_var[var].append((value, target))
+        if by_var:
+            start = asm.new_label("gentry")
+            for var, pairs in sorted(by_var.items()):
+                asm.emit(PUSH, var & 0xFFFF)
+                asm.emit(SYS, (S_VAR_READ << 8) | 1)
+                asm.emit(0x21)
+                asm.emit(0x03)                  # A = section register
+                stubs = []
+                for value, target in pairs:
+                    lbl = asm.new_label("gsec")
+                    stubs.append((lbl, target))
+                    asm.emit_dispatch(value & 0xFF, lbl)
+                nxt = asm.new_label("gsecn")
+                asm.emit(JMP, target_label=nxt)
+                for lbl, target in stubs:
+                    asm.label(lbl)
+                    _g_jump(ctx, target, allow_inline=False)
+                asm.label(nxt)
+            asm.label(start)
+        _g_emit_segment(ctx, entry)
+
+        def drain():
+            while ctx.pending:
+                p = ctx.pending.pop(0)
+                if isinstance(p, tuple):
+                    _g_emit_routine(ctx, p[1])
+                elif p not in ctx.emitted:
+                    _g_emit_segment(ctx, p)
+        drain()
+        # Members nothing links to (dead in the original too) keep their content.
+        for s in sorted(members):
+            if s not in ctx.emitted:
+                _g_emit_segment(ctx, s)
+                drain()
+    finally:
+        _GCTX = prev
+
+
+def _assign_scenes(segments, entries):
+    """Map segment -> scene number: BFS from each scene entry over in-scene links
+    (never through another scene's entry, never along a cross-scene goto)."""
+    entry_set = set(entries.values())
+    scene_of = {}
+    for num in sorted(entries):
+        e = entries[num]
+        if e not in segments:
+            continue
+        queue = [e]
+        while queue:
+            s = queue.pop(0)
+            if s in scene_of or s not in segments:
+                continue
+            if s in entry_set and s != e:
+                continue
+            scene_of[s] = num
+            for n in segments[s].get("nodes", []):
+                if isinstance(n, dict) and n.get("type") == "goto_scene":
+                    continue
+                queue += [x for x in _seg_links(n) if x not in scene_of]
+    for s in segments:
+        if s not in scene_of:
+            num = _seg_scene_num(s)
+            scene_of[s] = num if num in entries else min(entries)
+    return scene_of
+
+
 def _gen_gate(node, asm, st, cast):
     """if (var OP value) { then } else { else }.
 
@@ -1225,6 +2060,64 @@ def _gen_choice(node, asm, st, cast):
     prompt = node.get("prompt", "Make your choice!")
     opt_str = "|".join(o["label"] for o in options)
     lead_in = node.get("text", "")            # optional lead-in line under the title
+    # A timed choice (authored `timeout_ms`, or decoded `timed`/`timer_ms`) counts
+    # down; in the original bytecode its title slot is always "Hurry!" with the
+    # question moved to the text slot -- the marker the decoder keys on to
+    # recognise a timed choice -- so reproduce that layout.
+    timeout_ms = _int(node.get("timeout_ms") or node.get("timer_ms"), 0)
+    menu = node.get("menu") if isinstance(node.get("menu"), dict) else None
+    if menu:
+        # the decoded menu's exact arguments
+        prompt = menu.get("title") or ""
+        lead_in = menu.get("text") or ""
+        timeout_ms = _int(menu.get("timeout_ms"), -1)
+    elif timeout_ms > 0:
+        if not lead_in:
+            lead_in = prompt
+        prompt = "Hurry!"
+    if any(isinstance(o, dict) and o.get("when") for o in options):
+        # CONDITIONAL options: the engine's builder menu (yields 2/3/4), each
+        # option added only when its `when` conditions all hold -- as the
+        # original New Girl class / phone menus do. The chosen option's VALUE
+        # (its position here) comes back as the result, like a plain choice.
+        asm.emit(PUSH, st.intern(prompt))      # args[0] title
+        asm.emit(PUSH, st.intern(lead_in) if lead_in else 0xFFFF)  # args[1] text
+        if menu:
+            asm.emit(PUSH, _int(menu.get("timeout_ms"), -1) & 0xFFFF)      # args[2] timeout
+            asm.emit(PUSH, _int(menu.get("timeout_result"), -1) & 0xFFFF)  # args[3] default
+            asm.emit(PUSH, _int(menu.get("character_id"), -2) & 0xFFFF)    # args[4] character
+            asm.emit(PUSH, _int(menu.get("portrait_mode"), 1) & 0xFFFF)    # args[5] portrait
+        else:
+            asm.emit(PAIR, 0xFFFF)             # args[2]=-1 timeout, args[3]=-1
+            asm.emit(PUSH, 0xFFFE)             # args[4] character = -2 (default)
+            asm.emit(PUSH1)                    # args[5] portrait_mode = 1
+        asm.emit(SYS, (0x02 << 8) | 6)
+        for i, opt in enumerate(options):
+            skip = asm.new_label("bskip")
+            conds = opt.get("when") or []
+            for k, c in enumerate(conds):
+                asm.emit(PUSH, _int(c.get("var"), 0))
+                asm.emit(SYS, (S_VAR_READ << 8) | 1)
+                asm.emit(0x21)
+                asm.emit(PUSH, _int(c.get("value"), 0) & 0xFFFF)
+                asm.emit(_CMP[c.get("op") or "eq"])
+                if k:
+                    asm.emit(0x12)             # AND
+            if conds:
+                asm.emit(JMPF, target_label=skip)
+            asm.emit(PUSH, st.intern(opt["label"]))
+            asm.emit(PUSH, i)                  # value
+            asm.emit(PUSH1)                    # enabled
+            asm.emit(SYS, (0x03 << 8) | 3)
+            asm.label(skip)
+        asm.emit(PUSH0)                        # displayed in order
+        asm.emit(SYS, (0x04 << 8) | 1)
+    else:
+        _gen_plain_choice_call(node, asm, st, prompt, opt_str, lead_in, timeout_ms)
+    _gen_choice_routing(node, options, asm, st, cast)
+
+
+def _gen_plain_choice_call(node, asm, st, prompt, opt_str, lead_in, timeout_ms):
     title_ref = st.intern(prompt)
     opts_ref = st.intern(opt_str)
     text_ref = st.intern(lead_in) if lead_in else None
@@ -1239,16 +2132,27 @@ def _gen_choice(node, asm, st, cast):
         asm.emit(PUSH, 0xFFFF)                 # args[2] = -1 (no lead-in)
     # args[3]=timeout_ms, args[4]=timeout_result. A timed choice counts down and
     # auto-selects timeout_result when it expires. Default is no timeout (-1/-1).
-    timeout_ms = int(node.get("timeout_ms", 0))
-    if timeout_ms > 0:
-        timeout_result = int(node.get("timeout_result", 1000))
+    menu = node.get("menu") if isinstance(node.get("menu"), dict) else None
+    if menu:
+        asm.emit(PUSH, _int(menu.get("timeout_ms"), -1) & 0xFFFF)          # args[3]
+        asm.emit(PUSH, _int(menu.get("timeout_result"), -1) & 0xFFFF)      # args[4]
+        asm.emit(PUSH, _int(menu.get("character_id"), -2) & 0xFFFF)        # args[5]
+        asm.emit(PUSH, _int(menu.get("reserved"), -1) & 0xFFFF)            # args[6]
+        asm.emit(PUSH, _int(menu.get("portrait_mode"), 1) & 0xFFFF)        # args[7]
+    elif timeout_ms > 0:
+        timeout_result = _int(node.get("timeout_result"), 1000)
         asm.emit(PUSH, timeout_ms & 0xFFFF)    # args[3] timeout
         asm.emit(PUSH, timeout_result & 0xFFFF)  # args[4] result
+        asm.emit(PAIR, 0xFFFE)                 # args[5]=-2 character, args[6]=-1
+        asm.emit(PUSH1)                        # args[7] portrait_mode = 1
     else:
         asm.emit(PAIR, 0xFFFF)                 # args[3]=-1 timeout, args[4]=-1 result
-    asm.emit(PAIR, 0xFFFE)                     # args[5]=-2 character, args[6]=-1
-    asm.emit(PUSH1)                            # args[7] portrait_mode = 1
+        asm.emit(PAIR, 0xFFFE)                 # args[5]=-2 character, args[6]=-1
+        asm.emit(PUSH1)                        # args[7] portrait_mode = 1
     asm.emit(SYS, (S_CHOICE << 8) | 8)
+
+
+def _gen_choice_routing(node, options, asm, st, cast):
     # Answer routing (mirrors real episodes). 0x3e STORE pops (value, address), so
     # push the destination slot ADDRESS first, then push_result (the chosen index),
     # then STORE writes it and leaves the value; sp-- drops it. Each option then
@@ -1274,12 +2178,70 @@ def _gen_choice(node, asm, st, cast):
             _gen_node(n, asm, st, cast)
         asm.emit(JMP, target_label=end_lbl)
         asm.label(next_lbl)
+    # Timeout path: when the clock expires the result is the sentinel (1000),
+    # which matches no option index, so control falls through past the last test.
+    # A distinct timeout body lives here, exactly as in the original bytecode
+    # (Spencer's "Uh... I'll skip this for now...", Magic's frozen-with-fear beat).
+    for n in node.get("timeout_body") or []:
+        _gen_node(n, asm, st, cast)
     asm.label(end_lbl)
 
 
 # --------------------------------------------------------------------------- #
 # Scene -> .kiw chunk, and episode -> .exp container
 # --------------------------------------------------------------------------- #
+# Argument counts the reference runtime enforces for each yield (engine.py
+# dispatch: need(n) = exactly n, at_least(n) = n or more). Extracted from
+# shs-runtime's EngineState.dispatch and cross-checked against all 21,109 yields
+# in the 17 original episodes (only yield 91 differs there: the shipped game calls
+# the loading screen with 0 args, the runtime requires 1 -- we emit the 1-arg form).
+YIELD_ARITY = {
+    0: ("at_least", 1), 1: ("need", 8), 2: ("need", 6), 3: ("need", 3),
+    4: ("need", 1), 5: ("need", 2), 8: ("need", 4), 10: ("need", 2),
+    11: ("at_least", 2), 13: ("at_least", 2), 16: ("need", 1), 17: ("need", 3),
+    18: ("need", 0), 24: ("need", 2), 25: ("need", 2), 27: ("need", 1),
+    28: ("need", 1), 29: ("need", 1), 34: ("at_least", 2), 35: ("at_least", 4),
+    40: ("need", 3), 44: ("need", 2), 45: ("need", 1), 46: ("need", 2),
+    47: ("need", 3), 49: ("need", 3), 50: ("need", 4), 51: ("need", 3),
+    52: ("need", 3), 53: ("need", 2), 54: ("need", 2), 55: ("need", 1),
+    64: ("need", 2), 65: ("need", 3), 71: ("need", 8), 72: ("need", 2),
+    73: ("need", 1), 74: ("need", 1), 75: ("need", 1), 78: ("need", 3),
+    79: ("need", 1), 80: ("need", 2), 81: ("need", 1), 82: ("need", 0),
+    86: ("at_least", 3), 88: ("need", 1), 89: ("need", 0), 90: ("need", 2),
+    91: ("need", 1), 94: ("need", 22), 95: ("need", 1), 96: ("need", 20),
+    99: ("need", 1),
+}
+
+
+class EncoderVerifyError(ValueError):
+    pass
+
+
+def _verify_instructions(instrs, where="", verbatim=()):
+    """Reject bytecode the reference runtime would stop on ("Playback paused"):
+    a yield with the wrong argument count, a scene that does not open with the
+    frame prologue (PUSH_RET; PUSH_FP; SET_FP -- without it the first stack op
+    faults with "stack address -1 out of range"). (0x41 frame loads are legal:
+    lowered routines read their locals and arguments with them.)"""
+    problems = []
+    ops = [i[0] for i in instrs]
+    if ops[:3] != [PUSH_RET, PUSH_FP, SET_FP]:
+        problems.append("scene does not start with the frame prologue 42 48 4a")
+    for k, ins in enumerate(instrs):
+        op, operand = ins[0], ins[1]
+        if op == SYS and isinstance(operand, int) and k not in verbatim:
+            y, argc = operand >> 8, operand & 0xFF
+            rule = YIELD_ARITY.get(y)
+            if rule and ((rule[0] == "need" and argc != rule[1])
+                         or (rule[0] == "at_least" and argc < rule[1])):
+                problems.append("instruction %d: yield %d with %d args (runtime needs %s %d)"
+                                % (k, y, argc, "exactly" if rule[0] == "need" else "at least",
+                                   rule[1]))
+    if problems:
+        raise EncoderVerifyError("%s: %d problem(s): %s"
+                                 % (where or "scene", len(problems), "; ".join(problems[:6])))
+
+
 def _serialize_instructions(instrs):
     """(opcode, operand) list -> bytes, operand present iff opcode is 3-byte."""
     from shs_decoder import _KIWI_OPERAND_OPCODES
@@ -1304,6 +2266,7 @@ def _build_scene_chunk(scene, cast, characters=None):
     characters = characters or {}
     asm = _Asm()
     st = _StringTable()
+    cast_for_table = cast
     # Cast/name table FIRST: the decoder reads NUL-terminated names starting at
     # byte 15, up to an "Event" marker. Byte 14 is the instruction-count low byte
     # of the header, which can be printable and would otherwise glue onto the
@@ -1312,7 +2275,7 @@ def _build_scene_chunk(scene, cast, characters=None):
     # blank leading-slot form the decoder already restores (cast index 0 = the
     # player). Names are interned before any dialogue text so they sit at the
     # front of the word table where read_cast looks.
-    if cast:
+    if cast_for_table:
         st.pad_byte()                          # leading NUL: index-0 blank slot
         for i, name in enumerate(cast):
             if i == 0 and not name:
@@ -1331,37 +2294,55 @@ def _build_scene_chunk(scene, cast, characters=None):
     # The engine only shows a speaker name when the character has registered art
     # variants, so set_character_art_base is what makes BOTH the name and image
     # appear; set_character_name supplies the label.
-    for idx, name in enumerate(cast or []):
-        if idx == 0 or not name:
-            continue                       # index 0 is the blank/player slot
-        name_ref = st.intern(name)
-        asm.emit(PUSH, idx)                # char_id
-        asm.emit(PUSH, name_ref)           # name text ref
-        asm.emit(PUSH0)                    # format flag (0 = use as-is)
-        asm.emit(SYS, (S_SET_NAME << 8) | 3)
-        art = characters.get(name, {}).get("art")
-        if art is not None:
-            asm.emit(PUSH, idx)            # char_id
-            asm.emit(PUSH, int(art) & 0xFFFF)   # art base asset id
-            asm.emit(SYS, (S_SET_ART << 8) | 2)
-    # Token renames ($Antagonist -> a display name) via 1f 2e, so $tokens in the
-    # dialogue resolve. The decoder captures these in runtime_text_vars; we emit
-    # the first binding at scene start so the token has a valid value. (Renames
-    # that change mid-scene -- e.g. per combat enemy -- keep their first value;
-    # the exact per-encounter rebinding lives in the combat structure.)
-    for token, name in (scene.get("_renames") or {}).items():
-        asm.emit(PUSH, st.intern(token))
-        asm.emit(PUSH, st.intern(name))
-        asm.emit(SYS, (0x2E << 8) | 2)
+    setup = scene.get("_setup")
+    _NARRATOR[0] = _int((setup or {}).get("ui_defaults", {}).get("75")) \
+        if (setup or {}).get("ui_defaults", {}).get("75") is not None else None
+    if scene.get("_in_code"):
+        pass                               # the scene's exact code registers its cast
+    elif setup is not None:
+        # the registration the original scene performs, recorded by execution
+        # (decoder scene_setup): same ids, art bases, names and format flags
+        for c in setup.get("characters") or []:
+            cid = _int(c.get("id"))
+            if c.get("art") is not None:
+                asm.emit(PUSH, cid & 0xFFFF)
+                asm.emit(PUSH, _int(c["art"]) & 0xFFFF)
+                asm.emit(SYS, (S_SET_ART << 8) | 2)
+            if c.get("name") is not None:
+                asm.emit(PUSH, cid & 0xFFFF)
+                asm.emit(PUSH, st.intern(c["name"]))
+                if "format" in c:
+                    asm.emit(PUSH, _int(c["format"]) & 0xFFFF)
+                    asm.emit(SYS, (S_SET_NAME << 8) | 3)
+                else:
+                    asm.emit(SYS, (0x40 << 8) | 2)          # yield 64: name as-is
+        for slot, val in sorted((setup.get("ui_defaults") or {}).items()):
+            asm.emit(PUSH, _int(val) & 0xFFFF)
+            asm.emit(SYS, (_int(slot) << 8) | 1)           # 74 / 75
+    else:
+        for idx, name in enumerate(cast or []):
+            if idx == 0 or not name:
+                continue                       # index 0 is the blank/player slot
+            name_ref = st.intern(name)
+            asm.emit(PUSH, idx)                # char_id
+            asm.emit(PUSH, name_ref)           # name text ref
+            asm.emit(PUSH0)                    # format flag (0 = use as-is)
+            asm.emit(SYS, (S_SET_NAME << 8) | 3)
+            art = characters.get(name, {}).get("art")
+            if art is not None:
+                asm.emit(PUSH, idx)            # char_id
+                asm.emit(PUSH, int(art) & 0xFFFF)   # art base asset id
+                asm.emit(SYS, (S_SET_ART << 8) | 2)
     # Scene body.
-    for node in scene.get("nodes", []):
-        _gen_node(node, asm, st, cast)
+    if scene.get("_graph"):
+        _emit_graph_scene(scene["_graph"], asm, st, cast)
+    else:
+        for node in scene.get("nodes", []):
+            _gen_node(node, asm, st, cast)
     # Terminal: HALT. A scene compiled standalone has no caller to RET to, and a
     # `goto` node (if present) already transferred control before we get here.
     asm.emit(HALT)
 
-    instrs = asm.resolve()
-    code = _serialize_instructions(instrs)
     words = bytearray(st.word_bytes())
     # Init resource table: 8-byte rows [type, asset, name_ref, index] appended to
     # the word region (between the strings and the code). This is decoder-facing
@@ -1390,17 +2371,27 @@ def _build_scene_chunk(scene, cast, characters=None):
         if len(words) % 2:
             words.append(0)
     words = bytes(words)
+    main_count = len(words) // 2
+    # VM scratch cells (lowered routines' scratch words, engine text buffers)
+    # are the uninitialised data words right after the main words
+    scratch = getattr(asm, "scratch", 0)
+    gap_count = scratch + 128 if scratch else 0
+    for ins in asm.ins:
+        if isinstance(ins[1], tuple) and ins[1][0] == "scratch":
+            ins[1] = (main_count + ins[1][1]) & 0xFFFF
+    instrs = asm.resolve()
+    _verify_instructions(instrs, "scene %s" % scene.get("id"), asm.verbatim)
+    code = _serialize_instructions(instrs)
 
     # KiWi v2 header: 'kiwi' + version(2) + previous_flag(0) + flag(0)
     #   + counts(main, gap, extra, instr) ; then word table ; then code.
-    main_count = len(words) // 2
     header = bytearray()
     header += b"kiwi"
     header.append(2)                 # version
     header.append(0)                 # previous_flag
     header.append(0)                 # flag
     header += struct.pack(">H", main_count)   # main_words
-    header += struct.pack(">H", 0)            # gap_count
+    header += struct.pack(">H", gap_count)    # gap_count
     header += struct.pack(">H", 0)            # extra_words
     header += struct.pack(">H", len(instrs))  # instruction_count
     return bytes(header) + words + code
@@ -1454,7 +2445,7 @@ def _scene_id_from_seg(seg_name):
     return int(m.group(1)) if m else None
 
 
-def compile_episode(spec):
+def compile_episode(spec, graph=True):
     """Compile an authoring spec (dict) into .exp bytes.
 
     Accepts two shapes:
@@ -1464,6 +2455,8 @@ def compile_episode(spec):
         back into nested nodes before compiling, so a decoded episode can be
         edited and re-encoded with the same schema.
     """
+    global _ROUTINES
+    _ROUTINES = dict(spec.get("routines") or {})
     cast = spec.get("cast", [])
     characters = dict(spec.get("characters", {}))
 
@@ -1493,34 +2486,103 @@ def compile_episode(spec):
         scene_nums = sorted({_scene_id_from_seg(s) for s in segments
                              if _scene_id_from_seg(s) is not None})
         scenes = []
+        ents = {}
         for num in scene_nums:
-            entry = entries.get(num) or ("s%d" % num)
-            if entry not in segments:
+            e = entries.get(num) or ("s%d" % num)
+            if e in segments:
+                ents[num] = e
+        scene_of = _assign_scenes(segments, ents)
+        # Cross-scene gotos that land MID-scene (a section entry): collect
+        # (register, value, target) per target scene for its entry dispatch.
+        sec_entries = {}
+        for _sid, _g in segments.items():
+            for _n in _g.get("nodes", []):
+                if not (isinstance(_n, dict) and _n.get("type") == "goto_scene"):
+                    continue
+                _f = _n.get("file")
+                _reg = _n.get("section_register") or {}
+                if not isinstance(_f, str) or _reg.get("var") is None:
+                    continue
+                _f = _f.replace(".json", "")
+                _tn = scene_of.get(_f)
+                if _tn is None or _f == ents.get(_tn) or scene_of.get(_sid) == _tn:
+                    continue
+                sec_entries.setdefault(_tn, []).append(
+                    (_int(_reg["var"]), _int(_reg.get("value")), _f))
+        use_graph = bool(spec.get("_graph_compile")) or graph
+        # The scene prologue's own dispatch table (section_dispatch.bindings:
+        # register value -> section byte offset) -- the original op5c cascade run
+        # on scene entry. Map each offset to the segment starting (or sitting
+        # just after) there and add it to that scene's section-entry dispatch.
+        _ranges = {}
+        for _sid, _g in segments.items():
+            _o = [int(x["offset"]) for x in _g.get("nodes", [])
+                  if isinstance(x, dict) and str(x.get("offset", "")).lstrip("-").isdigit()]
+            if _o:
+                _ranges[_sid] = (min(_o), max(_o))
+
+        def _seg_at_offset(off, scn):
+            cont = after = al = None
+            for _nm, (_lo, _hi) in _ranges.items():
+                if scene_of.get(_nm) != scn:
+                    continue
+                if _lo <= off <= _hi:
+                    cont = _nm
+                elif _lo >= off and (al is None or _lo < al):
+                    after, al = _nm, _lo
+            return cont or (after if after and al - off <= 64 else None)
+
+        for _scn, _sd in (spec.get("section_dispatch") or {}).items():
+            if not isinstance(_sd, dict) or _sd.get("register") is None:
                 continue
-            nodes = _flatten_segment_graph(segments, entry)
-            # The flattener follows next/then/else/choice pointers but not
-            # goto_scene/dispatch edges, so segments in this scene reached only via
-            # section-dispatch (e.g. a day-hub) would be dropped. Append any such
-            # not-yet-emitted segments of this scene so their content survives the
-            # round-trip (order within them is preserved; cross-links become linear).
-            emitted_txt = {id(n) for n in nodes}
-            covered = _flatten_covered_segments(segments, entry)
-            for sid in segments:
-                if _scene_id_from_seg(sid) == num and sid not in covered:
-                    for n in segments[sid].get("nodes", []):
-                        if isinstance(n, dict) and n.get("type") not in ("next",):
-                            nodes.append(n)
-            scene_node = {"id": num, "nodes": nodes}
-            # Attach token renames for this scene (first binding per token) from
-            # runtime_text_vars so $tokens in dialogue resolve.
-            rtv = ((spec.get("runtime_text_vars") or {}).get("scenes") or {}).get(str(num))
-            if rtv:
-                ren = {}
-                for token, binds in rtv.items():
-                    if isinstance(binds, list) and binds:
-                        ren[token] = binds[0].get("name", "")
-                if ren:
-                    scene_node["_renames"] = ren
+            _tn = _int(_scn, 0)
+            _ebv = _sd.get("entry_by_value")
+            if isinstance(_ebv, dict) and _ebv:
+                # engine-accurate (decoder ran the prologue per register value)
+                for _v, _seg in _ebv.items():
+                    _seg = str(_seg).replace(".json", "")
+                    if _seg in segments and _seg != ents.get(_tn):
+                        sec_entries.setdefault(_tn, []).append(
+                            (_int(_sd["register"]), _int(_v), _seg))
+                continue
+            for _b in _sd.get("bindings") or []:
+                if _b.get("value") is None or _b.get("section_offset") is None:
+                    continue
+                _seg = _seg_at_offset(_int(_b["section_offset"]), _tn)
+                if _seg and _seg != ents.get(_tn):
+                    sec_entries.setdefault(_tn, []).append(
+                        (_int(_sd["register"]), _int(_b["value"]), _seg))
+        for num in sorted(ents):
+            entry = ents[num]
+            members = {s for s, sn in scene_of.items() if sn == num}
+            if use_graph:
+                # Graph compiler (DEFAULT): every segment a labelled block, links as
+                # jumps, calls as PUSH_RET+JMP / returns as guarded RET, and the
+                # section-entry dispatch. Across the 16 decoded episodes it keeps
+                # all but 29 of 11056 runtime-reachable lines, and every re-encoded
+                # episode replays its choices correctly in the reference engine
+                # (except Wrong Side's synthesized fights). The tree fold below
+                # (graph=False / --tree) loses ~566 and is kept for comparison.
+                scene_node = {"id": num, "nodes": [],
+                              "_graph": (segments, entry, members, scene_of,
+                                         sec_entries.get(num, []))}
+            else:
+                # Default: fold the scene graph into a nested tree, then append
+                # any same-scene segment the fold did not reach so its content is
+                # kept (verified runtime-reachable across the corpus).
+                nodes = _flatten_segment_graph(segments, entry)
+                covered = _flatten_covered_segments(segments, entry)
+                for sid in segments:
+                    if _scene_id_from_seg(sid) == num and sid not in covered:
+                        for n in segments[sid].get("nodes", []):
+                            if isinstance(n, dict) and n.get("type") not in ("next",):
+                                nodes.append(n)
+                scene_node = {"id": num, "nodes": nodes}
+            _su = (spec.get("scene_setup") or {}).get(str(num))
+            if _su is not None:
+                scene_node["_setup"] = _su
+            if str(num) in (spec.get("ir_scenes") or []):
+                scene_node["_in_code"] = True
             scenes.append(scene_node)
     else:
         scenes = spec.get("scenes", [])
@@ -1547,9 +2609,11 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description="Compile a story spec JSON into a .exp")
     ap.add_argument("input", help="authoring spec .json")
     ap.add_argument("-o", "--output", required=True, help="output .exp path")
+    ap.add_argument("--tree", action="store_true",
+                    help="use the legacy tree fold instead of the graph compiler")
     args = ap.parse_args(argv)
     spec = json.loads(Path(args.input).read_text())
-    data = compile_episode(spec)
+    data = compile_episode(spec, graph=not args.tree)
     Path(args.output).write_bytes(data)
     if spec.get("scenes"):
         n_scenes = len(spec["scenes"])
