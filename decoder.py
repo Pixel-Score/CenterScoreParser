@@ -1591,11 +1591,12 @@ def disassemble_script(data, cast=None, resolve_targets=True):
     SELN = {
         0x00: "STATUS", 0x01: "CHOICE", 0x05: "SET_SPEAKER", 0x08: "TITLE",
         0x0a: "SCENE_GOTO", 0x0b: "SET_BG", 0x0d: "SAY", 0x0f: "CUSTOM_SPEAKER",
-        0x12: "DISPATCH", 0x1b: "RANDOM", 0x23: "SET_BG_PNG", 0x2c: "VAR_WRITE",
-        0x2d: "VAR_READ", 0x34: "PLACE_SPRITE", 0x41: "NARRATION",
-        0x46: "BUILD_WORD", 0x47: "PICK_WORD", 0x4a: "SET_POV", 0x4f: "PLAY_SFX",
-        0x50: "SET_MUSIC", 0x51: "MINIGAME_BYID", 0x52: "STOP_MUSIC",
-        0x58: "SCORE_FEEDBACK", 0x63: "CHECKPOINT",
+        0x12: "NOOP", 0x1b: "RANDOM", 0x23: "SET_BG_PNG", 0x2c: "VAR_WRITE",
+        0x2d: "VAR_READ", 0x34: "SET_OWNER_NUMBER", 0x41: "NARRATION",
+        0x46: "PLATFORM_QUERY", 0x47: "WORD_GAME", 0x4a: "SET_PRIMARY_SPEAKER",
+        0x4f: "REQUEST_AUDIO", 0x50: "SET_MUSIC", 0x51: "STOP_AUDIO", 0x52: "VIBRATE",
+        0x58: "DIALOGUE_NOTICE", 0x63: "AD_NOOP", 0x07: "END_EPISODE",
+        0x09: "SUBMIT_POLL", 0x21: "SHOW_CARD", 0x60: "WORD_GRID",
     }
     # standalone (non-0x1f) arithmetic / compare opcodes
     ARITH = {0x50: "ADD", 0x51: "SUB", 0x52: "MUL", 0x53: "DIV"}
@@ -3746,13 +3747,22 @@ def line_to_dict(ln):
             d["character_id"] = a[ti + 1]
         if len(a) > ti + 2 and a[ti + 2] not in (-1, None):
             d["expression"] = a[ti + 2]
-    elif va and va[0] == 0x0f and len(va[1]) >= 4:
-        # yield 15 [name, text, character, expression override]: a one-off
-        # named speaker
+    elif va and va[0] == 0x0f and len(va[1]) >= 2:
+        # yield 15 [prefix?, name, text, pad, pad]: a line headed by a plain-
+        # text name (panel mode 3). The engine reads only the prefix and the
+        # two texts (libshs09.so case 15); the trailing words are kept so a
+        # re-encode is byte-identical
+        a = va[1]
         d["via"] = 15
-        d["character_id"] = va[1][2]
-        if va[1][3] != -1:
-            d["expression"] = va[1][3]
+        o = 1 if isinstance(a[0], int) and a[0] < 0 else 0
+        if o:
+            d["mode"] = a[0]
+        rest = a[o + 2:]
+        if len(rest) >= 1 and rest[0] is not None:
+            d["character_id"] = rest[0]
+        if len(rest) >= 2 and rest[1] not in (-1, None):
+            d["expression"] = rest[1]
+        d["argc"] = len(a)
     return d
 
 
@@ -14248,7 +14258,7 @@ def _needs_runtime_values(ir):
 # Text-reference argument positions per yield, from the reference engine's
 # read_text/resolve_text calls (engine.py). Yield 0 (format) and 13 (dialogue)
 # depend on argument values and are handled in _text_positions.
-TEXT_ARGS = {1: (0, 1, 2), 2: (0, 1), 3: (0,), 7: (0, 1), 8: (0, 1), 15: (0, 1),
+TEXT_ARGS = {1: (0, 1, 2), 2: (0, 1), 3: (0,), 8: (0, 1), 15: (0, 1),
              33: (0, 1), 65: (1,), 24: (0, 1), 17: (0, 1, 2), 40: (0, 1, 2),
              25: (0, 1), 28: (0,), 71: (0, 1, 2, 3), 78: (0,), 88: (0,),
              46: (0, 1), 47: (0, 1), 49: (1,), 64: (1,), 90: (1,), 94: (20, 21),
@@ -14271,19 +14281,19 @@ YIELD_PTRS = {
 # yields the IR does not carry (they write into VM memory or read data tables)
 MEMORY_YIELDS = frozenset({17, 25, 28, 40, 71, 78, 94, 96})
 YIELD_NAMES = {0: "format", 1: "choice", 2: "menu_begin", 3: "menu_option",
-               4: "menu_show", 5: "set_character_expression", 7: "host_card",
-               8: "presentation", 9: "survey_submit", 15: "named_dialogue",
-               33: "host_card_timed", 70: "bakery_minigame",
+               4: "menu_show", 5: "set_character_expression", 7: "end_episode",
+               8: "presentation", 9: "submit_poll", 15: "named_line",
+               33: "show_card", 70: "platform_query",
                10: "goto_scene", 11: "set_background", 13: "dialogue", 16: "set_scene_value",
                27: "random_below", 29: "get_ui_result", 34: "set_background",
                35: "set_background", 44: "set_number", 45: "get_number", 46: "set_string",
                47: "get_string_default", 49: "set_character_name", 50: "set_number_bit",
                51: "get_number_bit", 52: "set_owner_number", 53: "get_owner_number",
-               54: "set_owner_number", 55: "get_owner_number", 64: "set_character_name",
+               54: "set_number", 55: "get_number", 64: "set_character_name",
                65: "narration", 72: "set_character_art_base", 73: "get_character_art_base",
                74: "set_ui_default", 75: "set_ui_default", 79: "request_audio",
                80: "request_audio", 81: "stop_audio", 82: "vibrate", 86: "set_background",
-               88: "dialogue_notice", 89: "wobble", 90: "scene_badge", 91: "loading"}
+               88: "dialogue_notice", 89: "wobble", 90: "scene_badge", 91: "loading", 18: "noop", 63: "end_episode", 99: "noop", 76: "named_line"}
 
 
 def _text_positions(yid, args, strings):
@@ -14309,6 +14319,11 @@ def _text_positions(yid, args, strings):
         if not args or not isinstance(args[0], int):
             return None
         return (1,) if args[0] < 0 else (0,)
+    if yid in (15, 76):
+        # [name, text] or [prefix<0, name, text] (libshs09.so case 15)
+        if not args or not isinstance(args[0], int):
+            return (0, 1)
+        return (1, 2) if args[0] < 0 else (0, 1)
     return TEXT_ARGS.get(yid, ())
 
 
@@ -14911,6 +14926,7 @@ class Engine:
         self.pick_rand = _Rand(seed * 7 + 1)
         self.name = name
         self.events = []
+        self.ended = False
 
     @staticmethod
     def nkey(owner, key):
@@ -15036,16 +15052,37 @@ class Engine:
             self.events.append(("say", self.subst(rt(args[ti]))))
             return 0
         if y == 15:
-            # named one-off speaker ("Voice", "Calendar"): [name, text, char, expr]
-            self.events.append(("say", self.subst(rt(args[1]))))
+            # libshs09.so case 15 (0x91bd4): panel mode 3 -- a line headed by a
+            # name that is plain text, not a registered character: [name, text]
+            # or [prefix<0, name, text]; both substituted; nothing else is read
+            # (a third / fourth argument is padding). Prefix -2 / -3 decorate
+            # the text like dialogue.
+            pre = args[0] < 0
+            text = rt(args[2 if pre else 1])
+            if pre and args[0] == -2:
+                text = "(" + text + ")"
+            elif pre and args[0] == -3:
+                text = "`" + text + "`"
+            self.events.append(("say", self.subst(text)))
             return 0
-        if y in (7, 33):
-            # host card (the end-of-episode credits card): [title, text, ...]
-            self.events.append(("card", y, self.subst(rt(args[0])), self.subst(rt(args[1]))))
+        if y == 33:
+            # case 33 (0x92110): a card UI with two RAW (unsubstituted) texts
+            # and a parameter; waits for the player
+            self.events.append(("card", 33, rt(args[0]), rt(args[1])))
+            return 0
+        if y in (7, 63):
+            # cases 7 / 63 (-> FUN_0007e614): end the episode -- resets the
+            # episode state and the running VM, clears scheduled scripts, clears
+            # the resume save; no argument is read
+            self.events.append(("end_episode",))
+            self.ended = True
             return 0
         if y == 70:
-            self.events.append(("minigame", 70))
-            return 0
+            # case 70 (0x903ac): a build query, nothing shown. Android 1.0.9
+            # answers selector 2 -> 2, 3 -> 6, 6 -> dynamic string slot 0,
+            # 9 -> 1, 11 -> 0/1 (an application pointer test), else 0. Scripts
+            # use `70(9) == 2` to pick between two builds' code paths.
+            return {2: 2, 3: 6, 6: 0x7FF5, 9: 1}.get(args[0] if args else -1, 0)
         if y == 1:
             opts = self.subst(rt(args[1])).split("|")
             self.events.append(("choice", tuple(opts)))
@@ -15143,6 +15180,14 @@ def play(programs, start, policy=0, seed=12345, max_events=300, max_scenes=200):
                 vm.resume(r)
                 for e in eng.events[n0:]:
                     out.append((e, sid))
+                if eng.ended:
+                    # libshs09.so: service 7 resets the running VM (FUN_0009f200 on
+                    # the scene's VM at +0x278: PC = SP = FP = 0), clears the
+                    # scheduled-script stack and sets the flag that stops the
+                    # scene runner (FUN_0007f5f4) from loading another script.
+                    # Nothing after the call runs as part of the episode.
+                    out.append((("end",), sid))
+                    break
             elif st[0] == "halt":
                 if not eng.scheduled:
                     out.append((("end",), sid))
@@ -16348,50 +16393,29 @@ def _speaker_hints(seg_doc):
 
 
 def _drop_unreachable_segments(seg_doc):
-    """Remove segments nothing can reach: no entry, dispatch table, routine or
-    node names them (directly or through a chain). Conservative: any string
-    anywhere in the document that equals a segment name counts as a link, and
-    a segment is kept if any text it shows is not shown by a reachable one."""
+    """Remove segments nothing can reach (see _reachable_segments) whose
+    every string is also carried by a reachable segment -- duplicates left by
+    segmentation. A segment holding anything unique is kept."""
     segs = seg_doc.get("segments") or {}
+    seen = _reachable_segments(seg_doc)
 
-    def names_in(o, acc):
-        if isinstance(o, str):
-            v = o.replace(".json", "")
-            if v in segs:
-                acc.add(v)
-        elif isinstance(o, dict):
-            for v in o.values():
-                names_in(v, acc)
-        elif isinstance(o, list):
-            for v in o:
-                names_in(v, acc)
-        return acc
-    roots = names_in({k: v for k, v in seg_doc.items() if k != "segments"}, set())
-    seen, work = set(), list(roots)
-    while work:
-        nm = work.pop()
-        if nm in seen:
-            continue
-        seen.add(nm)
-        work.extend(names_in(segs[nm].get("nodes"), set()) - seen)
-
-    def texts(o, acc):
+    def strs(o, acc):
         if isinstance(o, dict):
             for k, v in o.items():
-                if k in ("text", "prompt", "label") and isinstance(v, str):
+                if isinstance(v, str) and k not in ("type", "next", "then", "else", "after",
+                                                     "offset", "id", "source", "name"):
                     acc.add(v)
                 else:
-                    texts(v, acc)
+                    strs(v, acc)
         elif isinstance(o, list):
             for v in o:
-                texts(v, acc)
+                strs(v, acc)
         return acc
     shown = set()
     for nm in seen:
-        texts(segs[nm].get("nodes"), shown)
-    dead = [nm for nm in segs if nm not in seen]
-    for nm in dead:
-        if texts(segs[nm].get("nodes"), set()) <= shown:
+        strs(segs[nm].get("nodes"), shown)
+    for nm in [n for n in segs if n not in seen]:
+        if strs(segs[nm].get("nodes"), set()) <= shown:
             del segs[nm]
 
 
@@ -16518,6 +16542,140 @@ def _lower_and_finish(pre, scripts, force_scenes):
 _VERIFY_POLICIES = (0, -1, ("rand", 1), ("rand", 2))
 
 
+def _reachable_segments(doc):
+    """Segments the encoder's program can reach: entries, dispatch tables,
+    routines and every segment a node names, plus the segments section
+    dispatch enters by byte offset (the one holding the binding's offset, or
+    the one ending just before it)."""
+    segs = doc.get("segments") or {}
+    def names_in(o, acc):
+        if isinstance(o, str):
+            v = o.replace(".json", "")
+            if v in segs:
+                acc.add(v)
+        elif isinstance(o, dict):
+            for v in o.values():
+                names_in(v, acc)
+        elif isinstance(o, list):
+            for v in o:
+                names_in(v, acc)
+        return acc
+    roots = names_in({k: v for k, v in doc.items() if k != "segments"}, set())
+    # section dispatch enters by byte offset (the encoder compiles each
+    # binding to the segment holding that offset, or the one ending just
+    # before it)
+    offs = {}
+    for nm, g in segs.items():
+        for n in g.get("nodes") or []:
+            if isinstance(n, dict) and str(n.get("offset", "")).isdigit():
+                offs.setdefault(nm, []).append(int(n["offset"]))
+    for _scn, sd in (doc.get("section_dispatch") or {}).items():
+        if not isinstance(sd, dict):
+            continue
+        pref_ = "s%s" % _scn
+        for b in sd.get("bindings") or []:
+            try:
+                off = int(b.get("section_offset"))
+            except (TypeError, ValueError):
+                continue
+            for nm, ol in offs.items():
+                if not (nm == pref_ or nm.startswith(pref_ + "_")):
+                    continue
+                if any(off <= o <= off + 64 for o in ol) or 0 <= off - max(ol) <= 12:
+                    roots.add(nm)
+    reach, work = set(), list(roots)
+    while work:
+        nm = work.pop()
+        if nm in reach:
+            continue
+        reach.add(nm)
+        work.extend(names_in(segs[nm].get("nodes"), set()) - reach)
+    return reach
+
+
+_SHOW_TEXT_YIELDS = frozenset({0, 1, 2, 3, 8, 13, 15, 33, 65, 71, 76, 88})
+
+
+def _scene_text_gaps(doc, scripts):
+    """Scenes kept as story graph whose nodes lack a text the scene's code can
+    display (a dialogue / narration / menu / card text that is a constant in
+    any reachable display call). Static and generic: the scene's top-level
+    program and every routine it calls are lifted; a text counts as present
+    when some node of the scene carries it (choice options as their joined
+    "a|b" string; templates with %d / $Tokens match their filled forms)."""
+    out = []
+    _scene_text_gaps.last = {}
+    ir_scenes = set(str(x) for x in (doc.get("ir_scenes") or []))
+    segs = doc.get("segments") or {}
+
+    reach = _reachable_segments(doc)
+
+    def canon(t):
+        return re.sub(r"\s+", " ", t or "").strip()
+    for sidx, (_label, data) in enumerate(scripts, 1):
+        if str(sidx) in ir_scenes:
+            continue
+        try:
+            ins = _kiwi_program(data).instructions
+            strings = _ChunkStrings(data)
+        except Exception:
+            continue
+        # every display call in the script whose text argument is a constant
+        # (evaluated by the reference VM's stack rules)
+        want = set()
+        for i, x in enumerate(ins):
+            if x.opcode != 0x1f or not x.operand or (x.operand >> 8) not in _SHOW_TEXT_YIELDS:
+                continue
+            y = x.operand >> 8
+            args = _eval_yield_args(ins, i, x.operand & 0xFF) or []
+            for p in _text_positions(y, args, strings) or ():
+                a = args[p] if p < len(args) else None
+                if isinstance(a, int) and a > 0 and a in strings:
+                    t = canon(strings[a])
+                    if t and len(t) > 1:
+                        want.add(t)
+        have = set()
+
+        def walk(x):
+            if isinstance(x, dict):
+                for k, v in x.items():
+                    if isinstance(v, str) and k in ("text", "prompt", "label", "title",
+                                                    "subtitle", "pattern", "default",
+                                                    "speaker", "name", "heading"):
+                        have.add(canon(v))
+                    elif k == "options" and isinstance(v, list):
+                        labels = [o.get("label", "") for o in v if isinstance(o, dict)]
+                        if labels:
+                            have.add(canon("|".join(labels)))
+                        for o in v:
+                            if isinstance(o, list):
+                                have.add(canon("|".join(str(z) for z in o)))
+                        walk(v)
+                    else:
+                        walk(v)
+            elif isinstance(x, list):
+                for v in x:
+                    walk(v)
+        pref = "s%d" % sidx
+        for nm in reach:
+            if nm == pref or nm.startswith(pref + "_"):
+                walk(segs[nm].get("nodes"))
+        cast = set(canon(c) for c in (doc.get("cast") or []) if c)
+        miss = []
+        for t in want:
+            if t in have or t in cast:
+                continue
+            # a template the graph fills ("%d", "$Token") or a filled form
+            pat = re.split(r"%[cds]|\$[A-Za-z_0-9]+", t)
+            if len(pat) > 1 and any(re.search(".*?".join(map(re.escape, pat)), h) for h in have):
+                continue
+            miss.append(t)
+        if miss:
+            out.append(sidx)
+            _scene_text_gaps.last[sidx] = sorted(miss)
+    return out
+
+
 def _verify_decode(pre, doc, scripts, force_all=False, rounds=None):
     """SELF-VERIFICATION. Play the original scripts and the re-encoded decode
     (shs_encoder = the executable definition of the JSON contract) with the
@@ -16554,7 +16712,7 @@ def _verify_decode(pre, doc, scripts, force_all=False, rounds=None):
             elif e[0] == "choice":
                 out.append((("choice", tuple(clean(x) for x in e[1])), sid))
             else:
-                out.append((e[:1] if e[0] in ("end", "error") else e, sid))
+                out.append((e[:1] if e[0] == "error" else e, sid))
         return out
     DEPTH = 6000
 
@@ -16620,6 +16778,18 @@ def _verify_decode(pre, doc, scripts, force_all=False, rounds=None):
                 bad = (cands, pol, k, got[k][0] if k < len(got) else None)
                 break
         if bad is None:
+            # playthroughs only cover the paths four policies take: a scene
+            # whose story graph lacks text its code can display (an arm no
+            # policy reached) is not faithful either
+            gaps = [sc_ for sc_ in _scene_text_gaps(doc, scripts) if sc_ not in forced]
+            if gaps:
+                print("[i] verification: scene(s) %s miss text their code can show "
+                      "(%s) -> exact IR" % (gaps, "; ".join(
+                          "%r" % t[:40] for t in _scene_text_gaps.last[gaps[0]][:3])),
+                      file=sys.stderr)
+                forced |= set(gaps)
+                doc = _lower_and_finish(pre, scripts, forced)
+                continue
             if forced:
                 print("[+] verification: decode matches the original under %d policies "
                       "(scenes lowered to exact IR: %s)" % (len(_VERIFY_POLICIES),
@@ -19714,6 +19884,11 @@ def main(argv=None):
         if not args.no_verify and not args.exact:
             seg_doc = _verify_decode(_pre_lower, seg_doc, scripts)
         _drop_unreachable_segments(seg_doc)
+        # segmentation-internal gate tables built on reading service 70 as a
+        # minigame (libshs09.so: it is a build query) -- the nodes carry the
+        # real minigames and their win / lose arms
+        seg_doc.pop("minigame_results", None)
+        seg_doc.pop("minigame_scoring", None)
         _state_index(seg_doc)
         _speaker_hints(seg_doc)
         text = json.dumps(strip_notes(restore_int_values(stringify_numbers(seg_doc))),

@@ -341,11 +341,24 @@ def _gen_node(node, asm, st, cast):
             # A one-off named speaker not in the cast (e.g. "Voice") uses the
             # custom-speaker op 1f 0f, which carries the name as a string:
             # push name_ref; push text_ref; push pair; 1f 0f 04.
+            # yield 15 [prefix?, name, text, pad, pad]: the engine reads the
+            # prefix and the two texts; the padding words are re-emitted as
+            # decoded (character_id / expression) so the call is unchanged
+            argc = _int(node.get("argc"), 4)
+            n_args = 0
+            if node.get("mode") is not None:
+                asm.emit(PUSH, _int(node["mode"]) & 0xFFFF)
+                n_args += 1
             asm.emit(PUSH, st.intern(speaker))
             _emit_text(node, asm, st, node["text"])
-            asm.emit(PUSH, _int(node.get("character_id"), 0) & 0xFFFF)
-            asm.emit(PUSH, (_int(node["expression"]) if node.get("expression") is not None else -1) & 0xFFFF)
-            asm.emit(SYS, (0x0F << 8) | 4)
+            n_args += 2
+            if argc - n_args >= 1:
+                asm.emit(PUSH, _int(node.get("character_id"), 0) & 0xFFFF)
+                n_args += 1
+            if argc - n_args >= 1:
+                asm.emit(PUSH, (_int(node["expression"]) if node.get("expression") is not None else -1) & 0xFFFF)
+                n_args += 1
+            asm.emit(SYS, (0x0F << 8) | n_args)
         else:
             # [mode?, text, character, expression?] exactly as decoded
             # (character_id / mode / expression), else text + cast index
