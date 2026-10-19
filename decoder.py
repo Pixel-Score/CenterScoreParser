@@ -16687,10 +16687,13 @@ def _verify_decode(pre, doc, scripts, force_all=False, rounds=None):
     lift; nothing is tuned to an episode."""
     import re as _re
     try:
-        import shs_encoder as ENC
+        try:
+            import shs_encoder as ENC
+        except ImportError:
+            import encoder as ENC        # the repository names it encoder.py
     except Exception as ex:
-        print("[!] verification skipped (%s): keep shs_encoder.py next to "
-              "shs_decoder.py" % ex, file=sys.stderr)
+        print("[!] verification skipped (%s): keep shs_encoder.py (or "
+              "encoder.py) next to the decoder" % ex, file=sys.stderr)
         return doc
     try:
         orig = {int(lbl, 16): program_from_chunk(data) for lbl, data in scripts}

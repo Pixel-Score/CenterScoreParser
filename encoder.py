@@ -2257,7 +2257,10 @@ def _verify_instructions(instrs, where="", verbatim=()):
 
 def _serialize_instructions(instrs):
     """(opcode, operand) list -> bytes, operand present iff opcode is 3-byte."""
-    from shs_decoder import _KIWI_OPERAND_OPCODES
+    try:
+        from shs_decoder import _KIWI_OPERAND_OPCODES
+    except ImportError:
+        from decoder import _KIWI_OPERAND_OPCODES   # repository file name
     out = bytearray()
     for op, operand in instrs:
         out.append(op)
