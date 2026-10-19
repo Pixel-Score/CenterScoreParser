@@ -1,0 +1,2469 @@
+{
+  "title": "MTX_Dr_Pepper_5",
+  "episode": "Christmas in Helzeroth",
+  "cast": [
+    "Taylor",
+    "Angie",
+    "Erik",
+    "Brendan",
+    "Andrew",
+    "Bear"
+  ],
+  "main_characters": [
+    "Taylor"
+  ],
+  "genders": {
+    "Taylor": "F",
+    "Angie": "F",
+    "Erik": "M",
+    "Brendan": "M",
+    "Andrew": "M"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1",
+    "2": "s2",
+    "3": "s3"
+  },
+  "scene_minigame_banks": {
+    "1": {},
+    "2": {},
+    "3": {}
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "checkpoints": {
+        "sets": [],
+        "replays": [
+          {
+            "offset": "7291",
+            "target": "7203"
+          }
+        ]
+      },
+      "timed_choices": {
+        "7704": {
+          "timer_ms": "3000",
+          "labels": [
+            "Dodge!",
+            "Block!"
+          ],
+          "timeout_offset": "7763"
+        },
+        "8355": {
+          "timer_ms": "4000",
+          "labels": [
+            "Stab blindly!"
+          ],
+          "timeout_offset": "8517"
+        }
+      },
+      "bindings": [
+        {
+          "value": null,
+          "section_offset": "7769",
+          "enter_at_section": true
+        },
+        {
+          "value": null,
+          "section_offset": "8523",
+          "enter_at_section": true
+        }
+      ],
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    },
+    "2": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "1",
+      "valid_values": [
+        "1"
+      ],
+      "cases": [
+        {
+          "value": "1",
+          "key": "2"
+        }
+      ]
+    },
+    "3": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "2",
+      "valid_values": [
+        "2"
+      ],
+      "cases": [
+        {
+          "value": "2",
+          "key": "2"
+        }
+      ]
+    }
+  },
+  "segments": {
+    "s1_03_after": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 1,
+          "offset": "8744"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s2",
+          "section_register": {
+            "var": "1001",
+            "value": "1"
+          },
+          "offset": "8751"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_04_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Taylor the Swift stabs blindly!",
+          "character_id": "0",
+          "offset": "8372",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Taylor stabs with her dagger! The blade hits home! Taylor, roll for damage.",
+          "character_id": "4",
+          "offset": "8381",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "1",
+          "offset": "8391"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Okay... Here goes.",
+          "character_id": "0",
+          "offset": "8398",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "20!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "8407",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "That's a critical hit!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "8416",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Indeed it is... Brendan.",
+          "character_id": "4",
+          "offset": "8425",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26011",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "8437"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Brendan the Magical feels a sharp, shooting pain in his side! He collapses!",
+          "character_id": "4",
+          "offset": "8446",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "Brendan! No! What happened?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8455",
+          "side": "left"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "1",
+          "offset": "8465"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Your blindfolds are pulled off, and the audience roars with laughter as Taylor discovers the person she has slain... Is Brendan the Magical!",
+          "character_id": "4",
+          "offset": "8474",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "Brendan! Nooooo!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8483",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "Mwahahahahaha!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "8492",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Happy Garh'alla, everyone!",
+          "character_id": "4",
+          "offset": "8501",
+          "side": "right"
+        },
+        {
+          "type": "narration",
+          "text": "That was a pretty bad ending! Try again to see what happens if Taylor holds back and `doesn't` accidentally wound Brendan the Magical!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "8511",
+          "text_bbcode": "That was a pretty bad ending! Try again to see what happens if Taylor holds back and [b]doesn't[/b] accidentally wound Brendan the Magical!"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 1,
+          "offset": "8744"
+        },
+        {
+          "type": "return",
+          "offset": "8514"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_05_timeout": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "No, it's too risky! I won't attack without even knowing who I'm attacking.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8523"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "And why not?",
+          "character_id": "4",
+          "offset": "8532"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Um, hello? We're all in the same gladiator pit in close proximity. How do I know I'm not, like, fighting Brendan or Angie without even realizing it?",
+          "character_id": "0",
+          "offset": "8539"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "4",
+          "image": "2024",
+          "text": "...",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "8548"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "Andrew, are you okay?",
+          "character_id": "2",
+          "offset": "8557"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "4",
+          "image": "2024",
+          "text": "...",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "8566"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "4",
+          "image": "2064",
+          "text": "I've never... Seen... Such a thing.",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "8575"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "4",
+          "image": "2429",
+          "text": "What is it?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "8584"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "4",
+          "image": "2034",
+          "text": "Andrew is... Speechless!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "8593"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "1",
+          "offset": "8603"
+        },
+        {
+          "type": "narration",
+          "text": "After a moment, Andrew clears his throat.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "8613"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "4",
+          "image": "2024",
+          "text": "Most impressive. Taylor the Swift, you saw through the most clever of my traps. Congratulations.",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "8622"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "For that, I believe your little team has earned my forgiveness.",
+          "character_id": "4",
+          "offset": "8631"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "Yay!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "8640"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "And a trip to the tobogganing on Mount Despair.",
+          "character_id": "4",
+          "offset": "8649"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Yay!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "8658"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "And a loot drop.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "8667"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "Yay!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "8676"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "2",
+          "image": "2427",
+          "text": "Well, I guess all's well that ends well.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "8685"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Precisely.",
+          "character_id": "4",
+          "offset": "8694"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "And Andrew?",
+          "character_id": "0",
+          "offset": "8701"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Yes, Taylor the Swift?",
+          "character_id": "4",
+          "offset": "8710"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Happy Garh'alla!",
+          "character_id": "0",
+          "offset": "8717"
+        },
+        {
+          "type": "narration",
+          "text": "That's it for this episode! Thanks for playing!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "8727"
+        },
+        {
+          "type": "narration",
+          "text": "And from everyone at Surviving High School, wishing you a happy Winter Celebration of Garh'alla! See you next time!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "8737"
+        },
+        {
+          "type": "next",
+          "next": "s1_03_after"
+        }
+      ]
+    },
+    "s1_02_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "Are we going to the goblin tobogganing?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "8168",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Somehow, I have a feeling we're going to miss the tobogganing this year, friend Erik.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "8177",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26015",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "8189"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "The dragons lift you up and away, carrying you effortlessly, quickly, and swiftly to the gladiator holding cells of Tal-halla-shen.",
+          "character_id": "4",
+          "offset": "8198",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26011",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "8210"
+        },
+        {
+          "type": "music",
+          "track_id": "8224",
+          "loop": false,
+          "offset": "8217"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "There, you are each blindfolded, then led out into the ring. You hear the thunderous applause and jeers of the spectators and feel the flames of the fire pits!",
+          "character_id": "4",
+          "offset": "8226",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "I don't like where this is going...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8235",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "You are each stripped of your weapons and handed a rusty dagger.",
+          "character_id": "4",
+          "offset": "8244",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "It's a fight to the death against a barbarian horde! Your fight for survival begins now! May the worthy survive!",
+          "character_id": "4",
+          "offset": "8253",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "Uh... What's around us?",
+          "character_id": "3",
+          "offset": "8262",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "You can't see anything!",
+          "character_id": "4",
+          "offset": "8271",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Uh, my character feels around blindly.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "8280",
+          "side": "right"
+        },
+        {
+          "type": "music",
+          "track_id": "8209",
+          "loop": false,
+          "offset": "8287"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Your hand hits something... Or someone! You better hurry up and get a plan together! You hear the rush of barbarian footsteps!",
+          "character_id": "4",
+          "offset": "8296",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Taylor, you feel something run into you!",
+          "character_id": "4",
+          "offset": "8305",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "This is ridiculous! I can't see anything! How do I know what to do? I run!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8314",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Taylor runs into another gladiator! Taylor, what do you do?",
+          "character_id": "4",
+          "offset": "8323",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "Just stab blindly! It's your only chance!",
+          "character_id": "3",
+          "offset": "8332",
+          "side": "right"
+        },
+        {
+          "type": "choice",
+          "prompt": "Think fast!",
+          "options": [
+            {
+              "index": "0",
+              "label": "Stab blindly!",
+              "next": "s1_04_opt0"
+            }
+          ],
+          "menu": {
+            "title": "Think fast!",
+            "text": "Taylor runs into another gladiator!",
+            "timeout_ms": "4000",
+            "timeout_result": "1000",
+            "character_id": "0",
+            "reserved": "4",
+            "portrait_mode": "1"
+          },
+          "after": "s1_03_after",
+          "on_timeout": "s1_05_timeout.json",
+          "timed": true,
+          "timer_ms": "4000"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_06_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "`I'm` running this game! `I` make the rules in Helzeroth! `I AM THE LAW!`",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "8071",
+          "text_bbcode": "[color=#e23b3b][i]I'm[/i][/color] running this game! [color=#e23b3b][i]I[/i][/color] make the rules in Helzeroth! [color=#e23b3b][i]I AM THE LAW![/i][/color]",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "But you'll see. I have some very special Garh'alla plans for all of you!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "8080",
+          "side": "right"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_07_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "There's no such thing as this 'Christmas' of which you speak here in Helzeroth!",
+          "character_id": "4",
+          "offset": "8099",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Well, after today, I'll make sure you `never` forget that Garh'alla is definitely `not` Christmas!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "8108",
+          "text_bbcode": "Well, after today, I'll make sure you [color=#e23b3b][i]never[/i][/color] forget that Garh'alla is definitely [color=#e23b3b][i]not[/i][/color] Christmas!",
+          "side": "right"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_08_opt2": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "That's right! Garh'alla is all about blood wafers, tobogganing goblins, and the blindfolded gladiator pit fights!",
+          "character_id": "3",
+          "offset": "8129",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "You know, I think I know just the place to take all of you so that this `really` feels like Garh'alla.",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "8138",
+          "text_bbcode": "You know, I think I know just the place to take all of you so that this [color=#e23b3b][i]really[/i][/color] feels like Garh'alla.",
+          "side": "right"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_09_opt3": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "How dare you! You don't even know the `name` of the Winter Celebration!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "8150",
+          "text_bbcode": "How dare you! You don't even know the [color=#e23b3b][i]name[/i][/color] of the Winter Celebration!",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Well, after today, I'll make sure you `never` forget what Garh'alla is all about!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "8159",
+          "text_bbcode": "Well, after today, I'll make sure you [color=#e23b3b][i]never[/i][/color] forget what Garh'alla is all about!",
+          "side": "right"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_01_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "The dragons come around for a second pass... Their talons reach out to grab each of you!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "7842",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Roll to see if you evade successfully.",
+          "character_id": "4",
+          "offset": "7851",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "1",
+          "offset": "7861"
+        },
+        {
+          "type": "narration",
+          "text": "Everyone grabs a dice and rolls...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7871"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "10.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "7880",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "7.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "7889",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "Gulp... 1.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "7898",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26012",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "7910"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "Angie trips over her own feet, falling face-first into the mud as a dragon grabs her! Brendan runs straight into the dragon's outstretched claws!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "7919",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "And Erik...",
+          "character_id": "4",
+          "offset": "7928",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "Gulp.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "7937",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "Erik pulls out his sword and stabs himself in the foot before one of the dragons grabs him!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "7946",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "Not my foot! Eiieeee!",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "7955",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Taylor the Swift! You're our only hope now!",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "7964",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "1",
+          "offset": "7974"
+        },
+        {
+          "type": "narration",
+          "text": "Taylor picks up the die... And rolls!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7984"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "2",
+          "image": "2427",
+          "text": "15! With my dexterity of 17, that should be more than enough to...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7993",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Wrong! The dragon casts a Confusion Spell on you. That means you need a roll of 18 or better!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "8002",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26012",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "8014"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "You clumsily lurch to the side, and the dragon ensnares you with his talons!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "8023",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "1",
+          "image": "2426",
+          "text": "Andrew, that's...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "8032",
+          "side": "left"
+        },
+        {
+          "type": "choice",
+          "prompt": "Andrew, that's...",
+          "options": [
+            {
+              "index": "0",
+              "label": "Cheating.",
+              "next": "s1_06_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Not in the spirit of Christmas.",
+              "next": "s1_07_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Not in the spirit of Garh'alla.",
+              "next": "s1_08_opt2"
+            },
+            {
+              "index": "3",
+              "label": "Not in the spirit of Ghar'lic.",
+              "next": "s1_09_opt3"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Andrew, that's...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_02_after"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_10_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Taylor the Swift dodges to the side.",
+          "character_id": "0",
+          "offset": "7824",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "Nice dodge!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "7833",
+          "side": "right"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_11_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "And what, exactly, are you blocking `with?`",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "7730",
+          "text_bbcode": "And what, exactly, are you blocking [color=#e23b3b][i]with?[/i][/color]",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "Huh?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7739",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "You don't have a shield, and you're a ranger! You don't wear any armor!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "7748",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "I... Um... Forgot that.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7757",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "...And a blast of flame engulfs Taylor the Swift, burning off all of her golden hair!",
+          "character_id": "4",
+          "offset": "7796",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "4",
+          "image": "2429",
+          "text": "No! Not my beautiful, golden hair!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7805",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "It's too late for your precious hair.",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7814",
+          "side": "right"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_12_timeout": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "I... Um... Uh...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7769"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Taylor the Swift stands stupidly by, staring at her feet and muttering to herself in useless phrases!",
+          "character_id": "4",
+          "offset": "7778"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "1",
+          "image": "2426",
+          "text": "Hey!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "7787"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg7124_1"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s2": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 2,
+          "offset": "45"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s3",
+          "section_register": {
+            "var": "1001",
+            "value": "2"
+          },
+          "offset": "52"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s3": {
+      "nodes": [
+        {
+          "type": "call",
+          "routine": "s3_r10",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing!"
+            },
+            1
+          ],
+          "offset": "121"
+        },
+        {
+          "type": "end"
+        }
+      ],
+      "pov": "Taylor"
+    },
+    "s1_enter_v0": {
+      "pov": "Taylor",
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "6",
+          "offset": "7283"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg7124_1"
+        }
+      ]
+    },
+    "s3_r10_b1": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 33,
+          "name": "show_card",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            4000
+          ]
+        },
+        {
+          "type": "yield",
+          "yield": 7,
+          "name": "end_episode",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            {
+              "local": -3
+            }
+          ]
+        },
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s1_bg7124_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "6",
+          "offset": "7283"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26011",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "7314"
+        },
+        {
+          "type": "pov_change",
+          "character": "Taylor",
+          "index": "0",
+          "offset": "7318"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "7327"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "7336"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "7345"
+        },
+        {
+          "type": "title_card",
+          "title": "Christmas in Helzeroth",
+          "subtitle": "Because every world deserves a chance to celebrate...",
+          "asset_id": "26012",
+          "flag": "-1",
+          "section_start": true,
+          "offset": "7357"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "7364"
+        },
+        {
+          "type": "narration",
+          "text": "Happy Holidays! Welcome to a special premium mini-episode of Surviving High School!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7371"
+        },
+        {
+          "type": "narration",
+          "text": "For this mini-episode, we're taking you to the imaginary world of Helzeroth in the nerds' Ogres and Elves role playing game!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7378"
+        },
+        {
+          "type": "narration",
+          "text": "You'll play as Taylor to see if you can help her survive the holidays!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7388",
+          "set_pov": "Taylor"
+        },
+        {
+          "type": "control",
+          "playable": [
+            "Taylor"
+          ]
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26012",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "7400"
+        },
+        {
+          "type": "narration",
+          "text": "It's Christmas Eve and the nerds are gathered in Helzeroth for a special role-playing event...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7410"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "Thank you all for joining me on this special day, December 24th.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "7419",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "Thank you for planning this special celebration for us, Andrew!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "7428",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "I don't get it... Is Christmas Eve in Helzeroth a really big deal or something?",
+          "character_id": "0",
+          "offset": "7435",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "3",
+          "image": "2023",
+          "text": "To be clear, there is no 'Christmas' in Helzeroth. By pure coincidence, the Winter Celebration of Garh'alla just happens to fall on December 24th.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "7444",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "So we're actually celebrating some creepy Garh'alla thing?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7453",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Wrong again. Our `characters` are celebrating their beloved ancestral festival of Garh'alla.",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7462",
+          "text_bbcode": "Wrong again. Our [color=#e23b3b][i]characters[/i][/color] are celebrating their beloved ancestral festival of Garh'alla.",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Isn't that right, team?",
+          "character_id": "4",
+          "offset": "7471",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "Oh, Winter Celebration of Garh'alla, is there anything more magical than watching the goblins tobogganing down the icy Mountain of Despair?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7480",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "I'm looking forward to the blindfolded gladiator fights tonight.",
+          "character_id": "3",
+          "offset": "7489",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "I baked cookies!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "7498",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "They're little gingerbread men shaped like our characters and I even used colored icing to...",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "7507",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "1",
+          "offset": "7517"
+        },
+        {
+          "type": "narration",
+          "text": "In real life, Andrew slaps the cookies out of Erik's hands.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7527"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Unless those are Groekan Blood-Wafers, `we're` not eating them.",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7536",
+          "text_bbcode": "Unless those are Groekan Blood-Wafers, [color=#e23b3b][i]we're[/i][/color] not eating them.",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "I spent all morning decorating those.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "7545",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Could you be any `less` in character? A one-armed giant would `never` bake cookies!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7554",
+          "text_bbcode": "Could you be any [color=#e23b3b][i]less[/i][/color] in character? A one-armed giant would [color=#e23b3b][i]never[/i][/color] bake cookies!",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "But... I...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "7563",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Come on, people! I've crafted a magnificent gaming experience for you. Show some commitment!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7572",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "1",
+          "image": "2426",
+          "text": "Calm down, Andrew! It's just a game.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "7581",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Just... A... `GAME?`",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7590",
+          "text_bbcode": "Just... A... [color=#e23b3b][i]GAME?[/i][/color]",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Er... Taylor, I think you just crossed a line...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "7599",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26012",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "7611"
+        },
+        {
+          "type": "music",
+          "track_id": "8209",
+          "loop": false,
+          "offset": "7618"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Up in the sky, you suddenly see a shadow that blocks out the sun!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7627",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "No! It can't be!",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "7636",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "It's a dragon, isn't it?",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "7645",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Try a `horde` of dragons! They swoop down, breathing fire at Angie Elfendale and Brendan the Magical!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7654",
+          "text_bbcode": "Try a [color=#e23b3b][i]horde[/i][/color] of dragons! They swoop down, breathing fire at Angie Elfendale and Brendan the Magical!",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Angie Elfendale blocks with her shield!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "7663",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "Brendan the Magical rolls to the side!",
+          "character_id": "3",
+          "offset": "7672",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "A blast of flame shoots straight at the ranger, Taylor the Swift!",
+          "character_id": "4",
+          "offset": "7681",
+          "side": "right"
+        },
+        {
+          "type": "choice",
+          "prompt": "Think fast!",
+          "options": [
+            {
+              "index": "0",
+              "label": "Dodge!",
+              "next": "s1_10_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Block!",
+              "next": "s1_11_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Think fast!",
+            "text": "A blast of flame shoots straight at Taylor the Swift!",
+            "timeout_ms": "3000",
+            "timeout_result": "1000",
+            "character_id": "0",
+            "reserved": "4",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after",
+          "on_timeout": "s1_12_timeout.json",
+          "timed": true,
+          "timer_ms": "3000"
+        }
+      ]
+    },
+    "s1_bg7124_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "7135",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "7142",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_bg7124_r"
+        }
+      ]
+    },
+    "s1_bg7124_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg7124_t",
+          "else": "s1_bg7124_r",
+          "offset": "7124",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg7124_r": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26011",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "7314"
+        },
+        {
+          "type": "pov_change",
+          "character": "Taylor",
+          "index": "0",
+          "offset": "7318"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "7327"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "7336"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "7345"
+        },
+        {
+          "type": "title_card",
+          "title": "Christmas in Helzeroth",
+          "subtitle": "Because every world deserves a chance to celebrate...",
+          "asset_id": "26012",
+          "flag": "-1",
+          "section_start": true,
+          "offset": "7357"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "7364"
+        },
+        {
+          "type": "narration",
+          "text": "Happy Holidays! Welcome to a special premium mini-episode of Surviving High School!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7371"
+        },
+        {
+          "type": "narration",
+          "text": "For this mini-episode, we're taking you to the imaginary world of Helzeroth in the nerds' Ogres and Elves role playing game!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7378"
+        },
+        {
+          "type": "narration",
+          "text": "You'll play as Taylor to see if you can help her survive the holidays!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7388",
+          "set_pov": "Taylor"
+        },
+        {
+          "type": "control",
+          "playable": [
+            "Taylor"
+          ]
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26012",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "7400"
+        },
+        {
+          "type": "narration",
+          "text": "It's Christmas Eve and the nerds are gathered in Helzeroth for a special role-playing event...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7410"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "Thank you all for joining me on this special day, December 24th.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "7419",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "Thank you for planning this special celebration for us, Andrew!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "7428",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "I don't get it... Is Christmas Eve in Helzeroth a really big deal or something?",
+          "character_id": "0",
+          "offset": "7435",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "3",
+          "image": "2023",
+          "text": "To be clear, there is no 'Christmas' in Helzeroth. By pure coincidence, the Winter Celebration of Garh'alla just happens to fall on December 24th.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "7444",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "So we're actually celebrating some creepy Garh'alla thing?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7453",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Wrong again. Our `characters` are celebrating their beloved ancestral festival of Garh'alla.",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7462",
+          "text_bbcode": "Wrong again. Our [color=#e23b3b][i]characters[/i][/color] are celebrating their beloved ancestral festival of Garh'alla.",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "Isn't that right, team?",
+          "character_id": "4",
+          "offset": "7471",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "Oh, Winter Celebration of Garh'alla, is there anything more magical than watching the goblins tobogganing down the icy Mountain of Despair?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7480",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "I'm looking forward to the blindfolded gladiator fights tonight.",
+          "character_id": "3",
+          "offset": "7489",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "I baked cookies!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "7498",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "They're little gingerbread men shaped like our characters and I even used colored icing to...",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "7507",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "1",
+          "offset": "7517"
+        },
+        {
+          "type": "narration",
+          "text": "In real life, Andrew slaps the cookies out of Erik's hands.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "7527"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Unless those are Groekan Blood-Wafers, `we're` not eating them.",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7536",
+          "text_bbcode": "Unless those are Groekan Blood-Wafers, [color=#e23b3b][i]we're[/i][/color] not eating them.",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "I spent all morning decorating those.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "7545",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Could you be any `less` in character? A one-armed giant would `never` bake cookies!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7554",
+          "text_bbcode": "Could you be any [color=#e23b3b][i]less[/i][/color] in character? A one-armed giant would [color=#e23b3b][i]never[/i][/color] bake cookies!",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "But... I...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "7563",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Come on, people! I've crafted a magnificent gaming experience for you. Show some commitment!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7572",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "1",
+          "image": "2426",
+          "text": "Calm down, Andrew! It's just a game.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "7581",
+          "side": "left"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Just... A... `GAME?`",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7590",
+          "text_bbcode": "Just... A... [color=#e23b3b][i]GAME?[/i][/color]",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Er... Taylor, I think you just crossed a line...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "7599",
+          "side": "right"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26012",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "7611"
+        },
+        {
+          "type": "music",
+          "track_id": "8209",
+          "loop": false,
+          "offset": "7618"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Up in the sky, you suddenly see a shadow that blocks out the sun!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7627",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "No! It can't be!",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "7636",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "It's a dragon, isn't it?",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "7645",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "1",
+          "image": "2021",
+          "text": "Try a `horde` of dragons! They swoop down, breathing fire at Angie Elfendale and Brendan the Magical!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "7654",
+          "text_bbcode": "Try a [color=#e23b3b][i]horde[/i][/color] of dragons! They swoop down, breathing fire at Angie Elfendale and Brendan the Magical!",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Angie Elfendale blocks with her shield!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "7663",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "Brendan the Magical rolls to the side!",
+          "character_id": "3",
+          "offset": "7672",
+          "side": "right"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": null,
+          "image": "2020",
+          "text": "A blast of flame shoots straight at the ranger, Taylor the Swift!",
+          "character_id": "4",
+          "offset": "7681",
+          "side": "right"
+        },
+        {
+          "type": "choice",
+          "prompt": "Think fast!",
+          "options": [
+            {
+              "index": "0",
+              "label": "Dodge!",
+              "next": "s1_10_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Block!",
+              "next": "s1_11_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Think fast!",
+            "text": "A blast of flame shoots straight at Taylor the Swift!",
+            "timeout_ms": "3000",
+            "timeout_result": "1000",
+            "character_id": "0",
+            "reserved": "4",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after",
+          "on_timeout": "s1_12_timeout.json",
+          "timed": true,
+          "timer_ms": "3000"
+        }
+      ]
+    },
+    "s1_enter_v0_bg7124_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "7135",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "7142",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg7124_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg7124_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg7124_t",
+          "else": "s1_enter_v0_bg7124_r",
+          "offset": "7124",
+          "op": "eq"
+        }
+      ]
+    }
+  },
+  "pov_note": "Multi-POV episode. `pov` on a segment is the playable character in control on entry; a node's `set_pov` switches the current POV mid-stream (these are the game's 'You are now playing as X' cards). A dialogue node's `side` is 'left' when the speaker is the current POV (the game shows the current main on the left) and 'right' otherwise. POV is propagated in execution order from `entry`; only main_characters can hold it.",
+  "pack_id": "5000",
+  "episode_id": "5",
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "2425",
+          "name": "Taylor",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "2030",
+          "name": "Angie",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "26001",
+          "name": "Erik",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "2060",
+          "name": "Brendan",
+          "format": 1
+        },
+        {
+          "id": "4",
+          "art": "2020",
+          "name": "Andrew",
+          "format": 1
+        },
+        {
+          "id": "5",
+          "art": "26006",
+          "name": "Bear",
+          "format": 1
+        },
+        {
+          "id": "6",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "6",
+        "74": "0"
+      }
+    },
+    "2": {
+      "characters": [],
+      "ui_defaults": {}
+    },
+    "3": {
+      "characters": [],
+      "ui_defaults": {}
+    }
+  },
+  "routines": {
+    "s3_r10": {
+      "entry": "s3_r10_b1",
+      "params": 3,
+      "offset": "81"
+    }
+  },
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0
+    },
+    "set_only": [
+      "1000",
+      "1001"
+    ]
+  },
+  "name_vars": {
+    "$Scott": {
+      "default": "Scott"
+    },
+    "$Travis": {
+      "default": "Travis"
+    },
+    "$ZOE": {
+      "default": "Zoe"
+    }
+  }
+}

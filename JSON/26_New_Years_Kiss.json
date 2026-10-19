@@ -1,0 +1,6815 @@
+{
+  "title": "26_New_Years_Kiss",
+  "episode": "26: New Year's Kiss",
+  "cast": [
+    "Hector",
+    "Howard",
+    "Brendan",
+    "Zach",
+    "Porscha",
+    "Mona",
+    "Paula",
+    "Amanda",
+    "Taylor",
+    "Phil",
+    "Kim",
+    "Linda",
+    "Dinah",
+    "Spike",
+    "Mallika",
+    "Kenji"
+  ],
+  "main_characters": [
+    "Hector"
+  ],
+  "genders": {
+    "Hector": "M",
+    "Howard": "M",
+    "Brendan": "M",
+    "Zach": "M",
+    "Porscha": "F",
+    "Mona": "F",
+    "Paula": "F",
+    "Amanda": "F",
+    "Taylor": "F",
+    "Linda": "F",
+    "Dinah": "F",
+    "Spike": "M",
+    "Mallika": "F",
+    "Kenji": "M"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1",
+    "2": "s2",
+    "3": "s3"
+  },
+  "scene_minigame_banks": {
+    "1": {
+      "pick_word": [
+        {
+          "offset": "177",
+          "subtitle": "Don't get the girls mixed up!",
+          "correct": [
+            "Mona likes acting!",
+            "Porscha is from Wilson High!"
+          ],
+          "decoys": [
+            "Mona is from Wilson High.",
+            "Porscha likes acting."
+          ]
+        }
+      ]
+    },
+    "2": {
+      "build_word": [
+        {
+          "offset": "15",
+          "subtitle": "Stay calm!",
+          "words": [
+            "Stay",
+            "Calm"
+          ],
+          "answers": [
+            "stay",
+            "calm"
+          ],
+          "letters": "stayclmx"
+        },
+        {
+          "offset": "57",
+          "subtitle": "Look happy!",
+          "words": [
+            "Look",
+            "Happy"
+          ],
+          "answers": [
+            "look",
+            "happy"
+          ],
+          "letters": "lokhapyx"
+        },
+        {
+          "offset": "103",
+          "subtitle": "Try and smile!",
+          "words": [
+            "Try",
+            "Smile"
+          ],
+          "answers": [
+            "try",
+            "smile"
+          ],
+          "letters": "trysmlex"
+        }
+      ],
+      "pick_word": [
+        {
+          "offset": "237",
+          "subtitle": "Don't let Hector's friends see him get upset!",
+          "correct": [
+            "It's cool!",
+            "I'm fine!"
+          ],
+          "decoys": [
+            "Actually, I feel terrible.",
+            "Honestly, my heart is broken."
+          ]
+        }
+      ]
+    },
+    "3": {
+      "question_options": [
+        {
+          "offset": "5321",
+          "question": "How would you rate this pack?",
+          "options": [
+            "Loved it!",
+            "It had its moments.",
+            "It was ok.",
+            "Boring!"
+          ]
+        },
+        {
+          "offset": "5401",
+          "question": "Who would make the cutest couple?",
+          "options": [
+            "Amanda and Zach.",
+            "Amanda and Hector.",
+            "Spike and Mallika.",
+            "Dinah and Brendan."
+          ]
+        },
+        {
+          "offset": "5509",
+          "question": "Have you ever cheated on a boyfriend or girlfriend?",
+          "options": [
+            "Yes.",
+            "No."
+          ]
+        }
+      ]
+    }
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    },
+    "2": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "1",
+      "valid_values": [
+        "1"
+      ],
+      "cases": [
+        {
+          "value": "1",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "1": "s2_enter_v1"
+      }
+    },
+    "3": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "2",
+      "valid_values": [
+        "2"
+      ],
+      "cases": [
+        {
+          "value": "2",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "2": "s3"
+      }
+    }
+  },
+  "segments": {
+    "s1_06_win": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 2,
+          "offset": "18741"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Mona, Porscha, it's really great to see you both.",
+          "character_id": "0",
+          "offset": "18748"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Porscha, thanks for coming all the way over here. That's a long trip from the Wilson side of town.",
+          "character_id": "0",
+          "offset": "18755"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "18761"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "No trouble at all.",
+          "character_id": "4",
+          "offset": "18770"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "And Mona, you came even though you're immersed in studying for the community theatre production of 'Much Fondue About Nothing'.",
+          "character_id": "0",
+          "offset": "18777"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": "3",
+          "image": "2328",
+          "text": "Yes... Yes, I perhaps should be practicing.",
+          "character_id": "5",
+          "expression": "3",
+          "offset": "18786"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Well, after we broke up, I do remember you saying how important it was that you focus on your acting. I would `hate` to stand in your way.",
+          "character_id": "0",
+          "offset": "18793",
+          "text_bbcode": "Well, after we broke up, I do remember you saying how important it was that you focus on your acting. I would [color=#e23b3b][i]hate[/i][/color] to stand in your way."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": "3",
+          "image": "2328",
+          "text": "You're... You're right! I did resolve to end all frivilous dalliances and devote myself to my craft.",
+          "character_id": "5",
+          "expression": "3",
+          "offset": "18802"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": "4",
+          "image": "2329",
+          "text": "I cannot believe I allowed myself to be distracted! Where is Brendan? As a fellow actor, he should've known better than to invite me to a `party` in the middle of acting season!",
+          "character_id": "5",
+          "expression": "4",
+          "offset": "18811",
+          "text_bbcode": "I cannot believe I allowed myself to be distracted! Where is Brendan? As a fellow actor, he should've known better than to invite me to a [color=#3b78e2][i]party[/i][/color] in the middle of acting season!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "3",
+          "image": "26003",
+          "text": "Acting season?",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "18820"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Every season is acting season to Mona...",
+          "character_id": "0",
+          "offset": "18827"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": null,
+          "image": "2325",
+          "text": "I must be gone. Hector, it was delightful to see you, but I haven't the time for a romantic interest at the moment, or for any social distractions.",
+          "character_id": "5",
+          "offset": "18846"
+        },
+        {
+          "type": "narration",
+          "text": "Mona exits stage right.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18856"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Finally! I thought she'd never leave.",
+          "character_id": "4",
+          "offset": "18865"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Huh?",
+          "character_id": "0",
+          "offset": "18872"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Now it's just you and me...",
+          "character_id": "4",
+          "offset": "18881"
+        },
+        {
+          "type": "next",
+          "next": "s1_07_lose_m"
+        }
+      ]
+    },
+    "s1_07_lose": {
+      "nodes": [
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "18890"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "So, uh, Porscha. How's the acting going?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18899"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "3",
+          "image": "26003",
+          "text": "I'm not an actress.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "18908"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": "1",
+          "image": "2326",
+          "text": "What?! You're confusing me with this scullery maid?",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "18917"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Why is this so familiar... Oh, man. Alexei's party! That's when Mona broke up with me, right?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18926"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "18932"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "1",
+          "image": "26001",
+          "text": "`I` broke up with you at Alexei's party!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "18941",
+          "text_bbcode": "[color=#3b78e2][i]I[/i][/color] broke up with you at Alexei's party!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": "1",
+          "image": "2326",
+          "text": "I was only there for that great float caper that we pulled off.",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "18950"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "18956"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": null,
+          "image": "2325",
+          "text": "This is intolerable.",
+          "character_id": "5",
+          "offset": "18965"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "18981"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": null,
+          "image": "2325",
+          "text": "Goodbye, Hector. I hope, for your sake, that our paths never again cross.",
+          "character_id": "5",
+          "offset": "18990"
+        },
+        {
+          "type": "narration",
+          "text": "Mona storms off.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19000"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "3",
+          "image": "26003",
+          "text": "I can't believe you mixed up the two of us...",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "19009"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Uh. Yeah, that's really awkward. I bet you want to storm off now too, huh?",
+          "character_id": "0",
+          "offset": "19016"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "2",
+          "image": "26002",
+          "text": "Oh, I don't know. Most guys fall madly in love with me. It's kind of refreshing to find out that there's someone like you.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "19025"
+        },
+        {
+          "type": "next",
+          "next": "s1_07_lose_m"
+        }
+      ]
+    },
+    "s1_05_after": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "18428"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18444"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Hector! Come back over here! Where are you?",
+          "character_id": "4",
+          "offset": "18453"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1015",
+          "variant": "1",
+          "offset": "18463"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18477"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "I guess I better do some damage control.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18489"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "18499"
+        },
+        {
+          "type": "narration",
+          "text": "And so...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18509"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "So, Hector, I hear you're single right now. I bet that means you're going to need someone to kiss at midnight.",
+          "character_id": "4",
+          "offset": "18518"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": "2",
+          "image": "2327",
+          "text": "I suppose it's good that `I'm` here to take up that role.",
+          "character_id": "5",
+          "expression": "2",
+          "offset": "18527",
+          "text_bbcode": "I suppose it's good that [color=#3b78e2][i]I'm[/i][/color] here to take up that role."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "1",
+          "image": "26001",
+          "text": "Yeah, right. Like Hector would ever choose `you` over `me!`",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "18536",
+          "text_bbcode": "Yeah, right. Like Hector would ever choose [color=#3b78e2][i]you[/i][/color] over [color=#3b78e2][i]me![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Uh...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18545"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18551"
+        },
+        {
+          "type": "narration",
+          "text": "Hector spots Amanda watching him from across the room...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18561"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18567"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "...",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "18576"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Oh man, this looks bad.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18588"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Wouldn't you ladies like to stop arguing and... Uh... Have some beef stroganoff? Or some pavlova. That's a dessert... I think.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18597"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "1",
+          "image": "26001",
+          "text": "Stop trying to change the subject, Hector.",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "18606"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": "1",
+          "image": "2326",
+          "text": "Hector, Daaahling, please dismiss this understudy.",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "18615"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "1",
+          "image": "26001",
+          "text": "Aren't you the girl who stormed into Alexei's party? Give it a rest, drama queen.",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "18624"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Okay, talking to two ex-girlfriends. No big deal. Just need to keep my facts straight, make a little small talk, and get out of here...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18636"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Before Amanda gets the wrong idea.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18648"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": true,
+          "offset": "18655"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "1000",
+          "offset": "18714"
+        },
+        {
+          "type": "minigame",
+          "minigame_type": "pick_word",
+          "kind": "content_fork",
+          "minigame_id": "1000",
+          "via": "by_id",
+          "trigger": "18714",
+          "win_threshold": "5",
+          "offset": "18724",
+          "win": "s1_06_win",
+          "lose": "s1_07_lose",
+          "setup": {
+            "bank": "pick_word",
+            "rounds": [
+              {
+                "offset": "177",
+                "subtitle": "Don't get the girls mixed up!",
+                "correct": [
+                  "Mona likes acting!",
+                  "Porscha is from Wilson High!"
+                ],
+                "decoys": [
+                  "Mona is from Wilson High.",
+                  "Porscha likes acting."
+                ]
+              }
+            ],
+            "timer_ms": "20000"
+          },
+          "timed": true,
+          "timer_ms": "20000"
+        }
+      ]
+    },
+    "s1_08_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "It's not going to be easy... This is a total mess you got us in.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18187"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "But I saw this on a sitcom once. All we need is a couple of wigs, some ice cream, and, hey, do you know if there's a circus in town?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18196"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "18202"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "1",
+          "image": "2061",
+          "text": "Hector, I don't want to get mixed up in some stupid scheme tonight.",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "18211"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "It's not a stupid scheme. We'll figure it out. We'll make it work.",
+          "character_id": "0",
+          "offset": "18218"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "1",
+          "image": "2061",
+          "text": "Oh, `we'll` make it work?",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "18227",
+          "text_bbcode": "Oh, [color=#e23b3b][i]we'll[/i][/color] make it work?"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "18233"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "1",
+          "image": "2061",
+          "text": "First, you go off on me for a perfectly reasonable mistake, and then you try to draft me into helping you fix it?",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "18242"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "1",
+          "image": "2061",
+          "text": "You know what, Hector? I think we'll `both` be better off if you leave me out of all of your ridiculous plans!",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "18251",
+          "text_bbcode": "You know what, Hector? I think we'll [color=#e23b3b][i]both[/i][/color] be better off if you leave me out of all of your ridiculous plans!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Wait, I didn't mean...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18260"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "1",
+          "image": "2061",
+          "text": "Whatever, man. I'm out of here.",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "18269"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "1",
+          "image": "2061",
+          "text": "Take care of your party yourself!",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "18288"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18294"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "I guess I shouldn't have been so hard on Brendan...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18306"
+        },
+        {
+          "type": "next",
+          "next": "s1_05_after"
+        }
+      ]
+    },
+    "s1_09_opt1": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "18324"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Sorry, man. You're just not ready for the big leagues.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18333"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "That's... That's...",
+          "character_id": "2",
+          "offset": "18342"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "18348"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "Great!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "18357"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Huh?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "18366"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "For once, I'm not going to be stuck trying to keep control of a party, or trying to sell a bunch of tickets for the school play, or figuring out how to get home from the Wilson High side of town!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "18375"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Hey, I'm only responsible for `some` of those things!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "18384",
+          "text_bbcode": "Hey, I'm only responsible for [color=#e23b3b][i]some[/i][/color] of those things!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "Anyway, thanks, Hector! I'm going to go hang out with Dinah.",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "18393"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Uh, yeah. Sure.",
+          "character_id": "0",
+          "offset": "18400"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18406"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "How about that? Brendan needed a break from all of the drama...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18418"
+        },
+        {
+          "type": "next",
+          "next": "s1_05_after"
+        }
+      ]
+    },
+    "s1_04_after": {
+      "nodes": [
+        {
+          "type": "sfx",
+          "sfx_id": "8004",
+          "offset": "17884"
+        },
+        {
+          "type": "narration",
+          "text": "Just then, the doorbell rings...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17894"
+        },
+        {
+          "type": "narration",
+          "text": "Hector opens the door...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17912"
+        },
+        {
+          "type": "music",
+          "track_id": "8224",
+          "loop": false,
+          "offset": "17927"
+        },
+        {
+          "type": "narration",
+          "text": "And a beautiful, blonde girl walks in.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17937"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Hi, Hector! It's been too, too long.",
+          "character_id": "4",
+          "offset": "17946"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Porscha?! What are you doing here?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "17955"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Some nerdy kid named Brendan said you were having a party... And you know I'd never miss one of your parties!",
+          "character_id": "4",
+          "offset": "17964"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "1",
+          "image": "26001",
+          "text": "What's wrong? Aren't you happy to see me?",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "17973"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "I... Uh... I...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "17982"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8004",
+          "offset": "17988"
+        },
+        {
+          "type": "narration",
+          "text": "The doorbell rings again.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17998"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I've got to answer the door!",
+          "character_id": "0",
+          "offset": "18005"
+        },
+        {
+          "type": "narration",
+          "text": "Hector opens the door, and Mona comes in!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18023"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": null,
+          "image": "2325",
+          "text": "Hector, Daaaahling! Brendan told me I really had to attend this soiree to learn more about Russian culture, and I must say I'm glad I listened to his advice.",
+          "character_id": "5",
+          "offset": "18032"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mona",
+          "emotion_code": "2",
+          "image": "2327",
+          "text": "Now if the school ever does a production of 'A Doll's Dwelling Place', I'll be prepared to play the lead!",
+          "character_id": "5",
+          "expression": "2",
+          "offset": "18041"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18047"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Uh, one second, ladies.",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "18056"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1015",
+          "variant": "1",
+          "offset": "18066"
+        },
+        {
+          "type": "narration",
+          "text": "Hector finds Brendan and drags him into his room.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18076"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "Dude! What gives? Did you honestly invite `two` of my crazy ex-girlfriends to this party?!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18085",
+          "text_bbcode": "Dude! What gives? Did you honestly invite [color=#e23b3b][i]two[/i][/color] of my crazy ex-girlfriends to this party?!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Hey, don't blame me. You had so many notes next to the girls in that book... How could I figure all of that out?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "18094"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "Crazy ex-girlfriends are clearly marked with the skull-and-crossbones!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18103"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Oh... I thought that meant they were goth-friendly. And, you know, Dinah doesn't really have any goth friends, so I thought...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "18112"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "You know Mona's not a goth!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18121"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "To be fair, Mona totally went goth when she was rehearsing for her roles in 'Vampires: The Musical' and 'Once Upon a Coffin'.",
+          "character_id": "2",
+          "offset": "18130"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "Besides, I didn't know you dated Porscha. Doesn't she try to make out with everyone? This one time I was on the Wilson High side of town, and...",
+          "character_id": "2",
+          "offset": "18139"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "Brendan...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18148"
+        },
+        {
+          "type": "choice",
+          "prompt": "Brendan...",
+          "options": [
+            {
+              "index": "0",
+              "label": "We can fix this.",
+              "next": "s1_08_opt0"
+            },
+            {
+              "index": "1",
+              "label": "You're off the plan.",
+              "next": "s1_09_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Brendan...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_05_after"
+        }
+      ]
+    },
+    "s1_10_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Come on, Paula. A guy like me needs to be free to go where the wind blows.",
+          "character_id": "0",
+          "offset": "17453"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I can't let myself be held down by one girl.",
+          "character_id": "0",
+          "offset": "17460"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "17466"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I'm just not that kind of guy.",
+          "character_id": "0",
+          "offset": "17473"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "...Oh.",
+          "character_id": "7",
+          "offset": "17482"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Hmm... You might be right about that. Your popularity is mostly tied to your womanizing.",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "17491"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "If you weren't chasing after every girl in sight with slightly amusing pick-up lines, your popularity would plummet.",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "17500"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Exactly. I'm a free spirit! A wild stallion! I can't be tied down!",
+          "character_id": "0",
+          "offset": "17507"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Come on, Amanda. Let's get out of here. We've got to find another popular guy...",
+          "character_id": "6",
+          "offset": "17526"
+        },
+        {
+          "type": "narration",
+          "text": "Paula goes over to the other side of the room to talk to the guys there, but Amanda hesitates.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17536"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "17542"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "...",
+          "character_id": "7",
+          "offset": "17551"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Amanda? What's wrong?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "17560"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "Huh? Oh... Nothing.",
+          "character_id": "7",
+          "offset": "17569"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "17575"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Oh, `man!` Amanda thinks I meant all of that about being a wild stallion!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "17587",
+          "text_bbcode": "Oh, [color=#e23b3b][i]man![/i][/color] Amanda thinks I meant all of that about being a wild stallion!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Wait, Amanda, I didn't mean that I'd `never` want to date someone, I mean, if someone special came along...",
+          "character_id": "0",
+          "offset": "17594",
+          "text_bbcode": "Wait, Amanda, I didn't mean that I'd [color=#e23b3b][i]never[/i][/color] want to date someone, I mean, if someone special came along..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "Sniffle... Yeah... I guess it would have to be a really special girl to make you want to date her.",
+          "character_id": "7",
+          "offset": "17603"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "I mean, not just some stupid rich girl with red hair and bad grades and mean friends...",
+          "character_id": "7",
+          "offset": "17622"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Wait a second, that's not what I meant...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "17649"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Come on, Amanda! I said we were going to talk to hot guys!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "17658"
+        },
+        {
+          "type": "narration",
+          "text": "Paula pulls Amanda away.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17676"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "Stupid, stupid, stupid! How could I say that in front of Amanda? Now she's going to think I'm totally sleazy.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17688"
+        },
+        {
+          "type": "next",
+          "next": "s1_04_after"
+        }
+      ]
+    },
+    "s1_11_opt1": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "17706"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "WHAT?!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "17715"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "No one turns me down... No one!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "17724"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Whoa, whoa, whoa. I'm not saying you're not totally hot.",
+          "character_id": "0",
+          "offset": "17731"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "The problem is... Um... You dated Andy!",
+          "character_id": "0",
+          "offset": "17738"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "What does that have to do with anything?",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "17747"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Man, Andy and I go way back. Waaay back. He'd never forgive me if I went out with his girl.",
+          "character_id": "0",
+          "offset": "17754"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "You don't want to break the kid's heart, do you?",
+          "character_id": "0",
+          "offset": "17761"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Hmph. I guess I don't want to start any more drama that Taylor could capitalize on...",
+          "character_id": "6",
+          "offset": "17770"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Come on, Amanda. Let's go find some other popular guy for me to date.",
+          "character_id": "6",
+          "offset": "17789"
+        },
+        {
+          "type": "narration",
+          "text": "Paula walks off, but Amanda lingers for a moment.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17799"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "Hector, you're not... Friends with Zach, are you?",
+          "character_id": "7",
+          "offset": "17808"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Zach? No way! Barely even know the guy.",
+          "character_id": "0",
+          "offset": "17815"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "So you'd... You'd date someone who dated Zach?",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "17824"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Well, that's not exactly one of my requirements, but...",
+          "character_id": "0",
+          "offset": "17839"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Amanda! I said we're going to go talk to hot guys!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "17848"
+        },
+        {
+          "type": "narration",
+          "text": "Paula pulls Amanda away.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17866"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Okay, that was good. Maybe... Maybe Amanda would actually go out with me.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17878"
+        },
+        {
+          "type": "next",
+          "next": "s1_04_after"
+        }
+      ]
+    },
+    "s1_03_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "And you know what, Brendan? This time, while you're talking to the girls, I'll go get the snacks.",
+          "character_id": "0",
+          "offset": "17136"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "That way I can get some stuff I know Amanda will like...",
+          "mode": "-2",
+          "character_id": "0",
+          "offset": "17146"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "17152"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Well, we better get to work!",
+          "character_id": "0",
+          "offset": "17159"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "17169"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "17176"
+        },
+        {
+          "type": "narration",
+          "text": "That night at the party, kids from school pack Hector's house, but Hector's waiting for one person in particular...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17194"
+        },
+        {
+          "type": "narration",
+          "text": "As guests fill up the room, Hector is in the living room arranging nesting Russian dolls, fur hats, and Russian food.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17204"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kenji",
+          "emotion_code": null,
+          "image": "2245",
+          "text": "Hey, cool party, Hector!",
+          "character_id": "15",
+          "offset": "17213"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": null,
+          "image": "2280",
+          "text": "And the food is so culturally accurate! This borscht is great, and the beef stroganoff looks amazing!",
+          "character_id": "14",
+          "offset": "17230"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Spike",
+          "emotion_code": null,
+          "image": "2400",
+          "text": "Not to mention delicious.",
+          "character_id": "13",
+          "offset": "17247"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I'm just glad you're all having a good time.",
+          "character_id": "0",
+          "offset": "17254"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Okay, Russian New Years is going to be awesome... Now I just need to see if Amanda's here yet.",
+          "mode": "-2",
+          "character_id": "0",
+          "offset": "17264"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "Hector!",
+          "character_id": "7",
+          "offset": "17273"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Amanda! Hey! When did you get here?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17282"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Taylor and I got here a few minutes ago. All these decorations are so cool! Happy Russian New Year's Eve!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "17291"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Er, right! Happy Russian New Year's Eve.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17300"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "I'm really glad you could make it.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17309"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Of course! I love your parties, Hector.",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "17318"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Cool, cool.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17327"
+        },
+        {
+          "type": "narration",
+          "text": "Suddenly, Paula pushes past Amanda.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17337"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Hector! There you are. I've been thinking...",
+          "character_id": "6",
+          "offset": "17346"
+        },
+        {
+          "type": "music",
+          "track_id": "8220",
+          "loop": false,
+          "offset": "17353"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "We should totally date.",
+          "character_id": "6",
+          "offset": "17362"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "What?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "17371"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "4",
+          "image": "2019",
+          "text": "What?!",
+          "character_id": "7",
+          "expression": "4",
+          "offset": "17380"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "I'll be honest with you, Hector.",
+          "character_id": "6",
+          "offset": "17389"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Ever since Taylor won the title of Winter Queen, I've been looking for a way to increase my popularity.",
+          "character_id": "6",
+          "offset": "17398"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "And I finally figured it out! I just need a popular boyfriend!",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "17407"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "And, well, here you are.",
+          "character_id": "6",
+          "offset": "17416"
+        },
+        {
+          "type": "choice",
+          "prompt": "We should totally date.",
+          "options": [
+            {
+              "index": "0",
+              "label": "I'm not interested in having a girlfriend.",
+              "next": "s1_10_opt0"
+            },
+            {
+              "index": "1",
+              "label": "I'm not interested in you.",
+              "next": "s1_11_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "We should totally date.",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_04_after"
+        }
+      ]
+    },
+    "s1_12_opt0": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "16996"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Call it a favor. Since you and Kat broke up, you've been all mopey. You need to get out there and meet some new girls!",
+          "character_id": "0",
+          "offset": "17003"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "17009"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "4",
+          "image": "2064",
+          "text": "Wow. Hector, that's really cool of you.",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "17018"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "It has been really tough getting over Kat. Thanks for putting up with all of my whining.",
+          "character_id": "2",
+          "offset": "17027"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Yeah, yeah. No problem, man.",
+          "character_id": "0",
+          "offset": "17034"
+        },
+        {
+          "type": "next",
+          "next": "s1_03_after"
+        }
+      ]
+    },
+    "s1_13_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "No offense, but you're not exactly great at talking to hot girls.",
+          "character_id": "0",
+          "offset": "17044"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "And now that you're back on the market, you need to get a lot better, fast!",
+          "character_id": "0",
+          "offset": "17051"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "17057"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "So you're sending me to talk to a bunch of hot girls `because I'm not good at it?!`",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "17066",
+          "text_bbcode": "So you're sending me to talk to a bunch of hot girls [color=#e23b3b][i]because I'm not good at it?![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Yup. But the only way to get better is to get out there and do it!",
+          "character_id": "0",
+          "offset": "17073"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "17079"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Gulp!",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "17088"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Huh, maybe this wasn't the best thing to tell you right before you head out...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "17097"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "17106"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "You'll be fine! Just get out there and do it! Come on, champ! You've got this!",
+          "character_id": "0",
+          "offset": "17113"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "I... I'll give it my best shot.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "17122"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Perfect!",
+          "character_id": "0",
+          "offset": "17129"
+        },
+        {
+          "type": "next",
+          "next": "s1_03_after"
+        }
+      ]
+    },
+    "s1_02_after": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1015",
+          "variant": "0",
+          "offset": "16837"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "16844"
+        },
+        {
+          "type": "narration",
+          "text": "Two weeks later...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16854"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Brendan, do you know why I've called you here today?",
+          "character_id": "0",
+          "offset": "16861"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Because you're throwing this weird week-after-New-Year's-Eve party tonight, and you figured you could get me to do all the dirty work?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "16870"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "If by 'dirty work' you mean talk to a million hot girls and invite them to our party, then yes.",
+          "character_id": "0",
+          "offset": "16877"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "Huh?",
+          "character_id": "2",
+          "offset": "16886"
+        },
+        {
+          "type": "narration",
+          "text": "Hector hands Brendan a black address book.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16896"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "This, my friend, is a complete list of all the hottest girls in town, listed by hotness and cross-referenced by curfew. Pick a few to invite tonight, and make sure they'll be there.",
+          "character_id": "0",
+          "offset": "16903"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "Uh... Okay. I can do that. But why?",
+          "character_id": "2",
+          "offset": "16912"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Because, we have standards to uphold. People are going to think I'm slipping if there aren't lots of girls at this shindig.",
+          "character_id": "0",
+          "offset": "16919"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": null,
+          "image": "2060",
+          "text": "No, no. I meant, why do you want `me` to invite the girls?",
+          "character_id": "2",
+          "offset": "16928",
+          "text_bbcode": "No, no. I meant, why do you want [color=#e23b3b][i]me[/i][/color] to invite the girls?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Brendan, are you really going to complain about the chance to talk to hot girls?",
+          "character_id": "0",
+          "offset": "16935"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "4",
+          "image": "2064",
+          "text": "No... I just thought you'd usually want to handle the girls yourself and send me to get food or something...",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "16944"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Okay, to be totally honest, I thought...",
+          "character_id": "0",
+          "offset": "16951"
+        },
+        {
+          "type": "choice",
+          "prompt": "I thought...",
+          "options": [
+            {
+              "index": "0",
+              "label": "It would cheer you up.",
+              "next": "s1_12_opt0"
+            },
+            {
+              "index": "1",
+              "label": "You could use the experience.",
+              "next": "s1_13_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "I thought...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_03_after"
+        }
+      ]
+    },
+    "s1_14_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "4",
+          "image": "2214",
+          "text": "No, you aren't! What are you talking about?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "16629"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I'm... A sixth Russian?",
+          "character_id": "0",
+          "offset": "16636"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "16642"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Nope.",
+          "character_id": "1",
+          "offset": "16649"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I speak Russian?",
+          "character_id": "0",
+          "offset": "16656"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "16662"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Not true.",
+          "character_id": "1",
+          "offset": "16669"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I've been to Russia.",
+          "character_id": "0",
+          "offset": "16676"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "16682"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "No, you watched that James Bomb movie, 'From Russia with Ambivalence'. That doesn't count.",
+          "character_id": "1",
+          "offset": "16689"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "Okay, okay. So I'm not exactly an expert on Russia. I just had to delay the party.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "16698"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "4",
+          "image": "2214",
+          "text": "Why?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "16707"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "It's for a girl, isn't it?",
+          "character_id": "1",
+          "offset": "16714"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "No, because... Uh... I've got to go.",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "16723"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "16729"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Just come to the party!",
+          "character_id": "0",
+          "offset": "16736"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_15_opt1": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "16754"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Come on, man. Do you really want to have a boring old New Year's Eve party on the same day every year?",
+          "character_id": "0",
+          "offset": "16761"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Or do you want to have a `crazy`, totally `new` Russian New Year's Eve party on a whole new night?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "16770",
+          "text_bbcode": "Or do you want to have a [color=#e23b3b][i]crazy[/i][/color], totally [color=#e23b3b][i]new[/i][/color] Russian New Year's Eve party on a whole new night?"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "16776"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "It's uncharted party territory! We'll be pioneers in party history! They'll be writing us into party textbooks in no time!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "16785"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "When they teach classes about party-ology, they'll be talking about us!",
+          "character_id": "0",
+          "offset": "16792"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Heh. I guess I see your point...",
+          "character_id": "1",
+          "offset": "16799"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Great!",
+          "character_id": "0",
+          "offset": "16806"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "16820"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "See you at the party!",
+          "character_id": "0",
+          "offset": "16827"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_01_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Think about it... New Year's Eve is the one night of the year when it's okay to kiss anyone you want without any explanations.",
+          "character_id": "0",
+          "offset": "16468"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "It won't matter if she's with Zach... She can still kiss me. If she wants to, I mean.",
+          "character_id": "0",
+          "offset": "16475"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "I don't get it, Hector. You and Amanda have made out, like, at least a dozen times.",
+          "character_id": "8",
+          "offset": "16484"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Obviously, she's into you. Why don't you do something about it?",
+          "character_id": "8",
+          "offset": "16493"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "It's not that easy.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "16502"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I've kissed a lot of girls that I wasn't ready to start dating.",
+          "character_id": "0",
+          "offset": "16509"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "What if that's how Amanda feels?",
+          "character_id": "0",
+          "offset": "16516"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Besides... If Amanda wanted to get with me, she'd break up with that male-model wannabe.",
+          "character_id": "0",
+          "offset": "16523"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "I guess that makes sense. But, Hector, keep in mind that sometimes things aren't that simple.",
+          "character_id": "8",
+          "offset": "16532"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "And for the record, you might want to come up with a better story than this Russian New Year's Party. I don't think the rest of the school is going to buy it as easily as Amanda did.",
+          "character_id": "8",
+          "offset": "16541"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "16547"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Heh, no way! People are totally gullible. No one's even going to ask about it...",
+          "character_id": "0",
+          "offset": "16554"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1111",
+          "variant": "0",
+          "offset": "16564"
+        },
+        {
+          "type": "narration",
+          "text": "Later that day, after Hector tells Howard...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16574"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "4",
+          "image": "2214",
+          "text": "You want to have a Russian New Year's Eve party?!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "16583"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "That doesn't make any sense. You're not Russian.",
+          "character_id": "1",
+          "offset": "16590"
+        },
+        {
+          "type": "choice",
+          "prompt": "You're not Russian.",
+          "options": [
+            {
+              "index": "0",
+              "label": "Of course I'm Russian!",
+              "next": "s1_14_opt0"
+            },
+            {
+              "index": "1",
+              "label": "I'm just trying something new.",
+              "next": "s1_15_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "You're not Russian.",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_02_after"
+        }
+      ]
+    },
+    "s1_16_opt0": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "16387"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Okay, so I wanted to make sure Amanda could come. Is that such a crime?",
+          "character_id": "0",
+          "offset": "16394"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "16400"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "No... I mean, I know you kind of have a thing for her, but...",
+          "character_id": "8",
+          "offset": "16409"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Well, why not just have a normal party when she gets back? Why are you putting off the New Year's Party?",
+          "character_id": "8",
+          "offset": "16418"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1_17_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I just think normal New Year's Eve is overrated. And, uh, you know, why not try to bring a little culture to our party-going experience?",
+          "character_id": "0",
+          "offset": "16428"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "16434"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "3",
+          "image": "2428",
+          "text": "Come on, Hector. Did you forget what happened at the Winter Formal? I've kind of got it figured out that you've got a thing for Amanda.",
+          "character_id": "8",
+          "expression": "3",
+          "offset": "16443"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Oh. Right.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "16452"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "What I don't get is why you're doing this delayed party thing.",
+          "character_id": "8",
+          "offset": "16461"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg15902_1"
+        }
+      ]
+    },
+    "s2_03_win": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 2,
+          "offset": "6007"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Oh, you know how things are. I've got some stuff to take care of as the host.",
+          "character_id": "0",
+          "offset": "6014"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Linda",
+          "emotion_code": "3",
+          "image": "2263",
+          "text": "But you're going to miss the countdown.",
+          "character_id": "11",
+          "expression": "3",
+          "offset": "6023"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "6029"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Eh, you've seen one countdown, you've seen 'em all. I'll be right back.",
+          "character_id": "0",
+          "offset": "6036"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 2,
+          "offset": "6123"
+        },
+        {
+          "type": "return",
+          "offset": "6039"
+        }
+      ]
+    },
+    "s2_04_lose": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "I... I'm not okay! I can't take it anymore! I have to get out of here!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6048"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Linda",
+          "emotion_code": "3",
+          "image": "2263",
+          "text": "What's wrong?",
+          "character_id": "11",
+          "expression": "3",
+          "offset": "6057"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I'm kind of dealing with a lot right now, okay, Linda?",
+          "character_id": "0",
+          "offset": "6064"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Linda",
+          "emotion_code": "4",
+          "image": "2264",
+          "text": "Whoa! I had no idea! Sorry!",
+          "character_id": "11",
+          "expression": "4",
+          "offset": "6073"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "6079"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Sob!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6088"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "6094"
+        },
+        {
+          "type": "narration",
+          "text": "Hector runs to his room.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6114"
+        },
+        {
+          "type": "next",
+          "next": "s2_04_lose_m"
+        }
+      ]
+    },
+    "s2_02_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "Russian New Year's Eve is fun!",
+          "character_id": "7",
+          "offset": "5725"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "The only thing is... It's too bad there's no countdown to midnight.",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "5734"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Hey, not to worry. Do you think I'd let any New Year's Eve party go down without that?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "5743"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "I recorded the countdown last week! Let me just start it up on the TV.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "5752"
+        },
+        {
+          "type": "narration",
+          "text": "Hector starts up the pre-recorded countdown.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5762"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "There we go. We've got fifteen minutes till midnight, so I'll fastforward a little...",
+          "character_id": "0",
+          "offset": "5769"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Perfect.",
+          "character_id": "0",
+          "offset": "5776"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Ooh! I hope they have fireworks! I love fireworks!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "5785"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Linda",
+          "emotion_code": "2",
+          "image": "2262",
+          "text": "Hey, the countdown! Everyone, get in here!",
+          "character_id": "11",
+          "expression": "2",
+          "offset": "5794"
+        },
+        {
+          "type": "narration",
+          "text": "Zach pushes past Hector to stand next to Amanda.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5814"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "2",
+          "image": "2497",
+          "text": "This is the best part of New Year's Eve! Ready for that first New Year's kiss, Amanda?",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "5823"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "What? Where did Zach come from? I thought he'd be distracted for longer than that.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "5835"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "I can't kiss Amanda if Zach's here to kiss her! Looks like this whole stupid party was just a waste of time.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "5847"
+        },
+        {
+          "type": "narration",
+          "text": "Zach wraps his arms around Amanda.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5867"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "2",
+          "image": "2497",
+          "text": "There's nothing better than being with your girl on Russian New Year's Eve.",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "5876"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Ugh, I really don't want to watch Zach make out with Amanda.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5888"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "I need to get out of here.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5908"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Linda",
+          "emotion_code": null,
+          "image": "2260",
+          "text": "Hector, you're not going to watch the countdown?",
+          "character_id": "11",
+          "offset": "5917"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Yeah... I... I...",
+          "character_id": "0",
+          "offset": "5924"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": true,
+          "offset": "5931"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "1000",
+          "offset": "5980"
+        },
+        {
+          "type": "minigame",
+          "minigame_type": "pick_word",
+          "kind": "content_fork",
+          "minigame_id": "1000",
+          "via": "by_id",
+          "trigger": "5980",
+          "win_threshold": "5",
+          "offset": "5990",
+          "win": "s2_03_win",
+          "lose": "s2_04_lose",
+          "setup": {
+            "bank": "pick_word",
+            "rounds": [
+              {
+                "offset": "237",
+                "subtitle": "Don't let Hector's friends see him get upset!",
+                "correct": [
+                  "It's cool!",
+                  "I'm fine!"
+                ],
+                "decoys": [
+                  "Actually, I feel terrible.",
+                  "Honestly, my heart is broken."
+                ]
+              }
+            ],
+            "timer_ms": "20000"
+          },
+          "timed": true,
+          "timer_ms": "20000",
+          "variants": [
+            {
+              "platform": "mobile",
+              "bank": "pick_word",
+              "rounds": [
+                {
+                  "offset": "237",
+                  "subtitle": "Don't let Hector's friends see him get upset!",
+                  "correct": [
+                    "It's cool!",
+                    "I'm fine!"
+                  ],
+                  "decoys": [
+                    "Actually, I feel terrible.",
+                    "Honestly, my heart is broken."
+                  ]
+                }
+              ]
+            },
+            {
+              "platform": "tablet",
+              "bank": "build_word",
+              "rounds": [
+                {
+                  "offset": "15",
+                  "subtitle": "Stay calm!",
+                  "words": [
+                    "Stay",
+                    "Calm"
+                  ],
+                  "answers": [
+                    "stay",
+                    "calm"
+                  ],
+                  "letters": "stayclmx"
+                },
+                {
+                  "offset": "57",
+                  "subtitle": "Look happy!",
+                  "words": [
+                    "Look",
+                    "Happy"
+                  ],
+                  "answers": [
+                    "look",
+                    "happy"
+                  ],
+                  "letters": "lokhapyx"
+                },
+                {
+                  "offset": "103",
+                  "subtitle": "Try and smile!",
+                  "words": [
+                    "Try",
+                    "Smile"
+                  ],
+                  "answers": [
+                    "try",
+                    "smile"
+                  ],
+                  "letters": "trysmlex"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "s2_05_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "I'm really glad you could make it tonight, Amanda..",
+          "character_id": "0",
+          "offset": "5432"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "Hee hee! Thanks, Hector. You're so sweet!",
+          "character_id": "7",
+          "offset": "5441"
+        },
+        {
+          "type": "narration",
+          "text": "Hector moves a little closer to Amanda and puts his arm around her.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5451"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "So I was thinking...",
+          "character_id": "0",
+          "offset": "5458"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "5464"
+        },
+        {
+          "type": "narration",
+          "text": "Just then, Dinah walks into the room!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5474"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": null,
+          "image": "2105",
+          "text": "Hey, have you guys seen Brendan?",
+          "character_id": "12",
+          "offset": "5483"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Uh, no.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5492"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": null,
+          "image": "2105",
+          "text": "I can't find him anywhere...",
+          "character_id": "12",
+          "offset": "5511"
+        },
+        {
+          "type": "narration",
+          "text": "Dinah goes upstairs to look for Brendan.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5521"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "5527"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "So, um...",
+          "character_id": "0",
+          "offset": "5534"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "5540"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "Er...",
+          "character_id": "7",
+          "offset": "5549"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "5555"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Uh...",
+          "character_id": "0",
+          "offset": "5562"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Great... Now this is awkward.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5574"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "...",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "5583"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Well... Anyways, are you having a good time tonight?",
+          "character_id": "0",
+          "offset": "5590"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Yes!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "5599"
+        },
+        {
+          "type": "next",
+          "next": "s2_02_after"
+        }
+      ]
+    },
+    "s2_06_opt1": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "5617"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Uh, hey, do you want some `Gummy Mares?`",
+          "character_id": "0",
+          "offset": "5624",
+          "text_bbcode": "Uh, hey, do you want some [color=#e23b3b][i]Gummy Mares?[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "You got Gummy Mares?!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "5633"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "That's my favorite type of candy `and` my favorite type of horse!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "5642",
+          "text_bbcode": "That's my favorite type of candy [color=#3b78e2][i]and[/i][/color] my favorite type of horse!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Heh. I know. You're always eating them at lunch.",
+          "character_id": "0",
+          "offset": "5649"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Hee hee. You know, don't tell Taylor or Paula, but I still watch the Gummy Mares TV show!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "5658"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Hey, I don't think you ever get too old for cartoons. Just between you and me, I've been known to catch an episode or two of `Blackwing Bird.`",
+          "character_id": "0",
+          "offset": "5665",
+          "text_bbcode": "Hey, I don't think you ever get too old for cartoons. Just between you and me, I've been known to catch an episode or two of [color=#e23b3b][i]Blackwing Bird.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "Hee hee. I used to watch that show every day!",
+          "character_id": "7",
+          "offset": "5674"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "'I am the menace that flaps in the night!'",
+          "character_id": "0",
+          "offset": "5681"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "'Let's get hazardous!'",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "5690"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "No way!",
+          "character_id": "0",
+          "offset": "5697"
+        },
+        {
+          "type": "narration",
+          "text": "Amanda takes a handful of the candy and happily snacks on it.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5707"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Mmm!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "5716"
+        },
+        {
+          "type": "next",
+          "next": "s2_02_after"
+        }
+      ]
+    },
+    "s2_01_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Oh, man. This is it. What do I do?",
+          "mode": "-2",
+          "character_id": "0",
+          "offset": "5395"
+        },
+        {
+          "type": "choice",
+          "prompt": "What do I do?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Make a move on her.",
+              "next": "s2_05_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Offer her some snacks.",
+              "next": "s2_06_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "What do I do?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s2_02_after"
+        }
+      ]
+    },
+    "s2_07_opt0": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "5176"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "4",
+          "image": "2499",
+          "text": "No way! You want me to help with the music?",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "5185"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "2",
+          "image": "2497",
+          "text": "Coming from the music man himself... I guess it's time for me to step up and spin some tunes.",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "5194"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Uh, yeah... Just pick a few and add them to the playlist, all right?",
+          "character_id": "0",
+          "offset": "5201"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "2",
+          "image": "2497",
+          "text": "I won't let you down!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "5220"
+        },
+        {
+          "type": "narration",
+          "text": "Zach goes into the den and starts looking through Hector's music collection.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5230"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "5236"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Nice. Zach's out of the way, and as long as he picks something from my music collection, I know the music will be solid.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "5248"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "That should keep him busy... And I've got my chance to be alone with Amanda.",
+          "mode": "-2",
+          "character_id": "0",
+          "offset": "5258"
+        },
+        {
+          "type": "next",
+          "next": "s2_01_after"
+        }
+      ]
+    },
+    "s2_08_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Maybe you can pick a movie to put on or set up some video games...",
+          "character_id": "0",
+          "offset": "5268"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "5274"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "2",
+          "image": "2497",
+          "text": "Oh, I'm all over it, man. `All over it.` Where do you keep your fire?",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "5283",
+          "text_bbcode": "Oh, I'm all over it, man. [color=#e23b3b][i]All over it.[/i][/color] Where do you keep your fire?"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "5289"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Fire?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5298"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "2",
+          "image": "2497",
+          "text": "Yeah, I've been practicing this juggling routine, but it's not as cool without the fire.",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "5307"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Uh... Maybe it's better if you skip the fire.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5316"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": null,
+          "image": "2495",
+          "text": "Hey, you trusted me with the entertainment. I'm not going to let you down!",
+          "character_id": "3",
+          "offset": "5325"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "2",
+          "image": "2497",
+          "text": "Don't worry. You've got fire insurance, right?",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "5344"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Maybe this wasn't such a great idea...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5356"
+        },
+        {
+          "type": "narration",
+          "text": "Smoke begins drifting in from the kitchen, and there are assorted gasps and screams...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5366"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "4",
+          "image": "2499",
+          "text": "Where's that bucket of water? Someone hand me a bucket of water!",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "5375"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Whatever, I can clean up a little fire damage later. I can't waste this chance to talk to Amanda.",
+          "mode": "-2",
+          "character_id": "0",
+          "offset": "5385"
+        },
+        {
+          "type": "next",
+          "next": "s2_01_after"
+        }
+      ]
+    },
+    "s2": {
+      "nodes": [
+        {
+          "type": "loading",
+          "blocking": true,
+          "offset": "4925"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "5057"
+        },
+        {
+          "type": "narration",
+          "text": "Hector marches across the room to where Zach and Amanda are talking.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5067"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": null,
+          "image": "2495",
+          "text": "...And then I told my personal trainer that I wasn't going to ruin my manicure by lifting weights today, so he'd better come up with a new way for me to work on my biceps.",
+          "character_id": "3",
+          "offset": "5086"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Hey, Zach! Welcome to the party!",
+          "character_id": "0",
+          "offset": "5103"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Oh `man!` When did Zach get here?! I've got to get rid of him so I can talk to Amanda...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5115",
+          "text_bbcode": "Oh [color=#e23b3b][i]man![/i][/color] When did Zach get here?! I've got to get rid of him so I can talk to Amanda..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": null,
+          "image": "2495",
+          "text": "Hey, happy to be here. Cool party. Would've been here sooner, but I totally lost track of time at the gym.",
+          "character_id": "3",
+          "offset": "5124"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Hey, uh, I was actually wondering if you could help with...",
+          "character_id": "0",
+          "offset": "5131"
+        },
+        {
+          "type": "choice",
+          "prompt": "I was actually wondering if you could help with...",
+          "options": [
+            {
+              "index": "0",
+              "label": "The music.",
+              "next": "s2_07_opt0"
+            },
+            {
+              "index": "1",
+              "label": "The entertainment.",
+              "next": "s2_08_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "I was actually wondering if you could help with...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s2_01_after"
+        }
+      ]
+    },
+    "s3_02_var2000_eq11": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_02_var2000_eq11_bg5945_1"
+        }
+      ]
+    },
+    "s3_03_else": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_03_else_bg5945_1"
+        }
+      ]
+    },
+    "s3_01_var2000_eq8": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_01_var2000_eq8_bg5945_1"
+        }
+      ]
+    },
+    "s3_05_var2000_lt4": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_05_var2000_lt4_bg6645_1"
+        }
+      ]
+    },
+    "s3_07_opt0": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s3_08_opt1": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s3_06_else": {
+      "nodes": [
+        {
+          "type": "narration",
+          "text": "Hector hears someone come into his room. He turns and sees...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6977"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Porscha?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6986"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Yes, of course it's me, silly!",
+          "character_id": "4",
+          "offset": "6995"
+        },
+        {
+          "type": "narration",
+          "text": "Porscha runs up and pulls Hector next to her.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "7005"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "7011"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Mmm! Come here, Hector! You're missing the party.",
+          "character_id": "4",
+          "offset": "7020"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "7030"
+        },
+        {
+          "type": "narration",
+          "text": "And soon, as the clock strikes midnight, Porscha gives Hector a big kiss!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "7050"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "7056"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7065"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "7071"
+        },
+        {
+          "type": "narration",
+          "text": "Across the room Hector sees Zach kissing Amanda.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "7081"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7090"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Maybe this is the way it has to be...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7102"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Maybe Zach deserves her. They've been together for most of high school. Who am I to ruin that, if they're happy together?",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7114"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "That would just be totally selfish.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7126"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "I guess I better get used to the way things are. She's with him, I'm with one random hot girl after another.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7138"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7144"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Actually, when I put it that way, I guess this isn't that bad!",
+          "mode": "-2",
+          "character_id": "0",
+          "offset": "7154"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Hey, Porscha, did I ever show you the hot tub here?",
+          "character_id": "0",
+          "offset": "7161"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "7167"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Hee hee! Let's go!",
+          "character_id": "4",
+          "offset": "7176"
+        },
+        {
+          "type": "narration",
+          "text": "Amanda watches Porscha and Hector sneak off to the backyard.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "7186"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "...",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "7195"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": null,
+          "image": "2495",
+          "text": "What's wrong, babe? Are you crying?",
+          "character_id": "3",
+          "offset": "7204"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "N... No! I'm fine. Really.",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "7213"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": null,
+          "image": "2495",
+          "text": "Okay, cool. Let's get out of here.",
+          "character_id": "3",
+          "offset": "7222"
+        },
+        {
+          "type": "music",
+          "track_id": "8212",
+          "loop": false,
+          "offset": "7229"
+        },
+        {
+          "type": "narration",
+          "text": "Oh no! Is Hector really giving up on the one girl he has real feelings for?",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "7239"
+        },
+        {
+          "type": "narration",
+          "text": "Don't let this New Year's Eve party end on such a sour note!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "7249"
+        },
+        {
+          "type": "narration",
+          "text": "We know you can get a better ending than this! Try again!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "7259"
+        },
+        {
+          "type": "narration",
+          "text": "Or try playing the our Premium Content Mega Pack, Homecoming Queen!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "7269"
+        },
+        {
+          "type": "narration",
+          "text": "It's a battle for the crown between the most popular girls at Centerscore High! Do you have what it takes to beat Paula and become the new Homecoming Queen? Play now to find out!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "7279"
+        },
+        {
+          "type": "call",
+          "routine": "s3_r10",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Try again! We know you can do it!"
+            },
+            0
+          ],
+          "offset": "7289"
+        },
+        {
+          "type": "choice",
+          "prompt": "Help us improve the game by taking this optional survey.",
+          "options": [
+            {
+              "index": "0",
+              "label": "Take Survey.",
+              "next": "s3_07_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Skip Survey.",
+              "next": "s3_08_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Help us improve the game by taking this optional survey.",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          }
+        }
+      ]
+    },
+    "s3_04_else": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "4",
+          "op": "lt",
+          "offset": "6645",
+          "then": "s3_05_var2000_lt4",
+          "else": "s3_06_else"
+        }
+      ]
+    },
+    "s3": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1015",
+          "variant": "1",
+          "offset": "5912"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5918"
+        },
+        {
+          "type": "narration",
+          "text": "Hector shuts the door to his room and takes a deep breath.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5925"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "0",
+          "image": "2495",
+          "text": "Well, this could have gone better.",
+          "character_id": "0",
+          "offset": "5931"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "8",
+          "op": "gte",
+          "offset": "5945",
+          "then": "s3_01_var2000_eq8",
+          "else": "s3_04_else"
+        }
+      ]
+    },
+    "s3_03_else_cont": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_03_else_cont_bg5945_1"
+        }
+      ]
+    },
+    "s1_07_lose_m": {
+      "nodes": [
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "19031"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Yikes! How am I going to get out of this one?!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "19043"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "19050"
+        },
+        {
+          "type": "narration",
+          "text": "Just then, Howard runs in and steps between Porscha and Hector.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19060"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Hey, you're Porscha, right? There's a `really hot` guy looking for you. He said he'd be in the back yard. And did I mention that he's `really hot?`",
+          "character_id": "1",
+          "offset": "19067",
+          "text_bbcode": "Hey, you're Porscha, right? There's a [color=#e23b3b][i]really hot[/i][/color] guy looking for you. He said he'd be in the back yard. And did I mention that he's [color=#e23b3b][i]really hot?[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Who was it?",
+          "character_id": "4",
+          "offset": "19076"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Uh... I'm not sure.",
+          "character_id": "1",
+          "offset": "19083"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Was it Matt?",
+          "character_id": "4",
+          "offset": "19092"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Chris?",
+          "character_id": "4",
+          "offset": "19101"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Uh...",
+          "character_id": "1",
+          "offset": "19108"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Maybe Justin? Tom? David? James? Michael? Mike? Andrew? Jon? Peter? Wilmot?",
+          "character_id": "4",
+          "offset": "19117"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Uh... Yes! One of those!",
+          "character_id": "1",
+          "offset": "19124"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Hmm... Hector, wait right here. I better go see who was looking for me.",
+          "character_id": "4",
+          "offset": "19133"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Heh. Nice. There's no guy looking for Porscha, is there?",
+          "character_id": "0",
+          "offset": "19148"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Well, I'm sure if she wanders around long enough, she'll run into one of those guys.",
+          "character_id": "1",
+          "offset": "19155"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Anyway, Brendan said you were in a tight spot, so I thought I'd help out. After the way you came through for me with that crazy Astrid girl, I owed you one.",
+          "character_id": "1",
+          "offset": "19162"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Thanks, man.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19171"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Just get out of here. Nothing's worse than facing an ex-girlfriend.",
+          "character_id": "1",
+          "offset": "19178"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "19184"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Okay, no more girls getting in the way... I'm going to track down Amanda `right now.`",
+          "mode": "-2",
+          "character_id": "0",
+          "offset": "19194",
+          "text_bbcode": "Okay, no more girls getting in the way... I'm going to track down Amanda [color=#e23b3b][i]right now.[/i][/color]"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 1,
+          "offset": "19201"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s2_enter_v1",
+          "section_register": {
+            "var": "1001",
+            "value": "1"
+          },
+          "offset": "19208"
+        }
+      ]
+    },
+    "s2_04_lose_m": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 2,
+          "offset": "6123"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s3",
+          "section_register": {
+            "var": "1001",
+            "value": "2"
+          },
+          "offset": "6130"
+        }
+      ]
+    },
+    "s1_enter_v0": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "16",
+          "offset": "16061"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg15902_1"
+        }
+      ]
+    },
+    "s2_enter_v1": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "5057"
+        },
+        {
+          "type": "narration",
+          "text": "Hector marches across the room to where Zach and Amanda are talking.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5067"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": null,
+          "image": "2495",
+          "text": "...And then I told my personal trainer that I wasn't going to ruin my manicure by lifting weights today, so he'd better come up with a new way for me to work on my biceps.",
+          "character_id": "3",
+          "offset": "5086"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Hey, Zach! Welcome to the party!",
+          "character_id": "0",
+          "offset": "5103"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Oh `man!` When did Zach get here?! I've got to get rid of him so I can talk to Amanda...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5115",
+          "text_bbcode": "Oh [color=#e23b3b][i]man![/i][/color] When did Zach get here?! I've got to get rid of him so I can talk to Amanda..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": null,
+          "image": "2495",
+          "text": "Hey, happy to be here. Cool party. Would've been here sooner, but I totally lost track of time at the gym.",
+          "character_id": "3",
+          "offset": "5124"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Hey, uh, I was actually wondering if you could help with...",
+          "character_id": "0",
+          "offset": "5131"
+        },
+        {
+          "type": "choice",
+          "prompt": "I was actually wondering if you could help with...",
+          "options": [
+            {
+              "index": "0",
+              "label": "The music.",
+              "next": "s2_07_opt0"
+            },
+            {
+              "index": "1",
+              "label": "The entertainment.",
+              "next": "s2_08_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "I was actually wondering if you could help with...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s2_01_after"
+        }
+      ]
+    },
+    "s3_r10_b1": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 33,
+          "name": "show_card",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            4000
+          ]
+        },
+        {
+          "type": "yield",
+          "yield": 7,
+          "name": "end_episode",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            {
+              "local": -3
+            }
+          ]
+        },
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s3_r547_b1": {
+      "nodes": [
+        {
+          "type": "let",
+          "to": {
+            "local": 2
+          },
+          "value": 0
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 3
+          },
+          "value": 0
+        },
+        {
+          "type": "next",
+          "next": "s3_r547_b2"
+        }
+      ]
+    },
+    "s3_r547_b2": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 1,
+          "name": "choice",
+          "args": [
+            {
+              "text": "Make your choice!"
+            },
+            {
+              "text": "Take Survey.|Skip Survey."
+            },
+            {
+              "text": "Help us improve the game by taking this optional survey."
+            },
+            -1,
+            -1,
+            -2,
+            -1,
+            1
+          ],
+          "to": 5
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 3
+          },
+          "value": {
+            "local": 5
+          }
+        },
+        {
+          "type": "if",
+          "cond": {
+            "op": "not",
+            "a": {
+              "op": "==",
+              "a": {
+                "local": 3
+              },
+              "b": 1
+            }
+          },
+          "then": "s3_r547_b3",
+          "else": "s3_r547_b4"
+        }
+      ]
+    },
+    "s3_r547_b3": {
+      "nodes": [
+        {
+          "type": "let",
+          "to": {
+            "scratch": 4
+          },
+          "value": 3
+        },
+        {
+          "type": "let",
+          "to": {
+            "scratch": 5
+          },
+          "value": 2
+        },
+        {
+          "type": "next",
+          "next": "s3_r547_b6"
+        }
+      ]
+    },
+    "s3_r547_b4": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_r547_b5"
+        }
+      ]
+    },
+    "s3_r547_b5": {
+      "nodes": [
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s3_r547_b6": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_r547_b7"
+        }
+      ]
+    },
+    "s3_r547_b7": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 1,
+          "name": "choice",
+          "args": [
+            {
+              "text": "Make your choice!"
+            },
+            {
+              "text": "Loved it!|It had its moments.|It was ok.|Boring!"
+            },
+            {
+              "text": "How would you rate this pack?"
+            },
+            -1,
+            -1,
+            -2,
+            -1,
+            1
+          ],
+          "to": 5
+        },
+        {
+          "type": "let",
+          "to": {
+            "scratch": 6
+          },
+          "value": {
+            "local": 5
+          }
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 4
+          },
+          "value": 0
+        },
+        {
+          "type": "next",
+          "next": "s3_r547_b8"
+        }
+      ]
+    },
+    "s3_r547_b8": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_r547_b9"
+        }
+      ]
+    },
+    "s3_r547_b9": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 1,
+          "name": "choice",
+          "args": [
+            {
+              "text": "Make your choice!"
+            },
+            {
+              "text": "Amanda and Zach.|Amanda and Hector.|Spike and Mallika.|Dinah and Brendan."
+            },
+            {
+              "text": "Who would make the cutest couple?"
+            },
+            -1,
+            -1,
+            -2,
+            -1,
+            1
+          ],
+          "to": 5
+        },
+        {
+          "type": "let",
+          "to": {
+            "scratch": 7
+          },
+          "value": {
+            "local": 5
+          }
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 4
+          },
+          "value": 1
+        },
+        {
+          "type": "next",
+          "next": "s3_r547_b10"
+        }
+      ]
+    },
+    "s3_r547_b10": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_r547_b11"
+        }
+      ]
+    },
+    "s3_r547_b11": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 1,
+          "name": "choice",
+          "args": [
+            {
+              "text": "Make your choice!"
+            },
+            {
+              "text": "Yes.|No."
+            },
+            {
+              "text": "Have you ever cheated on a boyfriend or girlfriend?"
+            },
+            -1,
+            -1,
+            -2,
+            -1,
+            1
+          ],
+          "to": 5
+        },
+        {
+          "type": "let",
+          "to": {
+            "scratch": 8
+          },
+          "value": {
+            "local": 5
+          }
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 4
+          },
+          "value": 2
+        },
+        {
+          "type": "next",
+          "next": "s3_r547_b12"
+        }
+      ]
+    },
+    "s3_r547_b12": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_r547_b13"
+        }
+      ]
+    },
+    "s3_r547_b13": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 9,
+          "name": "submit_poll",
+          "args": [
+            10290,
+            2,
+            {
+              "scratch_addr": 4
+            },
+            6,
+            2,
+            {
+              "scratch_addr": 0
+            },
+            4
+          ],
+          "to": 5
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 2
+          },
+          "value": {
+            "local": 5
+          }
+        },
+        {
+          "type": "if",
+          "cond": {
+            "op": "not",
+            "a": {
+              "op": "==",
+              "a": {
+                "local": 2
+              },
+              "b": 1
+            }
+          },
+          "then": "s3_r547_b14",
+          "else": "s3_r547_b15"
+        }
+      ]
+    },
+    "s3_r547_b14": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 65,
+          "name": "narration",
+          "args": [
+            16,
+            {
+              "text": "Connection failed. Please try again later."
+            },
+            0
+          ],
+          "to": 5
+        },
+        {
+          "type": "next",
+          "next": "s3_r547_b16"
+        }
+      ]
+    },
+    "s3_r547_b15": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 65,
+          "name": "narration",
+          "args": [
+            16,
+            {
+              "text": "Thanks for taking the survey!"
+            },
+            0
+          ],
+          "to": 5
+        },
+        {
+          "type": "yield",
+          "yield": 0,
+          "name": "format",
+          "args": [
+            {
+              "text": "Poll results:\nHave you ever cheated on a boyfriend or girlfriend?\nYes.: %d.%d\nNo.: %d.%d"
+            },
+            {
+              "op": "/",
+              "a": {
+                "scratch": 0
+              },
+              "b": 10
+            },
+            {
+              "op": "%",
+              "a": {
+                "scratch": 0
+              },
+              "b": 10
+            },
+            {
+              "op": "/",
+              "a": {
+                "scratch": 1
+              },
+              "b": 10
+            },
+            {
+              "op": "%",
+              "a": {
+                "scratch": 1
+              },
+              "b": 10
+            }
+          ],
+          "to": 5
+        },
+        {
+          "type": "yield",
+          "yield": 65,
+          "name": "narration",
+          "args": [
+            16,
+            {
+              "local": 5
+            },
+            0
+          ],
+          "to": 5
+        },
+        {
+          "type": "next",
+          "next": "s3_r547_b16"
+        }
+      ]
+    },
+    "s3_r547_b16": {
+      "nodes": [
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s1_bg15902_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "16",
+          "offset": "16061"
+        },
+        {
+          "type": "pov_change",
+          "character": "Hector",
+          "index": "0",
+          "offset": "16120"
+        },
+        {
+          "type": "narration",
+          "text": "Want to catch up? Grab the Season 1 Set, now available in our store, and get Episodes 1-20 for 50% off!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16130"
+        },
+        {
+          "type": "title_card",
+          "title": "New Year's Kiss",
+          "subtitle": "Can love blossom on New Year's Eve?",
+          "asset_id": "1057",
+          "flag": "0",
+          "offset": "16143"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1027",
+          "variant": "0",
+          "offset": "16153"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "16160"
+        },
+        {
+          "type": "narration",
+          "text": "Two weeks ago at Centerscore High...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16180"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Hey, ladies. I'll be seeing the three of you at my New Year's Eve party, right?",
+          "character_id": "0",
+          "offset": "16187"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "I'll be there.",
+          "character_id": "8",
+          "offset": "16196"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Linda",
+          "emotion_code": null,
+          "image": "2260",
+          "text": "Of course I'll come.",
+          "character_id": "11",
+          "offset": "16205"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "I... I'm going to be out of town. My daddy's taking me and Zach sailing around the world on his yacht so we can celebrate New Year's Eve in every different time zone!",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "16214"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "What?! How is that even possible?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "16223"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "It's a really fast boat. But we'll be gone all of New Year's Eve...",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "16232"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Uh, did I say New Year's Eve party? I, uh... I meant... Uh... `Russian` New Year's Eve party.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "16241",
+          "text_bbcode": "Uh, did I say New Year's Eve party? I, uh... I meant... Uh... [color=#e23b3b][i]Russian[/i][/color] New Year's Eve party."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "4",
+          "image": "2429",
+          "text": "Huh?",
+          "character_id": "8",
+          "expression": "4",
+          "offset": "16250"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Yeah... Russian New Year is a week `after` everyone else's new year.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "16259",
+          "text_bbcode": "Yeah... Russian New Year is a week [color=#e23b3b][i]after[/i][/color] everyone else's new year."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Oh! I'll be home by then! Yay!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "16268"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Great, great... We'll have... Uh... Those Russian nesting dolls, borscht, furry hats...",
+          "character_id": "0",
+          "offset": "16275"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Linda",
+          "emotion_code": "3",
+          "image": "2263",
+          "text": "What does that have to do with New Year's Eve?",
+          "character_id": "11",
+          "expression": "3",
+          "offset": "16284"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Don't over-think it, comrade!",
+          "character_id": "0",
+          "offset": "16291"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "16297"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "I'll see you ladies in a couple of weeks!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "16306"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1033",
+          "variant": "0",
+          "offset": "16316"
+        },
+        {
+          "type": "narration",
+          "text": "Later that day in study hall...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16326"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Okay, Hector. What's the deal with this 'Russian New Year's Eve' party? This has to do with Amanda, doesn't it?",
+          "character_id": "8",
+          "offset": "16335"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Uh...",
+          "character_id": "0",
+          "offset": "16342"
+        },
+        {
+          "type": "choice",
+          "prompt": "Uh...",
+          "options": [
+            {
+              "index": "0",
+              "label": "Tell the truth.",
+              "next": "s1_16_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Lie.",
+              "next": "s1_17_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Uh...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after"
+        }
+      ]
+    },
+    "s1_bg15902_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "15913",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "15920",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_bg15902_r"
+        }
+      ]
+    },
+    "s1_bg15902_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg15902_t",
+          "else": "s1_bg15902_r",
+          "offset": "15902",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg15902_r": {
+      "nodes": [
+        {
+          "type": "pov_change",
+          "character": "Hector",
+          "index": "0",
+          "offset": "16120"
+        },
+        {
+          "type": "narration",
+          "text": "Want to catch up? Grab the Season 1 Set, now available in our store, and get Episodes 1-20 for 50% off!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16130"
+        },
+        {
+          "type": "title_card",
+          "title": "New Year's Kiss",
+          "subtitle": "Can love blossom on New Year's Eve?",
+          "asset_id": "1057",
+          "flag": "0",
+          "offset": "16143"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1027",
+          "variant": "0",
+          "offset": "16153"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "16160"
+        },
+        {
+          "type": "narration",
+          "text": "Two weeks ago at Centerscore High...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16180"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Hey, ladies. I'll be seeing the three of you at my New Year's Eve party, right?",
+          "character_id": "0",
+          "offset": "16187"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "I'll be there.",
+          "character_id": "8",
+          "offset": "16196"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Linda",
+          "emotion_code": null,
+          "image": "2260",
+          "text": "Of course I'll come.",
+          "character_id": "11",
+          "offset": "16205"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "I... I'm going to be out of town. My daddy's taking me and Zach sailing around the world on his yacht so we can celebrate New Year's Eve in every different time zone!",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "16214"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "What?! How is that even possible?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "16223"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "It's a really fast boat. But we'll be gone all of New Year's Eve...",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "16232"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Uh, did I say New Year's Eve party? I, uh... I meant... Uh... `Russian` New Year's Eve party.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "16241",
+          "text_bbcode": "Uh, did I say New Year's Eve party? I, uh... I meant... Uh... [color=#e23b3b][i]Russian[/i][/color] New Year's Eve party."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "4",
+          "image": "2429",
+          "text": "Huh?",
+          "character_id": "8",
+          "expression": "4",
+          "offset": "16250"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Yeah... Russian New Year is a week `after` everyone else's new year.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "16259",
+          "text_bbcode": "Yeah... Russian New Year is a week [color=#e23b3b][i]after[/i][/color] everyone else's new year."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Oh! I'll be home by then! Yay!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "16268"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Great, great... We'll have... Uh... Those Russian nesting dolls, borscht, furry hats...",
+          "character_id": "0",
+          "offset": "16275"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Linda",
+          "emotion_code": "3",
+          "image": "2263",
+          "text": "What does that have to do with New Year's Eve?",
+          "character_id": "11",
+          "expression": "3",
+          "offset": "16284"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Don't over-think it, comrade!",
+          "character_id": "0",
+          "offset": "16291"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "16297"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "I'll see you ladies in a couple of weeks!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "16306"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1033",
+          "variant": "0",
+          "offset": "16316"
+        },
+        {
+          "type": "narration",
+          "text": "Later that day in study hall...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16326"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Okay, Hector. What's the deal with this 'Russian New Year's Eve' party? This has to do with Amanda, doesn't it?",
+          "character_id": "8",
+          "offset": "16335"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Uh...",
+          "character_id": "0",
+          "offset": "16342"
+        },
+        {
+          "type": "choice",
+          "prompt": "Uh...",
+          "options": [
+            {
+              "index": "0",
+              "label": "Tell the truth.",
+              "next": "s1_16_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Lie.",
+              "next": "s1_17_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Uh...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after"
+        }
+      ]
+    },
+    "s1_enter_v0_bg15902_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "15913",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "15920",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg15902_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg15902_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg15902_t",
+          "else": "s1_enter_v0_bg15902_r",
+          "offset": "15902",
+          "op": "eq"
+        }
+      ]
+    },
+    "s3_02_var2000_eq11_bg5945_r": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_03_else_cont"
+        }
+      ]
+    },
+    "s3_02_var2000_eq11_bg5945_t": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_02_var2000_eq11_bg5945_t_bg6302_1"
+        }
+      ]
+    },
+    "s3_02_var2000_eq11_bg5945_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "8",
+          "then": "s3_02_var2000_eq11_bg5945_t",
+          "else": "s3_02_var2000_eq11_bg5945_r",
+          "offset": "5945",
+          "op": "gte"
+        }
+      ]
+    },
+    "s3_03_else_bg5945_r": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_03_else_cont"
+        }
+      ]
+    },
+    "s3_03_else_bg5945_t": {
+      "nodes": [
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "6572"
+        },
+        {
+          "type": "narration",
+          "text": "We hope `your` Russian New Year's Eve was just as much fun!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6582",
+          "text_bbcode": "We hope [b]your[/b] Russian New Year's Eve was just as much fun!"
+        },
+        {
+          "type": "narration",
+          "text": "That's it for this episode, but there is a bonus scene somewhere around here if you want to try again for a perfect score.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6592"
+        },
+        {
+          "type": "narration",
+          "text": "Or try playing the our Premium Content Mega Pack, Homecoming Queen!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6602"
+        },
+        {
+          "type": "narration",
+          "text": "It's a battle for the crown between the most popular girls at Centerscore High! Do you have what it takes to beat Paula and become the new Homecoming Queen? Play now to find out!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6612"
+        },
+        {
+          "type": "return"
+        }
+      ]
+    },
+    "s3_03_else_bg5945_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "8",
+          "then": "s3_03_else_bg5945_t",
+          "else": "s3_03_else_bg5945_r",
+          "offset": "5945",
+          "op": "gte"
+        }
+      ]
+    },
+    "s3_01_var2000_eq8_bg5945_r": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s3_01_var2000_eq8_bg5945_t": {
+      "nodes": [
+        {
+          "type": "narration",
+          "text": "Hector sits on the floor.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5952"
+        },
+        {
+          "type": "narration",
+          "text": "Amanda comes in, quietly shutting the door behind her...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5959"
+        },
+        {
+          "type": "narration",
+          "text": "And sits next to Hector.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "5966"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "7",
+          "image": "2502",
+          "text": "What's wrong, Hector?",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "5975"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "5989"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "0",
+          "image": "2205",
+          "text": "Huh? Oh, nothing. It's a party! We're all having fun! Woo!",
+          "character_id": "0",
+          "offset": "5995"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "...",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6004"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "6010"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Woo?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6019"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "6025"
+        },
+        {
+          "type": "narration",
+          "text": "From outside the room, they hear people counting down...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6035"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "6045"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Five!",
+          "character_id": "1",
+          "offset": "6052"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Linda",
+          "emotion_code": null,
+          "image": "2260",
+          "text": "Four!",
+          "character_id": "11",
+          "offset": "6061"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": null,
+          "image": "2495",
+          "text": "Three!",
+          "character_id": "3",
+          "offset": "6070"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "6076"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Two!",
+          "character_id": "4",
+          "offset": "6085"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1015",
+          "variant": "1",
+          "offset": "6095"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "One!",
+          "character_id": "7",
+          "offset": "6112"
+        },
+        {
+          "type": "music",
+          "track_id": "8221",
+          "loop": false,
+          "offset": "6119"
+        },
+        {
+          "type": "narration",
+          "text": "Amanda leans over and gives Hector a short, sweet kiss.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6129"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Amanda...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "6138"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Happy Russian New Year!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "6147"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Happy New Year.",
+          "character_id": "0",
+          "offset": "6154"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "I... I guess we better get back to the party now.",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6163"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "6173"
+        },
+        {
+          "type": "narration",
+          "text": "Hector and Amanda walk back into the living room. All around the room, couples are paired up. Mallika is with Spike, Howard is kissing Linda, Brendan gives Dinah a hug, and Porscha is making out with Wilmot.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6183"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": null,
+          "image": "2495",
+          "text": "There you are!",
+          "character_id": "3",
+          "offset": "6202"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6208"
+        },
+        {
+          "type": "narration",
+          "text": "Zach sweeps Amanda up in his arms and kisses her!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6218"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "Uh... I'm going to go... Start up some music.",
+          "character_id": "0",
+          "offset": "6233"
+        },
+        {
+          "type": "narration",
+          "text": "Amanda pulls away from Zach and glances back at Hector, but he's already across the room, looking through his collection of songs.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6243"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "2",
+          "image": "2497",
+          "text": "Happy New Year, baby!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "6252"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Happy New Year.",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6261"
+        },
+        {
+          "type": "music",
+          "track_id": "8210",
+          "loop": false,
+          "offset": "6268"
+        },
+        {
+          "type": "narration",
+          "text": "Not bad! Looks like Amanda might have a tough decision ahead of her...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6278"
+        },
+        {
+          "type": "narration",
+          "text": "But at least Hector and Amanda got to share the first kiss of the new year, and the party was a huge success!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6288"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "11",
+          "offset": "6302",
+          "then": "s3_02_var2000_eq11",
+          "else": "s3_03_else"
+        },
+        {
+          "type": "return"
+        }
+      ]
+    },
+    "s3_01_var2000_eq8_bg5945_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "8",
+          "then": "s3_01_var2000_eq8_bg5945_t",
+          "else": "s3_01_var2000_eq8_bg5945_r",
+          "offset": "5945",
+          "op": "gte"
+        }
+      ]
+    },
+    "s3_03_else_cont_bg5945_r": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_05_var2000_lt4"
+        }
+      ]
+    },
+    "s3_03_else_cont_bg5945_t": {
+      "nodes": [
+        {
+          "type": "call",
+          "routine": "s3_r547",
+          "args": [],
+          "offset": "6615"
+        },
+        {
+          "type": "call",
+          "routine": "s3_r10",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing! See you in another episode!"
+            },
+            1
+          ],
+          "offset": "6626"
+        },
+        {
+          "type": "return"
+        }
+      ]
+    },
+    "s3_03_else_cont_bg5945_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "8",
+          "then": "s3_03_else_cont_bg5945_t",
+          "else": "s3_03_else_cont_bg5945_r",
+          "offset": "5945",
+          "op": "gte"
+        }
+      ]
+    },
+    "s3_02_var2000_eq11_bg5945_t_bg6302_r": {
+      "nodes": [
+        {
+          "type": "return"
+        }
+      ]
+    },
+    "s3_02_var2000_eq11_bg5945_t_bg6302_t": {
+      "nodes": [
+        {
+          "type": "narration",
+          "text": "That's it for this episode, but before we go...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6312"
+        },
+        {
+          "type": "music",
+          "track_id": "8210",
+          "loop": false,
+          "offset": "6319"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "6325"
+        },
+        {
+          "type": "narration",
+          "text": "You played a perfect game! And that means it's time for a bonus scene...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6335"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1042",
+          "variant": "1",
+          "offset": "6345"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "Ooh, let me tell you about this dream I had last night!",
+          "character_id": "7",
+          "offset": "6364"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "First I was a fish, and I totally had to find this little fish that was lost...",
+          "character_id": "7",
+          "offset": "6373"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "3",
+          "image": "2498",
+          "text": "Come on, Amanda. You have this dream every week. You've been watching 'Finding Screamo' again.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "6382"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Oh... Right.",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6391"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Okay, so I had this other dream where I was a robot, and there was trash everywhere, but I had to find the one surviving plant in Australia...",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "6400"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "3",
+          "image": "2498",
+          "text": "That's from 'Wall-a-by'.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "6409"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Oh. Huh.",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6418"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Oh! I know! I had this dream where I was stuck in this house that had, like, a million balloons tied to it...",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "6427"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "3",
+          "image": "2498",
+          "text": "Hold on a sec.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "6436"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "3",
+          "image": "2498",
+          "text": "No offense, babe, but I can only take so much of listening to your dreams about stupid 'Pickstar' movies.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "6445"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "2",
+          "image": "2497",
+          "text": "Let's just listen to the radio, okay?",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "6454"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Oh. Okay.",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6463"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Hector always listens to my dreams... I bet if he were here right now, he'd listen to me.",
+          "mode": "-2",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6475"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "And I bet he'd never tell me that my dreams are stupid!",
+          "mode": "-2",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "6487"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "4",
+          "image": "2019",
+          "text": "Eep! No! I love Zach! Zach is my boyfriend! Love, love, love.",
+          "mode": "-2",
+          "character_id": "7",
+          "expression": "4",
+          "offset": "6499"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": null,
+          "image": "2015",
+          "text": "Yup... No feelings for Hector at all... At all...",
+          "mode": "-2",
+          "character_id": "7",
+          "offset": "6511"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "...",
+          "mode": "-2",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6523"
+        },
+        {
+          "type": "narration",
+          "text": "Poor Amanda... It looks like she's got a lot more on her mind than most people would suspect!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6533"
+        },
+        {
+          "type": "narration",
+          "text": "Congratulations again on a perfect episode! See you next time!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6543"
+        },
+        {
+          "type": "narration",
+          "text": "Or try playing the our Premium Content Mega Pack, Homecoming Queen!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6553"
+        },
+        {
+          "type": "narration",
+          "text": "It's a battle for the crown between the most popular girls at Centerscore High! Do you have what it takes to beat Paula and become the new Homecoming Queen? Play now to find out!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6563"
+        },
+        {
+          "type": "next",
+          "next": "s3_02_var2000_eq11_bg5945_t_bg6302_r"
+        }
+      ]
+    },
+    "s3_02_var2000_eq11_bg5945_t_bg6302_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "11",
+          "then": "s3_02_var2000_eq11_bg5945_t_bg6302_t",
+          "else": "s3_02_var2000_eq11_bg5945_t_bg6302_r",
+          "offset": "6302",
+          "op": "eq"
+        }
+      ]
+    },
+    "s3_05_var2000_lt4_bg6645_r": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s3_06_else"
+        }
+      ]
+    },
+    "s3_05_var2000_lt4_bg6645_t": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "This is totally pathetic. I guess I'll just hide out in here until the party's over...",
+          "character_id": "0",
+          "offset": "6652"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": null,
+          "image": "2205",
+          "text": "No, wait a minute.",
+          "character_id": "0",
+          "offset": "6659"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "This is `my` party! I'm not going to let Zach make out with the girl `I` like at `my` party!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6668",
+          "text_bbcode": "This is [color=#e23b3b][i]my[/i][/color] party! I'm not going to let Zach make out with the girl [color=#e23b3b][i]I[/i][/color] like at [color=#e23b3b][i]my[/i][/color] party!"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "6674"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "If I want to kiss Amanda, then I'm going to!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6683"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "6693"
+        },
+        {
+          "type": "narration",
+          "text": "Hector runs over to Amanda and Zach, just as the two are about to kiss.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6713"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Amanda, I can't pretend anymore. I really, really like you.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6732"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "1",
+          "image": "2496",
+          "text": "Dude! So not cool!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "6741"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "1",
+          "image": "2496",
+          "text": "This better be another one of your lame jokes.",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "6750"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "First, my jokes are `not` lame!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6759",
+          "text_bbcode": "First, my jokes are [color=#e23b3b][i]not[/i][/color] lame!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "Second, no, it's no joke! I'm telling Amanda to leave you!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6768"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "4",
+          "image": "2499",
+          "text": "What? How? Why?",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "6777"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "Because I actually care about her! And I know I can make her happier than you can!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6786"
+        },
+        {
+          "type": "narration",
+          "text": "Zach steps up and shoves Hector!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6796"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zach",
+          "emotion_code": "1",
+          "image": "2496",
+          "text": "Not cool, man. Not cool.",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "6805"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "Oh, you did `not` want to make this physical, pretty-boy!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6814",
+          "text_bbcode": "Oh, you did [color=#e23b3b][i]not[/i][/color] want to make this physical, pretty-boy!"
+        },
+        {
+          "type": "narration",
+          "text": "Hector punches Zach!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6824"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "4",
+          "image": "2019",
+          "text": "Hector! Zach!",
+          "character_id": "7",
+          "expression": "4",
+          "offset": "6833"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Please, don't fight! No fighting!",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6842"
+        },
+        {
+          "type": "narration",
+          "text": "Hector and Zach knock over the table of food, then fall into the other guests!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6852"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "1",
+          "image": "2106",
+          "text": "Hey! Watch it! Ouch!",
+          "character_id": "12",
+          "expression": "1",
+          "offset": "6861"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6867"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Please, please stop! I don't want either of you to get hurt!",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6876"
+        },
+        {
+          "type": "narration",
+          "text": "Amanda bursts into tears and runs off.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6886"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Waaaaaah!",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "6895"
+        },
+        {
+          "type": "music",
+          "track_id": "8212",
+          "loop": false,
+          "offset": "6902"
+        },
+        {
+          "type": "narration",
+          "text": "This New Year's Eve party is a disaster!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6912"
+        },
+        {
+          "type": "narration",
+          "text": "You're not cruel enough to do this to Hector, are you?",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6922"
+        },
+        {
+          "type": "narration",
+          "text": "Try again and see if you can help him have a happy new year!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6932"
+        },
+        {
+          "type": "narration",
+          "text": "Or try playing the our Premium Content Mega Pack, Homecoming Queen!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6942"
+        },
+        {
+          "type": "narration",
+          "text": "It's a battle for the crown between the most popular girls at Centerscore High! Do you have what it takes to beat Paula and become the new Homecoming Queen? Play now to find out!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "6952"
+        },
+        {
+          "type": "call",
+          "routine": "s3_r10",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Try again! We know you can do it!"
+            },
+            0
+          ],
+          "offset": "6962"
+        },
+        {
+          "type": "return"
+        }
+      ]
+    },
+    "s3_05_var2000_lt4_bg6645_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "4",
+          "then": "s3_05_var2000_lt4_bg6645_t",
+          "else": "s3_05_var2000_lt4_bg6645_r",
+          "offset": "6645",
+          "op": "lt"
+        }
+      ]
+    }
+  },
+  "pack_id": "201",
+  "episode_id": "26",
+  "localized_titles": [
+    "26: New Year's Kiss",
+    "26 - New Year's Kiss",
+    "26: New Year's Kiss",
+    "26. New Year's Kiss",
+    "26: New Year's Kiss"
+  ],
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "2205",
+          "name": "Hector",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "2210",
+          "name": "Howard",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "2060",
+          "name": "Brendan",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "2495",
+          "name": "Zach",
+          "format": 1
+        },
+        {
+          "id": "4",
+          "art": "26000",
+          "name": "Porscha",
+          "format": 1
+        },
+        {
+          "id": "5",
+          "art": "2325",
+          "name": "Mona",
+          "format": 1
+        },
+        {
+          "id": "6",
+          "art": "2365",
+          "name": "Paula",
+          "format": 1
+        },
+        {
+          "id": "7",
+          "art": "2015",
+          "name": "Amanda",
+          "format": 1
+        },
+        {
+          "id": "8",
+          "art": "2425",
+          "name": "Taylor",
+          "format": 1
+        },
+        {
+          "id": "9",
+          "art": "2370",
+          "name": "Phil",
+          "format": 1
+        },
+        {
+          "id": "10",
+          "art": "2250",
+          "name": "Kim",
+          "format": 1
+        },
+        {
+          "id": "11",
+          "art": "2260",
+          "name": "Linda",
+          "format": 1
+        },
+        {
+          "id": "12",
+          "art": "2105",
+          "name": "Dinah",
+          "format": 1
+        },
+        {
+          "id": "13",
+          "art": "2400",
+          "name": "Spike",
+          "format": 1
+        },
+        {
+          "id": "14",
+          "art": "2280",
+          "name": "Mallika",
+          "format": 1
+        },
+        {
+          "id": "15",
+          "art": "2245",
+          "name": "Kenji",
+          "format": 1
+        },
+        {
+          "id": "16",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "16",
+        "74": "0"
+      }
+    },
+    "2": {
+      "characters": [],
+      "ui_defaults": {}
+    },
+    "3": {
+      "characters": [],
+      "ui_defaults": {}
+    }
+  },
+  "routines": {
+    "s3_r10": {
+      "entry": "s3_r10_b1",
+      "params": 3,
+      "offset": "5877"
+    },
+    "s3_r547": {
+      "entry": "s3_r547_b1",
+      "params": 0,
+      "offset": "7298"
+    }
+  },
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0,
+      "2000": 0
+    },
+    "set_only": [
+      "1000",
+      "1001"
+    ]
+  }
+}

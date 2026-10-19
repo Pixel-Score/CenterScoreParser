@@ -1,0 +1,5065 @@
+{
+  "title": "MTX_Dr_Pepper_4",
+  "episode": "Officer Monte's New Year's Bash",
+  "cast": [
+    "Officer Monte",
+    "Erik",
+    "Ms. Prez",
+    "Ms. Pliny",
+    "Coach Kessler",
+    "Coach",
+    "Shapiro",
+    "Mr. Russell",
+    "Jessica",
+    "Zoe",
+    "Ben",
+    "Howard",
+    "Ryan",
+    "Kenji",
+    "Megan",
+    "Bryce",
+    "Dontae",
+    "Dex",
+    "Brendan",
+    "Taylor",
+    "Ashley",
+    "Andrew"
+  ],
+  "main_characters": [
+    "Officer Monte"
+  ],
+  "genders": {
+    "Officer Monte": "M",
+    "Erik": "M",
+    "Ms. Prez": "F",
+    "Ms. Pliny": "F",
+    "Coach Kessler": "M",
+    "Coach": "M",
+    "Shapiro": "F",
+    "Mr. Russell": "M",
+    "Jessica": "F",
+    "Zoe": "F",
+    "Ben": "M",
+    "Howard": "M",
+    "Ryan": "M",
+    "Kenji": "M",
+    "Megan": "F",
+    "Bryce": "M",
+    "Dontae": "M",
+    "Dex": "M",
+    "Brendan": "M",
+    "Taylor": "F",
+    "Ashley": "F",
+    "Andrew": "M"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1"
+  },
+  "scene_minigame_banks": {
+    "1": {}
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "checkpoints": {
+        "sets": [],
+        "replays": [
+          {
+            "offset": "13325",
+            "target": "13049"
+          }
+        ]
+      },
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    }
+  },
+  "segments": {
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg13130_1"
+        }
+      ]
+    },
+    "s1_enter_v0": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "22",
+          "offset": "13317"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg13130_1"
+        }
+      ]
+    },
+    "s1_r24_b1": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 33,
+          "name": "show_card",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            4000
+          ]
+        },
+        {
+          "type": "yield",
+          "yield": 7,
+          "name": "end_episode",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            {
+              "local": -3
+            }
+          ]
+        },
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s1_bg13130_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "22",
+          "offset": "13317"
+        },
+        {
+          "type": "pov_change",
+          "character": "Officer Monte",
+          "index": "0",
+          "offset": "13337"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "13346"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "13355"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "13364"
+        },
+        {
+          "type": "narration",
+          "text": "A little while back, three Centerscore guys were sentenced to do a ride-along with the cantankerous Officer Monte...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13371"
+        },
+        {
+          "type": "narration",
+          "text": "When it was done, he appointed them 'Junior Detectives'... But did any ever actually come back?",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13381"
+        },
+        {
+          "type": "narration",
+          "text": "Find out now!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13391"
+        },
+        {
+          "type": "title_card",
+          "title": "Officer Monte's Holiday Bash",
+          "subtitle": "Will the night be ruined?",
+          "asset_id": "1078",
+          "flag": "1",
+          "offset": "13404"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1087",
+          "variant": "1",
+          "offset": "13414"
+        },
+        {
+          "type": "narration",
+          "text": "It's New Year's Eve at the Centerscore Police Station.",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13424"
+        },
+        {
+          "type": "narration",
+          "text": "The building is quiet and still...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13434"
+        },
+        {
+          "type": "music",
+          "track_id": "8207",
+          "loop": false,
+          "offset": "13441"
+        },
+        {
+          "type": "narration",
+          "text": "Except for one very excited police officer and the Junior Detective trailing behind him!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13451"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Ah, New Year's Eve! A night of merriment, joy, and frivolity...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13460"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "And my absolute favorite night of the year! Ask me why, Junior Detective!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13469"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Why, Junior Detective?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13478"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "You're not the sharpest pebble in the drawer, are you?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13487"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "I once stuck a pebble up my nose...?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "13496"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Ahem! New Year's Eve is my favorite night of the year because it's the night when this good town is lit up by dozens of rowdy, noisy, rambunctious parties...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13505"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "And that means there are dozens of parties for us to break up!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13514"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "You're telling me! I left one heck of a hootenanny to come here! We were playing `Ogres and Elves,` but then we were pretending to be popular, and then, well, it all got kind of confusing...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13523",
+          "text_bbcode": "You're telling me! I left one heck of a hootenanny to come here! We were playing [color=#e23b3b][i]Ogres and Elves,[/i][/color] but then we were pretending to be popular, and then, well, it all got kind of confusing..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Well, I must say, I appreciate your dedication to the job, Shortstop. Most of my Junior Detectives never bother to show their lollygagging faces around here.",
+          "character_id": "0",
+          "offset": "13530"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Of course! It's my duty to protect and swerve!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13539"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "That's protect and `serve.`",
+          "character_id": "0",
+          "offset": "13546",
+          "text_bbcode": "That's protect and [color=#e23b3b][i]serve.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "You mean I've been doing all that swerving for nothing?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13555"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Well, I suppose a good swerve never hurt a man. You ready to go bust some parties?",
+          "character_id": "0",
+          "offset": "13562"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Sure! Whatever you say, `Jefe!`",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13571",
+          "text_bbcode": "Sure! Whatever you say, [color=#e23b3b][i]Jefe![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "That's Spanish for Chief!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13580"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "13586"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Sure it is, Pipsqueak. Sure it is.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13595"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1042",
+          "variant": "1",
+          "offset": "13605"
+        },
+        {
+          "type": "narration",
+          "text": "A few minutes later, Officer Monte and Erik drive through town...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13615"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "So these parties we're busting... What exactly are we busting them for?",
+          "character_id": "1",
+          "offset": "13622"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Are they crime parties? My dad once threw a mystery theater dinner party, and things got pretty suspicious...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13631"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Don't you worry. Once we bust down some doors, I'm sure we'll find all kinds of seedy, criminal activity...",
+          "character_id": "0",
+          "offset": "13638"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "But for now, we're just going to drive around town until we hear the most terrible sound in the universe...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13647"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "The growl of a grizzly bear with a shark on its back?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13656"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "No... `People having fun.`",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13665",
+          "text_bbcode": "No... [color=#e23b3b][i]People having fun.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Oh...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13674"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "In fact... I think I hear some right now!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13683"
+        },
+        {
+          "type": "narration",
+          "text": "Officer Monte makes a hard left and pulls into a parking lot!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13693"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1090",
+          "variant": "1",
+          "offset": "13703"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "There must be some mistake... According to my Star Tour map, we're at... Centerscore High!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13712"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "There can't be a party happening here! It's winter break!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13721"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Detective Lesson number 1: You can trust your brain... Or you can trust your senses.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13730"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Turn off that twisted mess of neurons you call a brain, boy... And tell me what you hear!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13739"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "I hear... I hear...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13748"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "Music! And laughter! And joy!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "13757"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "13763"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Exactly! Now let's go ruin it!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13772"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1030",
+          "variant": "1",
+          "offset": "13782"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "13789"
+        },
+        {
+          "type": "narration",
+          "text": "Meanwhile, in a classroom in Centerscore High...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13799"
+        },
+        {
+          "type": "narration",
+          "text": "The Annual Faculty Christmas Party is in full swing!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13809"
+        },
+        {
+          "type": "narration",
+          "text": "At one end of the room, Ms. Prez talks with Ms. Pliny...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13819"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Pliny",
+          "emotion_code": "4",
+          "image": "2444",
+          "text": "My word! So Denni kissed Colt, which is why he broke up with Sam...",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "13828"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Prez",
+          "emotion_code": "2",
+          "image": "2432",
+          "text": "But then when she started dating Ben, he ended up kissing Jessica, and they broke up too!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "13837"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Pliny",
+          "emotion_code": "4",
+          "image": "2444",
+          "text": "Scandalous!",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "13846"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Prez",
+          "emotion_code": "2",
+          "image": "2432",
+          "text": "And get this... According to Mr. Russell, Jessica actually orchestrated the whole thing!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "13855"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Pliny",
+          "emotion_code": null,
+          "image": "2440",
+          "text": "I never did like her!",
+          "character_id": "3",
+          "offset": "13864"
+        },
+        {
+          "type": "narration",
+          "text": "And on the other side of the room, Coach Kessler talks to Coach Sanderson...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13874"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach Kessler",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "I'm telling you, buddy, your  boys might have some moves, but the Centerscore swim team is far and away the school's top athletes!",
+          "character_id": "4",
+          "offset": "13883"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach",
+          "emotion_code": null,
+          "image": "2075",
+          "text": "In your dreams, pal! The football team rules, and you know it!",
+          "character_id": "5",
+          "offset": "13892"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach Kessler",
+          "emotion_code": "1",
+          "image": "26021",
+          "text": "I'd like to see your boys in the water!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "13901"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach",
+          "emotion_code": "1",
+          "image": "2076",
+          "text": "Yeah, well I'd like to see your girls on the field!",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "13910"
+        },
+        {
+          "type": "narration",
+          "text": "Just then, the door to the room flies open! Officer Monte and Erik burst in!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13920"
+        },
+        {
+          "type": "music",
+          "track_id": "8209",
+          "loop": false,
+          "offset": "13927"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Hands in the air!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13936"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "Feet on the ground!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "13945"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach",
+          "emotion_code": "1",
+          "image": "2076",
+          "text": "Aw no, not `this` again!",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "13954",
+          "text_bbcode": "Aw no, not [color=#e23b3b][i]this[/i][/color] again!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Pliny",
+          "emotion_code": "4",
+          "image": "2444",
+          "text": "Is that Erik Ericson?",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "13963"
+        },
+        {
+          "type": "narration",
+          "text": "Principal Shapiro stomps towards the two...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13973"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Shapiro",
+          "emotion_code": "1",
+          "image": "2176",
+          "text": "What on Earth is the meaning of this?",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "13982"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Why don't you tell me, Shapiro? Because I'm seeing violations of local noise ordinances, unlicensed use of public buildings for recreational purposes...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13991"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Not to mention what appears to be unauthorized usage of a type-3 Classified chemical!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14000"
+        },
+        {
+          "type": "narration",
+          "text": "Across the room, Mr. Russell freezes, a vial in his hand...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14010"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mr. Russell",
+          "emotion_code": "3",
+          "image": "2438",
+          "text": "It's just dye... It... It makes the punch green...",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "14019"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "Green punch... Sounds pretty fishy!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "14028"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Ain't that the truth? I'm going to have to break this little shindig up! All of you need to get on your way, now!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14037"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach",
+          "emotion_code": "1",
+          "image": "2076",
+          "text": "You've got to be kidding me...",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "14046"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Prez",
+          "emotion_code": "1",
+          "image": "2431",
+          "text": "Talk about a buzz-kill...",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "14055"
+        },
+        {
+          "type": "narration",
+          "text": "Principal Shapiro leans in close to Monte and talks in a low, soft voice...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14065"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Shapiro",
+          "emotion_code": "3",
+          "image": "2178",
+          "text": "Monte, please... You don't have to do this...",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "14074"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Shapiro",
+          "emotion_code": "3",
+          "image": "2178",
+          "text": "It's New Year's Eve... Why don't you just go and have some fun?",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "14083"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "Fun? Fun is for other men, Kathy. Weaker... Lesser men.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "14092"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Don't let me catch you here again.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14101"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Shapiro",
+          "emotion_code": "1",
+          "image": "2176",
+          "text": "I have to come back here, I'm the Principal!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "14110"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "...You know what I meant.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14119"
+        },
+        {
+          "type": "narration",
+          "text": "Monte and Erik turn and walk out.",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14129"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Pliny",
+          "emotion_code": "3",
+          "image": "2443",
+          "text": "I'm not kidding, was that Erik Ericson? Am I the only one that saw that?",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "14138"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1090",
+          "variant": "1",
+          "offset": "14148"
+        },
+        {
+          "type": "narration",
+          "text": "And right outside, Erik and Monte head back to his car...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14158"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Say, how'd you know Principal Shapiro's first name anyway?",
+          "character_id": "1",
+          "offset": "14165"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "...It's a long story.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14174"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Oh. Okay.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14183"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Kathy, huh? I always figured it would be something exciting, like Guinevere...",
+          "character_id": "1",
+          "offset": "14190"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "You're one odd duck, kid.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14199"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "14205"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Now lace up your crime-fighting shoes... Because we've got some parties' butts to kick!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14214"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1069",
+          "variant": "1",
+          "offset": "14224"
+        },
+        {
+          "type": "music",
+          "track_id": "8203",
+          "loop": false,
+          "offset": "14231"
+        },
+        {
+          "type": "narration",
+          "text": "And so, a little while later, Monte and Erik sit crouched in the bushes outside a popular kids' party, staking out the festivities...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14241"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "So $ZOE still has feelings for Matteo? I had no idea!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "14250"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "A love triangle under my very roof! It's giving me goose pimples!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14259"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Keep your skin conditions to yourself, kid. We need to wait for the exact right minute to strike...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14268"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Strike? I thought we were just watching people have fun!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14277"
+        },
+        {
+          "type": "narration",
+          "text": "Just then, fireworks explode in the night sky! Everyone yells and cheers!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14287"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "2",
+          "image": "26007",
+          "text": "Look at me! Woo! I'm dancing on a picnic table!",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "14296"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "And that's our cue! Move!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14305"
+        },
+        {
+          "type": "narration",
+          "text": "Monte and Erik burst out of the bushes!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14315"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Everybody freeze!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14324"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "4",
+          "image": "26004",
+          "text": "Ahh! It's the police!",
+          "character_id": "9",
+          "expression": "4",
+          "offset": "14333"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "4",
+          "image": "2214",
+          "text": "Aw come on, really?",
+          "character_id": "11",
+          "expression": "4",
+          "offset": "14342"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "26014",
+          "text": "This can't be happening!",
+          "character_id": "10",
+          "expression": "4",
+          "offset": "14351"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Afraid it is, Captain Tweed!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14360"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "26014",
+          "text": "Why do people keep saying that? I don't even `wear` tweed!",
+          "character_id": "10",
+          "expression": "4",
+          "offset": "14369",
+          "text_bbcode": "Why do people keep saying that? I don't even [color=#e23b3b][i]wear[/i][/color] tweed!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "Oh no. No no no. You are `not` busting my party!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14378",
+          "text_bbcode": "Oh no. No no no. You are [color=#3b78e2][i]not[/i][/color] busting my party!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "No? What are you gonna do about it, missy?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14387"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "This!",
+          "character_id": "8",
+          "offset": "14396"
+        },
+        {
+          "type": "narration",
+          "text": "Jessica pulls open her purse and whips out a huge stack of papers!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14406"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "Permit to use a public park for recreation... Here!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14415"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "Permit to host an unsupervised group of more than 50 minors... Here!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14424"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "And finally, a signed declaration by everyone within 10 miles of here that they won't file any noise complaints! Read it and weep, Officer!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14433"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "26014",
+          "text": "Wow, you are on top of this!",
+          "character_id": "10",
+          "expression": "4",
+          "offset": "14442"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "2",
+          "image": "26007",
+          "text": "I've had a lot of parties get busted.",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "14451"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Lemme see that!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14460"
+        },
+        {
+          "type": "narration",
+          "text": "Monte grabs the paperwork and rifles through it...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14470"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Grumble grumble... This all looks in order...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14479"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "2",
+          "image": "26007",
+          "text": "Exactly!",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "14488"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "I guess we can just get going, right, and leave everyone alone...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14497"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Except!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14506"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "3",
+          "image": "26008",
+          "text": "Except...?",
+          "character_id": "8",
+          "expression": "3",
+          "offset": "14515"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Except I don't see any permit here for the presence of an unleashed Central American amphibian!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14524"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "4",
+          "image": "26009",
+          "text": "What?!",
+          "character_id": "8",
+          "expression": "4",
+          "offset": "14533"
+        },
+        {
+          "type": "narration",
+          "text": "Jessica spins around and sees Ryan holding up Lyle!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14543"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ryan",
+          "emotion_code": "2",
+          "image": "2392",
+          "text": "Everybody! Look at Lyle! You can tell he's mad because he keeps biting at things!",
+          "character_id": "12",
+          "expression": "2",
+          "offset": "14552"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "`No!`",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14561",
+          "text_bbcode": "[color=#3b78e2][i]No![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "Jessica storms over to Ryan!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14571"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "What is wrong with you?! Why would you bring Lyle here?",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14580"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ryan",
+          "emotion_code": "2",
+          "image": "2392",
+          "text": "Why wouldn't I? Everyone loves Lyle!",
+          "character_id": "12",
+          "expression": "2",
+          "offset": "14589"
+        },
+        {
+          "type": "narration",
+          "text": "As soon as Ryan says that, Lyle snaps at him, biting the side of his head!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14599"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ryan",
+          "emotion_code": "4",
+          "image": "2394",
+          "text": "Ow! Ow ow ow!",
+          "character_id": "12",
+          "expression": "4",
+          "offset": "14608"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "You have got to be kidding me...",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14617"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Them's the breaks, little lady.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14626"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Game. Set. `Checkmate.`",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14635",
+          "text_bbcode": "Game. Set. [color=#e23b3b][i]Checkmate.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "So not fair!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14644"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Attention! Everyone has ten minutes to vacate the premises, go home, and sit in melancholy silence, contemplating the futility of your lives!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14653"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "26013",
+          "text": "Aw... I hate doing that!",
+          "character_id": "10",
+          "expression": "3",
+          "offset": "14662"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "You're the worst, Officer Monte!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14671"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Just doing my job!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14680"
+        },
+        {
+          "type": "narration",
+          "text": "Erik and Monte walk away from the park as the students turn and scatter...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14690"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Mmmm... Smell that? That's the smell of a bunch of quiet, unhappy people on New Year's Eve!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14699"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Yeah... About that...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14708"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Got something to say, Shortstop?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14717"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Well... Not to question my Superior Officer... But what we're doing here doesn't really seem right...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14726"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Go on...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14735"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "I mean, I'm all about Protecting and Serving, but none of these parties are really bothering anyone...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14744"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Maybe we should just let them be.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14753"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Now listen here, little man, because I'm only going to say this once.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14762"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Parties might seem like good times where no one gets hurt. They might `seem` like totally harmless get-togethers where everyone's laughing and having fun...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14771",
+          "text_bbcode": "Parties might seem like good times where no one gets hurt. They might [color=#e23b3b][i]seem[/i][/color] like totally harmless get-togethers where everyone's laughing and having fun..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Yeah!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14780"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "But they're not! Every party `always` goes wrong! And someone gets laughed at! And someone gets teased! And someone gets called a little shrimp with a weirdo mustache!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14789",
+          "text_bbcode": "But they're not! Every party [color=#e23b3b][i]always[/i][/color] goes wrong! And someone gets laughed at! And someone gets teased! And someone gets called a little shrimp with a weirdo mustache!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Did... Did something happen to you at a party?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14798"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "No! Shut up! Now let's go put the shin in shindig!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14807"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "14813"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Okay...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14822"
+        },
+        {
+          "type": "music",
+          "track_id": "8220",
+          "loop": false,
+          "offset": "14829"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1006",
+          "variant": "1",
+          "offset": "14839"
+        },
+        {
+          "type": "narration",
+          "text": "And so Monte and Erik go around town...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14849"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Well, I've seen a lot of New Year's debauchery, but I'm not sure I've ever seen anything so sick and depraved...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14858"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kenji",
+          "emotion_code": "1",
+          "image": "2246",
+          "text": "What are you talking about?",
+          "character_id": "13",
+          "expression": "1",
+          "offset": "14867"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Megan",
+          "emotion_code": "1",
+          "image": "2291",
+          "text": "We're just sitting around watching movies and eating popcorn!",
+          "character_id": "14",
+          "expression": "1",
+          "offset": "14876"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Yeah? What do you call this weapon of mass destruction?",
+          "character_id": "0",
+          "offset": "14883"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kenji",
+          "emotion_code": "1",
+          "image": "2246",
+          "text": "That's a welding torch!",
+          "character_id": "13",
+          "expression": "1",
+          "offset": "14892"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "14898"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Yeah, well, it's evidence now, punk! Now get out!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14907"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "14917"
+        },
+        {
+          "type": "narration",
+          "text": "And after that, in the MAN frat...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14927"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Show's over, folks! Time to get back to the disgusting dens of trash you call homes!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14936"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "Dude, are you gonna bust every party we throw?!",
+          "character_id": "15",
+          "expression": "1",
+          "offset": "14945"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "1",
+          "image": "26026",
+          "text": "This is the worst college ever!",
+          "character_id": "16",
+          "expression": "1",
+          "offset": "14954"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "14960"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "You'll thank me when you're older, son. Now get moving!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14969"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1078",
+          "variant": "1",
+          "offset": "14979"
+        },
+        {
+          "type": "narration",
+          "text": "And soon enough, they approach a familiar house...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14989"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Last house on my list. This one was a real squeaker... Barely registered on the decibel scale...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14998"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "But no one gets by Officer Monte Carlos Monte!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "15007"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Hey... Wait a minute... I know where we are...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "15016"
+        },
+        {
+          "type": "narration",
+          "text": "But before Erik can stop him, Monte kicks open the door...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15026"
+        },
+        {
+          "type": "music",
+          "track_id": "8209",
+          "loop": false,
+          "offset": "15033"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "1",
+          "offset": "15043"
+        },
+        {
+          "type": "narration",
+          "text": "And storms into Brendan's den!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15053"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Nobody move! This party is officially busted!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "15062"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "4",
+          "image": "2064",
+          "text": "Oh no! Please don't arrest me, sir!",
+          "character_id": "18",
+          "expression": "4",
+          "offset": "15071"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dex",
+          "emotion_code": "4",
+          "image": "2104",
+          "text": "This can't be happening! I've already got priors!",
+          "character_id": "17",
+          "expression": "4",
+          "offset": "15080"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "4",
+          "image": "2064",
+          "text": "...What do you have priors for?",
+          "character_id": "18",
+          "expression": "4",
+          "offset": "15089"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dex",
+          "emotion_code": "4",
+          "image": "2104",
+          "text": "Sophomore year was rough times, man.",
+          "character_id": "17",
+          "expression": "4",
+          "offset": "15098"
+        },
+        {
+          "type": "narration",
+          "text": "Suddenly, Ashley stands up and points...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15108"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ashley",
+          "emotion_code": "1",
+          "image": "2036",
+          "text": "`Erik?!`",
+          "character_id": "20",
+          "expression": "1",
+          "offset": "15117",
+          "text_bbcode": "[color=#3b78e2][i]Erik?![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "...Hi guys.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "15126"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "4",
+          "image": "2064",
+          "text": "What are you doing with him? Did you lead him here?",
+          "character_id": "18",
+          "expression": "4",
+          "offset": "15135"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "No, I didn't lead him here, I swear! I think he has super-hearing!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "15144"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "More like a super sense of justice. Parties over, Pointdexters. Get on home.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "15153"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Look, sir, I really don't think you need to break this party up. We're not doing anything wrong...",
+          "character_id": "18",
+          "expression": "3",
+          "offset": "15162"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Oh yeah? There's noise level for one...",
+          "character_id": "0",
+          "offset": "15169"
+        },
+        {
+          "type": "narration",
+          "text": "Monte turns to the side of the room where the table is set up for `Ogres and Elves.`",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15179",
+          "text_bbcode": "Monte turns to the side of the room where the table is set up for [b]Ogres and Elves.[/b]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Over here, we've clearly got some kind of devil-summoning ritual...",
+          "character_id": "0",
+          "offset": "15186"
+        },
+        {
+          "type": "narration",
+          "text": "He turns to the far side of the room, where Taylor is covering her face in embarrassment...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15196"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "And I can't even begin to fathom why you'd have a pretty cheerleader-type here short of some sort of elaborate kidnapping scenario...",
+          "character_id": "0",
+          "offset": "15203"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Just a tip, kids... You'll never get the ransom. Her parents don't love her nearly enough.",
+          "character_id": "0",
+          "offset": "15210"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "1",
+          "image": "2426",
+          "text": "Hey!",
+          "character_id": "19",
+          "expression": "1",
+          "offset": "15219"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Now, if you could all just be on your way...",
+          "character_id": "0",
+          "offset": "15226"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "...No.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "15235"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Excuse me?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "15244"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": false,
+          "offset": "15251"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "I said no. This isn't right. These are my friends, and they're just having fun.",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15260"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "I agreed to be a Junior Detective because I thought it was the right thing to do... Because I believed in truth and justice...",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15269"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "But if this is justice... Then I quit!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15278"
+        },
+        {
+          "type": "narration",
+          "text": "Erik rips the badge off his chest and hurls it at Monte. Slowly, Monte kneels down and picks it off the floor.",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15288"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "...This is a Space 'Splosions Convention Attendee Badge.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "15297"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "Yes it is. Yes. It. `Is.`",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15306",
+          "text_bbcode": "Yes it is. Yes. It. [color=#e23b3b][i]Is.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ashley",
+          "emotion_code": "4",
+          "image": "2039",
+          "text": "Whoa... Was Erik just... Kind of awesome?",
+          "character_id": "20",
+          "expression": "4",
+          "offset": "15315"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dex",
+          "emotion_code": "4",
+          "image": "2104",
+          "text": "I know!",
+          "character_id": "17",
+          "expression": "4",
+          "offset": "15324"
+        },
+        {
+          "type": "narration",
+          "text": "Officer Monte sighs deeply...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15334"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Look, son, I appreciate that it's not always easy to do the right thing... But the law's the law!",
+          "character_id": "0",
+          "offset": "15341"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "Oh yeah? Then why are you the only officer working tonight?! I thought maybe you were just dedicated, and then I thought maybe you were the only officer in the world...",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15350"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "But now I think you might just be crazy!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15359"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "I... I...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "15368"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "So here's what's gonna happen, `Jefe`. My friends and I are going over to this table where we're gonna sit down and play `Ogres and Elves.`",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15377",
+          "text_bbcode": "So here's what's gonna happen, [color=#e23b3b][i]Jefe[/i][/color]. My friends and I are going over to this table where we're gonna sit down and play [color=#e23b3b][i]Ogres and Elves.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "You can either forcefully drag us out of here and make a huge scene...",
+          "character_id": "1",
+          "offset": "15384"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Or you can sit down and join us!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "15393"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "J... Join you?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "15402"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Sure, why not? It doesn't seem like you're doing anything else!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "15411"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "I... I don't know...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "15420"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "Come on, it'll be fun!",
+          "character_id": "18",
+          "expression": "2",
+          "offset": "15429"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "We're doing the Dragons with Flagons expansion! It's, uh... It's gonna get pretty real.",
+          "character_id": "21",
+          "expression": "2",
+          "offset": "15438"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "It's just, I... I don't really want to get made fun of...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "15447"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "No one's gonna make fun of you!",
+          "character_id": "18",
+          "expression": "2",
+          "offset": "15456"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dex",
+          "emotion_code": "2",
+          "image": "2102",
+          "text": "Yeah, we're nerds! We're the guys who `get` made fun of!",
+          "character_id": "17",
+          "expression": "2",
+          "offset": "15465",
+          "text_bbcode": "Yeah, we're nerds! We're the guys who [color=#e23b3b][i]get[/i][/color] made fun of!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Tell me about it...",
+          "character_id": "19",
+          "offset": "15474"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "You in... Sir?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "15483"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Well...",
+          "character_id": "0",
+          "offset": "15490"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Okay! But just for a little while!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "15499"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "Yay! This is weird, but yay!",
+          "character_id": "18",
+          "expression": "2",
+          "offset": "15508"
+        },
+        {
+          "type": "narration",
+          "text": "Everyone settles down at the table. Monte awkwardly takes a seat...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15518"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "So, the first thing you need to do is create a character...",
+          "character_id": "21",
+          "expression": "2",
+          "offset": "15527"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "I will be Osmund Bricklebeard, Vanguard of the Hyberian Wastes, Harbinger of the Seventh Apocalypse, and Wielder of the Obsidian Moustache of Oblivion!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "15536"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "4",
+          "image": "2024",
+          "text": "Whoa! Have you played this before?",
+          "character_id": "21",
+          "expression": "4",
+          "offset": "15545"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Not at all. I'm just very, `very` manly.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "15554",
+          "text_bbcode": "Not at all. I'm just very, [color=#e23b3b][i]very[/i][/color] manly."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Now let's kill some dragons and take their flagons!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "15563"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Yay!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "15572"
+        },
+        {
+          "type": "narration",
+          "text": "Wow! Looks like Erik managed to bring a little holiday cheer to Officer Monte! Who would've thought?",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15582"
+        },
+        {
+          "type": "narration",
+          "text": "We hope you enjoyed this `exclusive` piece of promotional content! Keep drinking Dr. Pepper, and see the other special stories!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15592",
+          "text_bbcode": "We hope you enjoyed this [b]exclusive[/b] piece of promotional content! Keep drinking Dr. Pepper, and see the other special stories!"
+        },
+        {
+          "type": "call",
+          "routine": "s1_r24",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing!"
+            },
+            1
+          ],
+          "offset": "15602"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_bg13130_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "13141",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "13148",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_bg13130_r"
+        }
+      ]
+    },
+    "s1_bg13130_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg13130_t",
+          "else": "s1_bg13130_r",
+          "offset": "13130",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg13130_r": {
+      "nodes": [
+        {
+          "type": "pov_change",
+          "character": "Officer Monte",
+          "index": "0",
+          "offset": "13337"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "13346"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "13355"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "13364"
+        },
+        {
+          "type": "narration",
+          "text": "A little while back, three Centerscore guys were sentenced to do a ride-along with the cantankerous Officer Monte...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13371"
+        },
+        {
+          "type": "narration",
+          "text": "When it was done, he appointed them 'Junior Detectives'... But did any ever actually come back?",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13381"
+        },
+        {
+          "type": "narration",
+          "text": "Find out now!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13391"
+        },
+        {
+          "type": "title_card",
+          "title": "Officer Monte's Holiday Bash",
+          "subtitle": "Will the night be ruined?",
+          "asset_id": "1078",
+          "flag": "1",
+          "offset": "13404"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1087",
+          "variant": "1",
+          "offset": "13414"
+        },
+        {
+          "type": "narration",
+          "text": "It's New Year's Eve at the Centerscore Police Station.",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13424"
+        },
+        {
+          "type": "narration",
+          "text": "The building is quiet and still...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13434"
+        },
+        {
+          "type": "music",
+          "track_id": "8207",
+          "loop": false,
+          "offset": "13441"
+        },
+        {
+          "type": "narration",
+          "text": "Except for one very excited police officer and the Junior Detective trailing behind him!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13451"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Ah, New Year's Eve! A night of merriment, joy, and frivolity...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13460"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "And my absolute favorite night of the year! Ask me why, Junior Detective!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13469"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Why, Junior Detective?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13478"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "You're not the sharpest pebble in the drawer, are you?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13487"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "I once stuck a pebble up my nose...?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "13496"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Ahem! New Year's Eve is my favorite night of the year because it's the night when this good town is lit up by dozens of rowdy, noisy, rambunctious parties...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13505"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "And that means there are dozens of parties for us to break up!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13514"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "You're telling me! I left one heck of a hootenanny to come here! We were playing `Ogres and Elves,` but then we were pretending to be popular, and then, well, it all got kind of confusing...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13523",
+          "text_bbcode": "You're telling me! I left one heck of a hootenanny to come here! We were playing [color=#e23b3b][i]Ogres and Elves,[/i][/color] but then we were pretending to be popular, and then, well, it all got kind of confusing..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Well, I must say, I appreciate your dedication to the job, Shortstop. Most of my Junior Detectives never bother to show their lollygagging faces around here.",
+          "character_id": "0",
+          "offset": "13530"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Of course! It's my duty to protect and swerve!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13539"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "That's protect and `serve.`",
+          "character_id": "0",
+          "offset": "13546",
+          "text_bbcode": "That's protect and [color=#e23b3b][i]serve.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "You mean I've been doing all that swerving for nothing?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13555"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Well, I suppose a good swerve never hurt a man. You ready to go bust some parties?",
+          "character_id": "0",
+          "offset": "13562"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Sure! Whatever you say, `Jefe!`",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13571",
+          "text_bbcode": "Sure! Whatever you say, [color=#e23b3b][i]Jefe![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "That's Spanish for Chief!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13580"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "13586"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Sure it is, Pipsqueak. Sure it is.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13595"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1042",
+          "variant": "1",
+          "offset": "13605"
+        },
+        {
+          "type": "narration",
+          "text": "A few minutes later, Officer Monte and Erik drive through town...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13615"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "So these parties we're busting... What exactly are we busting them for?",
+          "character_id": "1",
+          "offset": "13622"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Are they crime parties? My dad once threw a mystery theater dinner party, and things got pretty suspicious...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13631"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Don't you worry. Once we bust down some doors, I'm sure we'll find all kinds of seedy, criminal activity...",
+          "character_id": "0",
+          "offset": "13638"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "But for now, we're just going to drive around town until we hear the most terrible sound in the universe...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13647"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "The growl of a grizzly bear with a shark on its back?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13656"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "No... `People having fun.`",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13665",
+          "text_bbcode": "No... [color=#e23b3b][i]People having fun.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Oh...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13674"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "In fact... I think I hear some right now!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13683"
+        },
+        {
+          "type": "narration",
+          "text": "Officer Monte makes a hard left and pulls into a parking lot!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13693"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1090",
+          "variant": "1",
+          "offset": "13703"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "There must be some mistake... According to my Star Tour map, we're at... Centerscore High!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13712"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "There can't be a party happening here! It's winter break!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13721"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Detective Lesson number 1: You can trust your brain... Or you can trust your senses.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13730"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Turn off that twisted mess of neurons you call a brain, boy... And tell me what you hear!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13739"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "I hear... I hear...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13748"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "Music! And laughter! And joy!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "13757"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "13763"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Exactly! Now let's go ruin it!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13772"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1030",
+          "variant": "1",
+          "offset": "13782"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "13789"
+        },
+        {
+          "type": "narration",
+          "text": "Meanwhile, in a classroom in Centerscore High...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13799"
+        },
+        {
+          "type": "narration",
+          "text": "The Annual Faculty Christmas Party is in full swing!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13809"
+        },
+        {
+          "type": "narration",
+          "text": "At one end of the room, Ms. Prez talks with Ms. Pliny...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13819"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Pliny",
+          "emotion_code": "4",
+          "image": "2444",
+          "text": "My word! So Denni kissed Colt, which is why he broke up with Sam...",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "13828"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Prez",
+          "emotion_code": "2",
+          "image": "2432",
+          "text": "But then when she started dating Ben, he ended up kissing Jessica, and they broke up too!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "13837"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Pliny",
+          "emotion_code": "4",
+          "image": "2444",
+          "text": "Scandalous!",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "13846"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Prez",
+          "emotion_code": "2",
+          "image": "2432",
+          "text": "And get this... According to Mr. Russell, Jessica actually orchestrated the whole thing!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "13855"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Pliny",
+          "emotion_code": null,
+          "image": "2440",
+          "text": "I never did like her!",
+          "character_id": "3",
+          "offset": "13864"
+        },
+        {
+          "type": "narration",
+          "text": "And on the other side of the room, Coach Kessler talks to Coach Sanderson...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13874"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach Kessler",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "I'm telling you, buddy, your  boys might have some moves, but the Centerscore swim team is far and away the school's top athletes!",
+          "character_id": "4",
+          "offset": "13883"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach",
+          "emotion_code": null,
+          "image": "2075",
+          "text": "In your dreams, pal! The football team rules, and you know it!",
+          "character_id": "5",
+          "offset": "13892"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach Kessler",
+          "emotion_code": "1",
+          "image": "26021",
+          "text": "I'd like to see your boys in the water!",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "13901"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach",
+          "emotion_code": "1",
+          "image": "2076",
+          "text": "Yeah, well I'd like to see your girls on the field!",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "13910"
+        },
+        {
+          "type": "narration",
+          "text": "Just then, the door to the room flies open! Officer Monte and Erik burst in!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13920"
+        },
+        {
+          "type": "music",
+          "track_id": "8209",
+          "loop": false,
+          "offset": "13927"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Hands in the air!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13936"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "Feet on the ground!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "13945"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach",
+          "emotion_code": "1",
+          "image": "2076",
+          "text": "Aw no, not `this` again!",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "13954",
+          "text_bbcode": "Aw no, not [color=#e23b3b][i]this[/i][/color] again!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Pliny",
+          "emotion_code": "4",
+          "image": "2444",
+          "text": "Is that Erik Ericson?",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "13963"
+        },
+        {
+          "type": "narration",
+          "text": "Principal Shapiro stomps towards the two...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "13973"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Shapiro",
+          "emotion_code": "1",
+          "image": "2176",
+          "text": "What on Earth is the meaning of this?",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "13982"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Why don't you tell me, Shapiro? Because I'm seeing violations of local noise ordinances, unlicensed use of public buildings for recreational purposes...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "13991"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Not to mention what appears to be unauthorized usage of a type-3 Classified chemical!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14000"
+        },
+        {
+          "type": "narration",
+          "text": "Across the room, Mr. Russell freezes, a vial in his hand...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14010"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mr. Russell",
+          "emotion_code": "3",
+          "image": "2438",
+          "text": "It's just dye... It... It makes the punch green...",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "14019"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "Green punch... Sounds pretty fishy!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "14028"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Ain't that the truth? I'm going to have to break this little shindig up! All of you need to get on your way, now!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14037"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Coach",
+          "emotion_code": "1",
+          "image": "2076",
+          "text": "You've got to be kidding me...",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "14046"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Prez",
+          "emotion_code": "1",
+          "image": "2431",
+          "text": "Talk about a buzz-kill...",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "14055"
+        },
+        {
+          "type": "narration",
+          "text": "Principal Shapiro leans in close to Monte and talks in a low, soft voice...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14065"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Shapiro",
+          "emotion_code": "3",
+          "image": "2178",
+          "text": "Monte, please... You don't have to do this...",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "14074"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Shapiro",
+          "emotion_code": "3",
+          "image": "2178",
+          "text": "It's New Year's Eve... Why don't you just go and have some fun?",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "14083"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "Fun? Fun is for other men, Kathy. Weaker... Lesser men.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "14092"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Don't let me catch you here again.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14101"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Shapiro",
+          "emotion_code": "1",
+          "image": "2176",
+          "text": "I have to come back here, I'm the Principal!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "14110"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "...You know what I meant.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14119"
+        },
+        {
+          "type": "narration",
+          "text": "Monte and Erik turn and walk out.",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14129"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ms. Pliny",
+          "emotion_code": "3",
+          "image": "2443",
+          "text": "I'm not kidding, was that Erik Ericson? Am I the only one that saw that?",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "14138"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1090",
+          "variant": "1",
+          "offset": "14148"
+        },
+        {
+          "type": "narration",
+          "text": "And right outside, Erik and Monte head back to his car...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14158"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Say, how'd you know Principal Shapiro's first name anyway?",
+          "character_id": "1",
+          "offset": "14165"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "...It's a long story.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14174"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Oh. Okay.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14183"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Kathy, huh? I always figured it would be something exciting, like Guinevere...",
+          "character_id": "1",
+          "offset": "14190"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "You're one odd duck, kid.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14199"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "14205"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Now lace up your crime-fighting shoes... Because we've got some parties' butts to kick!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14214"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1069",
+          "variant": "1",
+          "offset": "14224"
+        },
+        {
+          "type": "music",
+          "track_id": "8203",
+          "loop": false,
+          "offset": "14231"
+        },
+        {
+          "type": "narration",
+          "text": "And so, a little while later, Monte and Erik sit crouched in the bushes outside a popular kids' party, staking out the festivities...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14241"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "So $ZOE still has feelings for Matteo? I had no idea!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "14250"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "A love triangle under my very roof! It's giving me goose pimples!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14259"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Keep your skin conditions to yourself, kid. We need to wait for the exact right minute to strike...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14268"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Strike? I thought we were just watching people have fun!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14277"
+        },
+        {
+          "type": "narration",
+          "text": "Just then, fireworks explode in the night sky! Everyone yells and cheers!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14287"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "2",
+          "image": "26007",
+          "text": "Look at me! Woo! I'm dancing on a picnic table!",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "14296"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "And that's our cue! Move!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14305"
+        },
+        {
+          "type": "narration",
+          "text": "Monte and Erik burst out of the bushes!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14315"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Everybody freeze!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14324"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "4",
+          "image": "26004",
+          "text": "Ahh! It's the police!",
+          "character_id": "9",
+          "expression": "4",
+          "offset": "14333"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "4",
+          "image": "2214",
+          "text": "Aw come on, really?",
+          "character_id": "11",
+          "expression": "4",
+          "offset": "14342"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "26014",
+          "text": "This can't be happening!",
+          "character_id": "10",
+          "expression": "4",
+          "offset": "14351"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Afraid it is, Captain Tweed!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14360"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "26014",
+          "text": "Why do people keep saying that? I don't even `wear` tweed!",
+          "character_id": "10",
+          "expression": "4",
+          "offset": "14369",
+          "text_bbcode": "Why do people keep saying that? I don't even [color=#e23b3b][i]wear[/i][/color] tweed!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "Oh no. No no no. You are `not` busting my party!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14378",
+          "text_bbcode": "Oh no. No no no. You are [color=#3b78e2][i]not[/i][/color] busting my party!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "No? What are you gonna do about it, missy?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14387"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "This!",
+          "character_id": "8",
+          "offset": "14396"
+        },
+        {
+          "type": "narration",
+          "text": "Jessica pulls open her purse and whips out a huge stack of papers!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14406"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "Permit to use a public park for recreation... Here!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14415"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "Permit to host an unsupervised group of more than 50 minors... Here!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14424"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "And finally, a signed declaration by everyone within 10 miles of here that they won't file any noise complaints! Read it and weep, Officer!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14433"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "26014",
+          "text": "Wow, you are on top of this!",
+          "character_id": "10",
+          "expression": "4",
+          "offset": "14442"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "2",
+          "image": "26007",
+          "text": "I've had a lot of parties get busted.",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "14451"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Lemme see that!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14460"
+        },
+        {
+          "type": "narration",
+          "text": "Monte grabs the paperwork and rifles through it...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14470"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Grumble grumble... This all looks in order...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14479"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "2",
+          "image": "26007",
+          "text": "Exactly!",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "14488"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "I guess we can just get going, right, and leave everyone alone...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14497"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Except!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14506"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "3",
+          "image": "26008",
+          "text": "Except...?",
+          "character_id": "8",
+          "expression": "3",
+          "offset": "14515"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Except I don't see any permit here for the presence of an unleashed Central American amphibian!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14524"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "4",
+          "image": "26009",
+          "text": "What?!",
+          "character_id": "8",
+          "expression": "4",
+          "offset": "14533"
+        },
+        {
+          "type": "narration",
+          "text": "Jessica spins around and sees Ryan holding up Lyle!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14543"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ryan",
+          "emotion_code": "2",
+          "image": "2392",
+          "text": "Everybody! Look at Lyle! You can tell he's mad because he keeps biting at things!",
+          "character_id": "12",
+          "expression": "2",
+          "offset": "14552"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "`No!`",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14561",
+          "text_bbcode": "[color=#3b78e2][i]No![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "Jessica storms over to Ryan!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14571"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "What is wrong with you?! Why would you bring Lyle here?",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14580"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ryan",
+          "emotion_code": "2",
+          "image": "2392",
+          "text": "Why wouldn't I? Everyone loves Lyle!",
+          "character_id": "12",
+          "expression": "2",
+          "offset": "14589"
+        },
+        {
+          "type": "narration",
+          "text": "As soon as Ryan says that, Lyle snaps at him, biting the side of his head!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14599"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ryan",
+          "emotion_code": "4",
+          "image": "2394",
+          "text": "Ow! Ow ow ow!",
+          "character_id": "12",
+          "expression": "4",
+          "offset": "14608"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "You have got to be kidding me...",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14617"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Them's the breaks, little lady.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14626"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Game. Set. `Checkmate.`",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14635",
+          "text_bbcode": "Game. Set. [color=#e23b3b][i]Checkmate.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "So not fair!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14644"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Attention! Everyone has ten minutes to vacate the premises, go home, and sit in melancholy silence, contemplating the futility of your lives!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14653"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "26013",
+          "text": "Aw... I hate doing that!",
+          "character_id": "10",
+          "expression": "3",
+          "offset": "14662"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jessica",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "You're the worst, Officer Monte!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "14671"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Just doing my job!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14680"
+        },
+        {
+          "type": "narration",
+          "text": "Erik and Monte walk away from the park as the students turn and scatter...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14690"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Mmmm... Smell that? That's the smell of a bunch of quiet, unhappy people on New Year's Eve!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14699"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Yeah... About that...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14708"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Got something to say, Shortstop?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14717"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Well... Not to question my Superior Officer... But what we're doing here doesn't really seem right...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14726"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Go on...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14735"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "I mean, I'm all about Protecting and Serving, but none of these parties are really bothering anyone...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14744"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Maybe we should just let them be.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14753"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Now listen here, little man, because I'm only going to say this once.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14762"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Parties might seem like good times where no one gets hurt. They might `seem` like totally harmless get-togethers where everyone's laughing and having fun...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14771",
+          "text_bbcode": "Parties might seem like good times where no one gets hurt. They might [color=#e23b3b][i]seem[/i][/color] like totally harmless get-togethers where everyone's laughing and having fun..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Yeah!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14780"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "But they're not! Every party `always` goes wrong! And someone gets laughed at! And someone gets teased! And someone gets called a little shrimp with a weirdo mustache!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14789",
+          "text_bbcode": "But they're not! Every party [color=#e23b3b][i]always[/i][/color] goes wrong! And someone gets laughed at! And someone gets teased! And someone gets called a little shrimp with a weirdo mustache!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Did... Did something happen to you at a party?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14798"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "No! Shut up! Now let's go put the shin in shindig!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14807"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "14813"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Okay...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14822"
+        },
+        {
+          "type": "music",
+          "track_id": "8220",
+          "loop": false,
+          "offset": "14829"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1006",
+          "variant": "1",
+          "offset": "14839"
+        },
+        {
+          "type": "narration",
+          "text": "And so Monte and Erik go around town...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14849"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Well, I've seen a lot of New Year's debauchery, but I'm not sure I've ever seen anything so sick and depraved...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14858"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kenji",
+          "emotion_code": "1",
+          "image": "2246",
+          "text": "What are you talking about?",
+          "character_id": "13",
+          "expression": "1",
+          "offset": "14867"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Megan",
+          "emotion_code": "1",
+          "image": "2291",
+          "text": "We're just sitting around watching movies and eating popcorn!",
+          "character_id": "14",
+          "expression": "1",
+          "offset": "14876"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Yeah? What do you call this weapon of mass destruction?",
+          "character_id": "0",
+          "offset": "14883"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kenji",
+          "emotion_code": "1",
+          "image": "2246",
+          "text": "That's a welding torch!",
+          "character_id": "13",
+          "expression": "1",
+          "offset": "14892"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "14898"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Yeah, well, it's evidence now, punk! Now get out!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14907"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "14917"
+        },
+        {
+          "type": "narration",
+          "text": "And after that, in the MAN frat...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14927"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Show's over, folks! Time to get back to the disgusting dens of trash you call homes!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14936"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "Dude, are you gonna bust every party we throw?!",
+          "character_id": "15",
+          "expression": "1",
+          "offset": "14945"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "1",
+          "image": "26026",
+          "text": "This is the worst college ever!",
+          "character_id": "16",
+          "expression": "1",
+          "offset": "14954"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "14960"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "You'll thank me when you're older, son. Now get moving!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "14969"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1078",
+          "variant": "1",
+          "offset": "14979"
+        },
+        {
+          "type": "narration",
+          "text": "And soon enough, they approach a familiar house...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "14989"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Last house on my list. This one was a real squeaker... Barely registered on the decibel scale...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14998"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "But no one gets by Officer Monte Carlos Monte!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "15007"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Hey... Wait a minute... I know where we are...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "15016"
+        },
+        {
+          "type": "narration",
+          "text": "But before Erik can stop him, Monte kicks open the door...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15026"
+        },
+        {
+          "type": "music",
+          "track_id": "8209",
+          "loop": false,
+          "offset": "15033"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "1",
+          "offset": "15043"
+        },
+        {
+          "type": "narration",
+          "text": "And storms into Brendan's den!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15053"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Nobody move! This party is officially busted!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "15062"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "4",
+          "image": "2064",
+          "text": "Oh no! Please don't arrest me, sir!",
+          "character_id": "18",
+          "expression": "4",
+          "offset": "15071"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dex",
+          "emotion_code": "4",
+          "image": "2104",
+          "text": "This can't be happening! I've already got priors!",
+          "character_id": "17",
+          "expression": "4",
+          "offset": "15080"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "4",
+          "image": "2064",
+          "text": "...What do you have priors for?",
+          "character_id": "18",
+          "expression": "4",
+          "offset": "15089"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dex",
+          "emotion_code": "4",
+          "image": "2104",
+          "text": "Sophomore year was rough times, man.",
+          "character_id": "17",
+          "expression": "4",
+          "offset": "15098"
+        },
+        {
+          "type": "narration",
+          "text": "Suddenly, Ashley stands up and points...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15108"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ashley",
+          "emotion_code": "1",
+          "image": "2036",
+          "text": "`Erik?!`",
+          "character_id": "20",
+          "expression": "1",
+          "offset": "15117",
+          "text_bbcode": "[color=#3b78e2][i]Erik?![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "...Hi guys.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "15126"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "4",
+          "image": "2064",
+          "text": "What are you doing with him? Did you lead him here?",
+          "character_id": "18",
+          "expression": "4",
+          "offset": "15135"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "No, I didn't lead him here, I swear! I think he has super-hearing!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "15144"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "More like a super sense of justice. Parties over, Pointdexters. Get on home.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "15153"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "3",
+          "image": "2063",
+          "text": "Look, sir, I really don't think you need to break this party up. We're not doing anything wrong...",
+          "character_id": "18",
+          "expression": "3",
+          "offset": "15162"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Oh yeah? There's noise level for one...",
+          "character_id": "0",
+          "offset": "15169"
+        },
+        {
+          "type": "narration",
+          "text": "Monte turns to the side of the room where the table is set up for `Ogres and Elves.`",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15179",
+          "text_bbcode": "Monte turns to the side of the room where the table is set up for [b]Ogres and Elves.[/b]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Over here, we've clearly got some kind of devil-summoning ritual...",
+          "character_id": "0",
+          "offset": "15186"
+        },
+        {
+          "type": "narration",
+          "text": "He turns to the far side of the room, where Taylor is covering her face in embarrassment...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15196"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "And I can't even begin to fathom why you'd have a pretty cheerleader-type here short of some sort of elaborate kidnapping scenario...",
+          "character_id": "0",
+          "offset": "15203"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Just a tip, kids... You'll never get the ransom. Her parents don't love her nearly enough.",
+          "character_id": "0",
+          "offset": "15210"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": "1",
+          "image": "2426",
+          "text": "Hey!",
+          "character_id": "19",
+          "expression": "1",
+          "offset": "15219"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Now, if you could all just be on your way...",
+          "character_id": "0",
+          "offset": "15226"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "...No.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "15235"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Excuse me?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "15244"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": false,
+          "offset": "15251"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "I said no. This isn't right. These are my friends, and they're just having fun.",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15260"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "I agreed to be a Junior Detective because I thought it was the right thing to do... Because I believed in truth and justice...",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15269"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "But if this is justice... Then I quit!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15278"
+        },
+        {
+          "type": "narration",
+          "text": "Erik rips the badge off his chest and hurls it at Monte. Slowly, Monte kneels down and picks it off the floor.",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15288"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "...This is a Space 'Splosions Convention Attendee Badge.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "15297"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "Yes it is. Yes. It. `Is.`",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15306",
+          "text_bbcode": "Yes it is. Yes. It. [color=#e23b3b][i]Is.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ashley",
+          "emotion_code": "4",
+          "image": "2039",
+          "text": "Whoa... Was Erik just... Kind of awesome?",
+          "character_id": "20",
+          "expression": "4",
+          "offset": "15315"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dex",
+          "emotion_code": "4",
+          "image": "2104",
+          "text": "I know!",
+          "character_id": "17",
+          "expression": "4",
+          "offset": "15324"
+        },
+        {
+          "type": "narration",
+          "text": "Officer Monte sighs deeply...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15334"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Look, son, I appreciate that it's not always easy to do the right thing... But the law's the law!",
+          "character_id": "0",
+          "offset": "15341"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "Oh yeah? Then why are you the only officer working tonight?! I thought maybe you were just dedicated, and then I thought maybe you were the only officer in the world...",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15350"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "But now I think you might just be crazy!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15359"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "I... I...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "15368"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "So here's what's gonna happen, `Jefe`. My friends and I are going over to this table where we're gonna sit down and play `Ogres and Elves.`",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "15377",
+          "text_bbcode": "So here's what's gonna happen, [color=#e23b3b][i]Jefe[/i][/color]. My friends and I are going over to this table where we're gonna sit down and play [color=#e23b3b][i]Ogres and Elves.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "You can either forcefully drag us out of here and make a huge scene...",
+          "character_id": "1",
+          "offset": "15384"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Or you can sit down and join us!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "15393"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "J... Join you?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "15402"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Sure, why not? It doesn't seem like you're doing anything else!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "15411"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "I... I don't know...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "15420"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "Come on, it'll be fun!",
+          "character_id": "18",
+          "expression": "2",
+          "offset": "15429"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "We're doing the Dragons with Flagons expansion! It's, uh... It's gonna get pretty real.",
+          "character_id": "21",
+          "expression": "2",
+          "offset": "15438"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "It's just, I... I don't really want to get made fun of...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "15447"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "No one's gonna make fun of you!",
+          "character_id": "18",
+          "expression": "2",
+          "offset": "15456"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dex",
+          "emotion_code": "2",
+          "image": "2102",
+          "text": "Yeah, we're nerds! We're the guys who `get` made fun of!",
+          "character_id": "17",
+          "expression": "2",
+          "offset": "15465",
+          "text_bbcode": "Yeah, we're nerds! We're the guys who [color=#e23b3b][i]get[/i][/color] made fun of!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Taylor",
+          "emotion_code": null,
+          "image": "2425",
+          "text": "Tell me about it...",
+          "character_id": "19",
+          "offset": "15474"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "You in... Sir?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "15483"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": null,
+          "image": "2330",
+          "text": "Well...",
+          "character_id": "0",
+          "offset": "15490"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Okay! But just for a little while!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "15499"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Brendan",
+          "emotion_code": "2",
+          "image": "2062",
+          "text": "Yay! This is weird, but yay!",
+          "character_id": "18",
+          "expression": "2",
+          "offset": "15508"
+        },
+        {
+          "type": "narration",
+          "text": "Everyone settles down at the table. Monte awkwardly takes a seat...",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15518"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "2",
+          "image": "2022",
+          "text": "So, the first thing you need to do is create a character...",
+          "character_id": "21",
+          "expression": "2",
+          "offset": "15527"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "I will be Osmund Bricklebeard, Vanguard of the Hyberian Wastes, Harbinger of the Seventh Apocalypse, and Wielder of the Obsidian Moustache of Oblivion!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "15536"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Andrew",
+          "emotion_code": "4",
+          "image": "2024",
+          "text": "Whoa! Have you played this before?",
+          "character_id": "21",
+          "expression": "4",
+          "offset": "15545"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Not at all. I'm just very, `very` manly.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "15554",
+          "text_bbcode": "Not at all. I'm just very, [color=#e23b3b][i]very[/i][/color] manly."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "2",
+          "image": "2332",
+          "text": "Now let's kill some dragons and take their flagons!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "15563"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Yay!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "15572"
+        },
+        {
+          "type": "narration",
+          "text": "Wow! Looks like Erik managed to bring a little holiday cheer to Officer Monte! Who would've thought?",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15582"
+        },
+        {
+          "type": "narration",
+          "text": "We hope you enjoyed this `exclusive` piece of promotional content! Keep drinking Dr. Pepper, and see the other special stories!",
+          "character_id": "22",
+          "expression": "0",
+          "offset": "15592",
+          "text_bbcode": "We hope you enjoyed this [b]exclusive[/b] piece of promotional content! Keep drinking Dr. Pepper, and see the other special stories!"
+        },
+        {
+          "type": "call",
+          "routine": "s1_r24",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing!"
+            },
+            1
+          ],
+          "offset": "15602"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_enter_v0_bg13130_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "13141",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "13148",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg13130_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg13130_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg13130_t",
+          "else": "s1_enter_v0_bg13130_r",
+          "offset": "13130",
+          "op": "eq"
+        }
+      ]
+    }
+  },
+  "pack_id": "5000",
+  "episode_id": "4",
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "2330",
+          "name": "Officer Monte",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "26015",
+          "name": "Erik",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "2430",
+          "name": "Ms. Prez",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "2440",
+          "name": "Ms. Pliny",
+          "format": 1
+        },
+        {
+          "id": "4",
+          "art": "26020",
+          "name": "Coach Kessler",
+          "format": 1
+        },
+        {
+          "id": "5",
+          "art": "2075",
+          "name": "Coach",
+          "format": 1
+        },
+        {
+          "id": "6",
+          "art": "2175",
+          "name": "Shapiro",
+          "format": 1
+        },
+        {
+          "id": "7",
+          "art": "2435",
+          "name": "Mr. Russell",
+          "format": 1
+        },
+        {
+          "id": "8",
+          "art": "26005",
+          "name": "Jessica",
+          "format": 1
+        },
+        {
+          "id": "9",
+          "art": "26000",
+          "name": "$ZOE",
+          "format": 1
+        },
+        {
+          "id": "10",
+          "art": "26010",
+          "name": "Ben",
+          "format": 1
+        },
+        {
+          "id": "11",
+          "art": "2210",
+          "name": "Howard",
+          "format": 1
+        },
+        {
+          "id": "12",
+          "art": "2390",
+          "name": "Ryan",
+          "format": 1
+        },
+        {
+          "id": "13",
+          "art": "2245",
+          "name": "Kenji",
+          "format": 1
+        },
+        {
+          "id": "14",
+          "art": "2290",
+          "name": "Megan",
+          "format": 1
+        },
+        {
+          "id": "15",
+          "art": "2065",
+          "name": "Bryce",
+          "format": 1
+        },
+        {
+          "id": "16",
+          "art": "26025",
+          "name": "Dontae",
+          "format": 1
+        },
+        {
+          "id": "17",
+          "art": "2100",
+          "name": "Dex",
+          "format": 1
+        },
+        {
+          "id": "18",
+          "art": "2060",
+          "name": "Brendan",
+          "format": 1
+        },
+        {
+          "id": "19",
+          "art": "2425",
+          "name": "Taylor",
+          "format": 1
+        },
+        {
+          "id": "20",
+          "art": "2035",
+          "name": "Ashley",
+          "format": 1
+        },
+        {
+          "id": "21",
+          "art": "2020",
+          "name": "Andrew",
+          "format": 1
+        },
+        {
+          "id": "22",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "22",
+        "74": "0"
+      }
+    }
+  },
+  "routines": {
+    "s1_r24": {
+      "entry": "s1_r24_b1",
+      "params": 3,
+      "offset": "13175"
+    }
+  },
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0
+    },
+    "set_only": [
+      "1000",
+      "1001"
+    ]
+  },
+  "name_vars": {
+    "$Scott": {
+      "default": "Scott"
+    },
+    "$Travis": {
+      "default": "Travis"
+    },
+    "$ZOE": {
+      "default": "Zoe"
+    }
+  }
+}

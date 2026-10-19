@@ -1,0 +1,6080 @@
+{
+  "title": "OMG_St_Patricks_Day",
+  "episode": "O.M.G.! It's St. Patrick's Day!",
+  "cast": [
+    "Paula",
+    "Beth",
+    "Dinah",
+    "Adam",
+    "Raven",
+    "Waitress",
+    "Bryce",
+    "Tina",
+    "Dontae",
+    "James",
+    "Beth",
+    "Raven",
+    "Adam",
+    "Hawk",
+    "Fabric Store Clerk",
+    "Nursery Clerk"
+  ],
+  "main_characters": [
+    "Paula"
+  ],
+  "genders": {
+    "Paula": "F",
+    "Beth": "F",
+    "Dinah": "F",
+    "Adam": "M",
+    "Raven": "F",
+    "Waitress": "F",
+    "Bryce": "M",
+    "Tina": "F",
+    "Dontae": "M",
+    "James": "M",
+    "Hawk": "M",
+    "Fabric Store Clerk": "M",
+    "Nursery Clerk": "F"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1"
+  },
+  "scene_minigame_banks": {
+    "1": {}
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    }
+  },
+  "segments": {
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg16726_1"
+        }
+      ]
+    },
+    "s1_enter_v0": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "16",
+          "offset": "16902"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg16726_1"
+        }
+      ]
+    },
+    "s1_bg16726_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "16",
+          "offset": "16902"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26000",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "16926"
+        },
+        {
+          "type": "narration",
+          "text": "And now, in honor of St. Patrick's Day, please enjoy this `free` special short story!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16957",
+          "text_bbcode": "And now, in honor of St. Patrick's Day, please enjoy this [b]free[/b] special short story!"
+        },
+        {
+          "type": "pov_change",
+          "character": "Paula",
+          "index": "0",
+          "offset": "16961"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "16970"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "16979"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "16988"
+        },
+        {
+          "type": "title_card",
+          "title": "O.M.G.! It's St. Patrick's Day!",
+          "subtitle": "Can Paula and Beth throw a great party?",
+          "asset_id": "1132",
+          "flag": "-1",
+          "offset": "17003"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "17010"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "0",
+          "offset": "17020"
+        },
+        {
+          "type": "narration",
+          "text": "It's morning at the O.M.G. Sorority at Centerscore U. Beth whistles as she moves around the kitchen, making some breakfast...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17030"
+        },
+        {
+          "type": "narration",
+          "text": "When the sorority's newest member wanders in!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17040"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Hi there! Want some muffins?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17049"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Ugh... You are `way` too chipper for 7 am.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17058",
+          "text_bbcode": "Ugh... You are [color=#3b78e2][i]way[/i][/color] too chipper for 7 am."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "...It's `10.`",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17067",
+          "text_bbcode": "...It's [color=#3b78e2][i]10.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Yeah, well, it's before noon, which means I'm enforcing my zero tolerance policy on whistling, dancing, or making eye-contact.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17076"
+        },
+        {
+          "type": "narration",
+          "text": "Paula walks over, grabs a muffin, and sits down. Beth cautiously joins her.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17086"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "So... How are you liking being a member of the sorority so far?",
+          "character_id": "1",
+          "offset": "17093"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Gee, Beth, I don't know. One year ago, I was the Queen Bee at my high school, dating the hottest guys and making everyone do whatever I wanted...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17102"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Now, thanks to a little legal... Misunderstanding... I'm wallowing at this third-tier state school, stuck at the lowest slot on the totem pole in some crappy sorority!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17111"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Oh...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17120"
+        },
+        {
+          "type": "narration",
+          "text": "Paula sighs.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17130"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "But I guess... Some of the other sisters... Aren't `so` bad...",
+          "character_id": "0",
+          "offset": "17137",
+          "text_bbcode": "But I guess... Some of the other sisters... Aren't [color=#3b78e2][i]so[/i][/color] bad..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Yay!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17146"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Do you have any big plans for the weekend?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17155"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Actually, yeah! Every six months, I get a `total` makeover.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17164",
+          "text_bbcode": "Actually, yeah! Every six months, I get a [color=#3b78e2][i]total[/i][/color] makeover."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "I'm talking haircut... Spa treatment... Massage... Mani... Pedi... Breddi...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17173"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "4",
+          "image": "26020",
+          "text": "What's a `Breddi`?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "17182",
+          "text_bbcode": "What's a [color=#3b78e2][i]Breddi[/i][/color]?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "If you have to ask, then you really shouldn't know. What are your plans?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17191"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Oh, I'm having a really romantic weekend with my boyfriend... We're gonna go take a trip down the coast, stop by some beaches, and stay at this really nice resort...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17200"
+        },
+        {
+          "type": "music",
+          "track_id": "8224",
+          "loop": false,
+          "offset": "17207"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "I hate to be the bearer of bad news, ladies... But you'll be doing no such things.",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17216"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Oh... Who am I kidding? I `love` being the bearer of bad news!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "17225",
+          "text_bbcode": "Oh... Who am I kidding? I [color=#3b78e2][i]love[/i][/color] being the bearer of bad news!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "What are you talking about, Tina?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17234"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "I'm talking about sorority business... Namely, the annual bake sale! We need to bake 500 cookies by Monday...",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17243"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "And of course, as the junior sisters, you'll be responsible for... All of them!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "17252"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "What? That's ridiculous!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17261"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Are you going to help at least?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17270"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Uh, no? The other sisters and I are taking a girl's trip to Vegas! Can you say `part-ay!`",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "17279",
+          "text_bbcode": "Uh, no? The other sisters and I are taking a girl's trip to Vegas! Can you say [color=#3b78e2][i]part-ay![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I can, but I choose not to...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17288"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Look, Tina, this is totally unfair! We're `not` your servants!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17297",
+          "text_bbcode": "Look, Tina, this is totally unfair! We're [color=#3b78e2][i]not[/i][/color] your servants!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "You can't make us do this!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17306"
+        },
+        {
+          "type": "narration",
+          "text": "Tina locks eyes with Paula and paces towards her...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17316"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "Now you listen here, `new girl,` and listen well. I am the Head Sister of this sorority. Do you know what that means?",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17325",
+          "text_bbcode": "Now you listen here, [color=#3b78e2][i]new girl,[/i][/color] and listen well. I am the Head Sister of this sorority. Do you know what that means?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "It `means` I know everything about you. I know exactly why you were kicked out of your high school, and why no other college would take you.",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17334",
+          "text_bbcode": "It [color=#3b78e2][i]means[/i][/color] I know everything about you. I know exactly why you were kicked out of your high school, and why no other college would take you."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "It means I took you into this sorority as an act of kindness, because frankly, no one else would have you...",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17343"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "But if you don't do exactly what I say... Then you'll be back out on your butt faster than you can say 'Mani Breddi.' Got it?",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17352"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "...Got it.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17361"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Well... What about me? I don't have any dark secret to be blackmailed with. Do `I` have to bake cookies?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17370",
+          "text_bbcode": "Well... What about me? I don't have any dark secret to be blackmailed with. Do [color=#3b78e2][i]I[/i][/color] have to bake cookies?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "...Shut up, Beth.",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17379"
+        },
+        {
+          "type": "narration",
+          "text": "Tina stalks off. When she's gone, Paula slams her fist down on the table!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17389"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "`Grrrr!` I hate her!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17398",
+          "text_bbcode": "[color=#3b78e2][i]Grrrr![/i][/color] I hate her!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "She's really been on kind of an angry tear lately...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17407"
+        },
+        {
+          "type": "narration",
+          "text": "Beth sighs deeply and starts taking out some baking supplies...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17417"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Whoa! Hey! What are you doing?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17426"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Well, 500 cookies aren't going to bake themselves...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17435"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Nuh-uh. No way. This girl does `not` bake.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17444",
+          "text_bbcode": "Nuh-uh. No way. This girl does [color=#3b78e2][i]not[/i][/color] bake."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "So what are you saying we should do?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17453"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "I say we fight back! Rebel! Viva la revolucion or whatever!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17462"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "But... How? She's the Head Sister!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17471"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Yeah? And how did she get to be the Head Sister in the first place?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17480"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "Don't you know that story? It's legendary!",
+          "character_id": "1",
+          "offset": "17487"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "When she was just a freshman and a new member, she went behind her Head Sister's back and threw a huge holiday party!",
+          "character_id": "1",
+          "offset": "17494"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "It was such a success, everyone rallied behind her! Ever since then, she's been untouchable!",
+          "character_id": "1",
+          "offset": "17501"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Well, that's it then, isn't it? We should do the same thing! We'll throw our own awesome holiday party!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17510"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Believe me, Beth... I know a thing or two about throwing a party...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17519"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "It's not that easy!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17528"
+        },
+        {
+          "type": "narration",
+          "text": "Beth walks over to a corkboard and points to a piece of paper.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17538"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "This is the Party Itinerary for the year... And Tina's already claimed all the major holidays!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17547"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Halloween... Christmas... Valentine's... Second Valentine's... Tina Day...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17556"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Sometimes she just makes holidays up!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17565"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "There has to be `something` she missed!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17574",
+          "text_bbcode": "There has to be [color=#3b78e2][i]something[/i][/color] she missed!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "Well... Actually... She did miss one thing... It looks like she didn't schedule a party for St. Patrick's Day!",
+          "character_id": "1",
+          "offset": "17581"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Are you thinking what I'm thinking?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17590"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "We spread rumors that Tina is racist against Irish people?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17599"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "4",
+          "image": "26020",
+          "text": "What? No! Why would you even think that?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "17608"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "We should throw a St. Patrick's Day party!",
+          "character_id": "1",
+          "offset": "17615"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Hmm... I suppose that works too...",
+          "character_id": "0",
+          "offset": "17622"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "Think about it! All the other sisters are out of the house this weekend! That means it's the perfect opportunity...",
+          "character_id": "1",
+          "offset": "17629"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Although... I don't know how we'd manage to do it in time... I mean, St. Patrick's Day is tonight!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17638"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "So that's... What... 5 hours, give or take, for two people to throw together a campus-wide party so good it'll completely destabilize the social order and result in a new regime?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17647"
+        },
+        {
+          "type": "narration",
+          "text": "Paula stands up and cracks her knuckles.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17657"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Piece of cake.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17666"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "4",
+          "image": "26020",
+          "text": "You're... Pretty scary...",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "17675"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "17681"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Yes, Beth. Yes, I am.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17690"
+        },
+        {
+          "type": "music",
+          "track_id": "8207",
+          "loop": false,
+          "offset": "17697"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1132",
+          "variant": "0",
+          "offset": "17707"
+        },
+        {
+          "type": "narration",
+          "text": "Moments later, Paula and Beth walk across the campus...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17717"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "All right, the first thing a party needs is great themed decor.",
+          "character_id": "0",
+          "offset": "17724"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Normally, I'd rely on either a squad of cheerleaders or cheap third-world laborers...",
+          "character_id": "0",
+          "offset": "17731"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I'm just going to pretend that's a joke...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17740"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "But we don't have time to do this right. So it's time to go for the next best thing...",
+          "character_id": "0",
+          "offset": "17747"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Social outcasts!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17756"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1117",
+          "variant": "0",
+          "offset": "17766"
+        },
+        {
+          "type": "narration",
+          "text": "Paula leads Beth into the theater department. There, on the stage, Dinah and Raven are rehearsing for a play...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17776"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": "3",
+          "image": "26029",
+          "text": "If only we'd paid more attention... If only we'd been more caring and observant... We might have prevented this tragedy!",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "17785"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "3",
+          "image": "2108",
+          "text": "Don't blame yourself, Margaret... There's no way we could have known he had the disease where you slowly turn into a horse.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "17794"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "And I'm just going to stop you two right there!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17803"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "I was kind of curious to see where it was going...",
+          "character_id": "1",
+          "offset": "17810"
+        },
+        {
+          "type": "narration",
+          "text": "The two girls turn to stare at Paula.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17820"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": null,
+          "image": "2105",
+          "text": "What do you want, Paula?",
+          "character_id": "2",
+          "offset": "17829"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "I'm sure you've been waiting your whole life to hear this, Goth-face, but I need your help.",
+          "character_id": "0",
+          "offset": "17836"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "Oh, this is going to be good...",
+          "character_id": "4",
+          "offset": "17845"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Beth and I are throwing a St. Patrick's day party tomorrow, and we're going to need some assistance with the decorations.",
+          "character_id": "0",
+          "offset": "17852"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "3",
+          "image": "2108",
+          "text": "So you came to... Us?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "17861"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Don't play innocent, Pigtails. I know you've got a vault back there of props and costumes, and `some` of them have got to be a good match for St. Patrick's Day!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17870",
+          "text_bbcode": "Don't play innocent, Pigtails. I know you've got a vault back there of props and costumes, and [color=#3b78e2][i]some[/i][/color] of them have got to be a good match for St. Patrick's Day!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "Well... We do have all those pots of gold...",
+          "character_id": "4",
+          "offset": "17879"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": null,
+          "image": "2105",
+          "text": "And the leprechaun outfits...",
+          "character_id": "2",
+          "offset": "17888"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "And the banner saying 'Happy St. Patrick's Day 2012'... Man, that was a weird play...",
+          "character_id": "4",
+          "offset": "17897"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "See? I knew it! Now hand that stuff over, and we'll be on our way!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17906"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "Uh, yeah, that's not going to happen.",
+          "character_id": "4",
+          "offset": "17915"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": null,
+          "image": "2105",
+          "text": "That stuff belongs to the Centerscore U. Theater Department! We can't just give it to you guys! What if its broken or messed up? Those parties get pretty rowdy...",
+          "character_id": "2",
+          "offset": "17924"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "Last time I went to a frat party, I saw a guy eat a frying pan!",
+          "character_id": "4",
+          "offset": "17933"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Look, I see how this is. You're not going to give us the props without something in exchange...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17942"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": "3",
+          "image": "26029",
+          "text": "No, we're just not going to give you the props.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "17951"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Come on... There must be `something` we can bribe you with...",
+          "character_id": "0",
+          "offset": "17958",
+          "text_bbcode": "Come on... There must be [color=#3b78e2][i]something[/i][/color] we can bribe you with..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Oh! I know! We'll let you guys come to the party, and you can invite all your friends! And... `And...` You can handle all the music!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17967",
+          "text_bbcode": "Oh! I know! We'll let you guys come to the party, and you can invite all your friends! And... [color=#3b78e2][i]And...[/i][/color] You can handle all the music!"
+        },
+        {
+          "type": "narration",
+          "text": "Dinah and Raven look at each other...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17977"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": null,
+          "image": "2105",
+          "text": "Well... We `were` looking for something to do this weekend...",
+          "character_id": "2",
+          "offset": "17986",
+          "text_bbcode": "Well... We [color=#3b78e2][i]were[/i][/color] looking for something to do this weekend..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "And I `was` kind of getting into DJ-ing...",
+          "character_id": "4",
+          "offset": "17995",
+          "text_bbcode": "And I [color=#3b78e2][i]was[/i][/color] kind of getting into DJ-ing..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": "2",
+          "image": "26028",
+          "text": "What do you say, Paula? Do we have a deal?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "18004"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "...Fine. Deal. But no songs with the words 'blood,' 'maggot,' or 'corpse-tacular.'",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18013"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18019"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "2",
+          "image": "2107",
+          "text": "Deal!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "18028"
+        },
+        {
+          "type": "music",
+          "track_id": "8210",
+          "loop": false,
+          "offset": "18035"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1132",
+          "variant": "0",
+          "offset": "18045"
+        },
+        {
+          "type": "narration",
+          "text": "Paula and Beth walk out of the theater department...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18055"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "That went well!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "18064"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Are you kidding? Thanks to your little deal, we're going to have our party packed wall-to-wall with weirdos and vampires!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18073"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "But... We got all the decorations...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18082"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Yeah, and we could have got them way easier if you'd just let `me` handle it! Those girls were three keenly-observant insults from caving!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18091",
+          "text_bbcode": "Yeah, and we could have got them way easier if you'd just let [color=#3b78e2][i]me[/i][/color] handle it! Those girls were three keenly-observant insults from caving!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I don't know if that's true...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18100"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Just sit back and look cute from now on, okay? I've got this covered.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18109"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18115"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Okay...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18124"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "0",
+          "offset": "18134"
+        },
+        {
+          "type": "music",
+          "track_id": "8203",
+          "loop": false,
+          "offset": "18141"
+        },
+        {
+          "type": "narration",
+          "text": "And so, a little while later, at the MAN frat house...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18151"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "So... Can I count on you boys to make an appearance?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18160"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "2",
+          "image": "26013",
+          "text": "A St. Patrick's Day party... Heck yeah! That sounds awesome!",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "18169"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "2",
+          "image": "2067",
+          "text": "We'll be there!",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "18178"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Great!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "18187"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "2",
+          "image": "26008",
+          "text": "Is it okay with Tina if we bring dates?",
+          "character_id": "9",
+          "expression": "2",
+          "offset": "18196"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Actually... Tina's not really involved in this party.",
+          "character_id": "0",
+          "offset": "18203"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "It's just something Paula and I are doing!",
+          "character_id": "1",
+          "offset": "18210"
+        },
+        {
+          "type": "narration",
+          "text": "The guys immediately back away, startled...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18220"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "Whoa... So is this... An `unauthorized` party...?",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "18229",
+          "text_bbcode": "Whoa... So is this... An [color=#e23b3b][i]unauthorized[/i][/color] party...?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Well... I didn't know you had to 'authorize' a party, but...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18238"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "3",
+          "image": "2068",
+          "text": "Yeah, sorry girls, but there's no way we can get mixed up in this...",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "18247"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "Tina gets `real` scary when people go behind her back. Last time someone tried something like this, we all ended up having to clean all the O.M.G. bathrooms!",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "18256",
+          "text_bbcode": "Tina gets [color=#e23b3b][i]real[/i][/color] scary when people go behind her back. Last time someone tried something like this, we all ended up having to clean all the O.M.G. bathrooms!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "3",
+          "image": "26014",
+          "text": "Girls are surprisingly messy...",
+          "character_id": "8",
+          "expression": "3",
+          "offset": "18265"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Let me get this straight... You guys won't got to a party... Because you're afraid Tina will be mad at you?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18274"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "That's about right, yeah.",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "18283"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "But it's not like she's a part of your frat! Why would she be able to make you do anything?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18292"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "3",
+          "image": "2068",
+          "text": "Tina is pretty persuasive...",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "18301"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Wow. Just wow. I thought I'd seen everything... But this is a new low.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18310"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "A bunch of college guys `utterly terrified` of a 100 pound girl. That's just `pathetic!`",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18319",
+          "text_bbcode": "A bunch of college guys [color=#3b78e2][i]utterly terrified[/i][/color] of a 100 pound girl. That's just [color=#3b78e2][i]pathetic![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "Hey, we... We're not terrified...",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "18328"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Are you kidding me? You're scared out of your minds! You're quaking in your boots!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18337"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "3",
+          "image": "2068",
+          "text": "No! We're just... You know... Respectful...",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "18346"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Respectful? Ha! Where's Tina's respect for your desire to party?!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18355"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Just admit... You guys are sad, little babies, scared crapless of her!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18364"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "1",
+          "image": "26007",
+          "text": "No way!",
+          "character_id": "9",
+          "expression": "1",
+          "offset": "18373"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "We're not scared of her!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "18382"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "But you still let her tell you what to do!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18391"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "1",
+          "image": "26012",
+          "text": "No! No one tells us what to do!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "18400"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Then stand up to her!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18409"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "2",
+          "image": "26008",
+          "text": "Yeah! We'll stand up to her! Who does she think she is?",
+          "character_id": "9",
+          "expression": "2",
+          "offset": "18418"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "Stupid Tina!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "18427"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "So if she doesn't want you to go this party...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18436"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "Then we're going to this party!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "18445"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "1",
+          "image": "26007",
+          "text": "Yeah!",
+          "character_id": "9",
+          "expression": "1",
+          "offset": "18454"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "1",
+          "image": "26012",
+          "text": "Party `party!`",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "18463",
+          "text_bbcode": "Party [color=#e23b3b][i]party![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Great! See you guys at eight o'clock, sharp! Wear green!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18472"
+        },
+        {
+          "type": "narration",
+          "text": "Paula and Beth leave...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18482"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "...Does anyone else feel like we just got conned?",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "18491"
+        },
+        {
+          "type": "music",
+          "track_id": "8207",
+          "loop": false,
+          "offset": "18498"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1123",
+          "variant": "0",
+          "offset": "18508"
+        },
+        {
+          "type": "narration",
+          "text": "And so, Paula spends the rest of the day going from person to person, manipulating...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18518"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Fabric Store Clerk",
+          "emotion_code": null,
+          "image": "2300",
+          "text": "A charity to help color-blind orphans? Why, of course I'll donate all my green fabric!",
+          "character_id": "14",
+          "offset": "18527"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1087",
+          "variant": "0",
+          "offset": "18537"
+        },
+        {
+          "type": "narration",
+          "text": "And deceiving...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18547"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nursery Clerk",
+          "emotion_code": null,
+          "image": "2305",
+          "text": "You represent the Irish Heritage Foundation, you say? That's wonderful! I'd love to offer you all my shamrocks and clovers!",
+          "character_id": "15",
+          "offset": "18556"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1093",
+          "variant": "0",
+          "offset": "18566"
+        },
+        {
+          "type": "narration",
+          "text": "And outright bullying!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18576"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "6",
+          "image": "2371",
+          "text": "`Cater my party!`",
+          "character_id": "0",
+          "expression": "6",
+          "offset": "18585",
+          "text_bbcode": "[color=#3b78e2][i]Cater my party![/i][/color]"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18591"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Waitress",
+          "emotion_code": "3",
+          "image": "2468",
+          "text": "Okay, okay! Just stop yelling!",
+          "character_id": "5",
+          "expression": "3",
+          "offset": "18600"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1132",
+          "variant": "0",
+          "offset": "18610"
+        },
+        {
+          "type": "narration",
+          "text": "As the sun sets, Paula and Beth head back towards the O.M.G sorority...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18620"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Phew! I can't even remember the last time I had to throw together a party just like that! Talk about a rush!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18629"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "So we're done then?",
+          "character_id": "1",
+          "offset": "18636"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "We've got decorations, music, catering, and we've put out invites to the whole school... I'd say that counts as done, yeah!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18645"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I just feel gross... Like I've compromised every part of my moral code...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18654"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Yeah, you'll get over it.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18663"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I don't know... We lied to a lot of people...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18672"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "'Lied' is such a strong word, Beth. I prefer to think we 'took artistic license with the truth!'",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18681"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "It feels like you're lying to me right now!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18690"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "But... I suppose it was all for a good cause...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18699"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Exactly! And when we're the most popular girls on campus, and Tina's a pathetic loser stuck shining our shoes, you won't feel bad about a thing!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18708"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Why does she have to be shining my shoes?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18717"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18723"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Just relax, would you? Everything's going to work out `just fine!`",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18732",
+          "text_bbcode": "Just relax, would you? Everything's going to work out [color=#3b78e2][i]just fine![/i][/color]"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "18742"
+        },
+        {
+          "type": "narration",
+          "text": "But an hour later...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18752"
+        },
+        {
+          "type": "music",
+          "track_id": "8209",
+          "loop": false,
+          "offset": "18759"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "This is a disaster! The party's about to start, and no one's here!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18768"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "I'm sure people are just coming fashionably late...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18777"
+        },
+        {
+          "type": "narration",
+          "text": "Beth clicks frantically on her laptop...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18787"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I don't think so, Paula! I've been monitoring the party's Faceplace Event Page, and no one has RSVP-ed!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18796"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "All those people who promised us they'd come... They must have changed their minds!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18805"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Hmm... I was worried this might happen...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18814"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "We came so close...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18823"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Like my grandpa always said, close only counts in hand-shoes and horse-grenades. It's time for us to go to Plan B.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18832"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "There's a Plan B?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18841"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "There's `always` a Plan B. Give me that computer!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18850",
+          "text_bbcode": "There's [color=#3b78e2][i]always[/i][/color] a Plan B. Give me that computer!"
+        },
+        {
+          "type": "narration",
+          "text": "Paula takes Beth's laptop and starts typing...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18860"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "What are you doing?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18869"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Oh, just updating the party's description... Instead of being a boring old St. Patrick's Day party... It's now a special event commemorating visiting Irish superstar Hawk Gunner!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18878"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Wait, what? Is he even Irish?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18887"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Sure! Probably! Maybe? I don't know, does it even matter? People are going to be so excited to see him, they'll show up in droves!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18896"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "But... He's not actually going to be here, is he?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18905"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Uh, of course not! How would I possibly arrange that?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18914"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "So now we're lying to the `entire school?`",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18923",
+          "text_bbcode": "So now we're lying to the [color=#3b78e2][i]entire school?[/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "Paula reaches over and gently touches Beth's cheek.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18933"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Oh, Beth... Sweet, stupid Beth...  Of course we are!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18942"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Won't they be upset?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18951"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Of course not! Once they get here, they'll be having such a good time, they'll forget all about it!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18960"
+        },
+        {
+          "type": "narration",
+          "text": "Beth shakes her head and stands up.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18970"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "No.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18979"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Excuse me?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18988"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "1",
+          "image": "26017",
+          "text": "I said no, Paula. All day long, we've been getting our way by tricking and bribing and bullying people... And I've had enough!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "18997"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "1",
+          "image": "26017",
+          "text": "I am `not` lying to the whole school! I'm just not!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "19006",
+          "text_bbcode": "I am [color=#3b78e2][i]not[/i][/color] lying to the whole school! I'm just not!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Yeah, well, guess what, Goody Two-Shoes? It's not `your` choice!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "19015",
+          "text_bbcode": "Yeah, well, guess what, Goody Two-Shoes? It's not [color=#3b78e2][i]your[/i][/color] choice!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "1",
+          "image": "26017",
+          "text": "No, you're right, it's not. You can do whatever terrible thing you want.",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "19024"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "1",
+          "image": "26017",
+          "text": "But you know what? I'm out!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "19033"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "You're `out?`",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "19042",
+          "text_bbcode": "You're [color=#3b78e2][i]out?[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "1",
+          "image": "26017",
+          "text": "Yeah. I'm out. Have fun with your lying and cheating party, Paula.",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "19051"
+        },
+        {
+          "type": "narration",
+          "text": "Beth turns and storms out.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19061"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "19067"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Fine! I will! And I'll do enough lying and cheating for both of us!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "19076"
+        },
+        {
+          "type": "music",
+          "track_id": "8205",
+          "loop": false,
+          "offset": "19083"
+        },
+        {
+          "type": "narration",
+          "text": "And so, fifteen minutes later...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19093"
+        },
+        {
+          "type": "narration",
+          "text": "The house is packed full of party-goers!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19103"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "2",
+          "image": "2067",
+          "text": "Rocking party, Paula!",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "19112"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Thanks, Bryce!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19121"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Adam",
+          "emotion_code": "2",
+          "image": "26023",
+          "text": "Yeah, this is actually a lot of fun! And the music is awesome!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "19130"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Glad to hear it, Adam!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19139"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "2",
+          "image": "26013",
+          "text": "I'm having a blast!",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "19148"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Sure you are... Guy... Sure you are.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19157"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Stupid Beth... Storming out all huffy...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "19169"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Well, if she doesn't want to be popular, then that's her choice! I'll get all the benefit for myself!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "19181"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Anyone want any snacks? Drinks? We've got four-leaf-clover cupcakes... Shamrock shortcake... And some very special green punch...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19190"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": null,
+          "image": "26006",
+          "text": "Yeah, yeah... When's Hawk getting here?",
+          "character_id": "9",
+          "offset": "19199"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "2",
+          "image": "2067",
+          "text": "Yeah! That's what I'm pumped about! That guy is awesome!",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "19208"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "2",
+          "image": "2107",
+          "text": "I have to admit, I'm actually kind of excited to meet him too... He was so good in 'Eskimo Kisses...'",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "19217"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Right... Well... About that... He actually might be a little delayed...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19226"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "What? Delayed? Weak!",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "19235"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Right! Well... Why don't you all just hang out and enjoy the party... And... Uh... See what happens!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19244"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Come on... Just get into it... Forget all about stupid Hawk Gunner...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19256"
+        },
+        {
+          "type": "music",
+          "track_id": "8224",
+          "loop": false,
+          "offset": "19263"
+        },
+        {
+          "type": "narration",
+          "text": "But as the minutes creep by, the guests just get more and more irritated!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19273"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Adam",
+          "emotion_code": "1",
+          "image": "26022",
+          "text": "Come on! Where is he?!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "19282"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "Yeah, it's been half an hour already!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "19291"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "1",
+          "image": "26012",
+          "text": "He's an Irish hero!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "19300"
+        },
+        {
+          "type": "narration",
+          "text": "James narrows his gaze...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19310"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "1",
+          "image": "26007",
+          "text": "What's the deal, Paula? Where's Hawk?",
+          "character_id": "9",
+          "expression": "1",
+          "offset": "19319"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Well... See... The thing is... Uh...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19328"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Hawk `might` not actually be coming...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19337",
+          "text_bbcode": "Hawk [color=#3b78e2][i]might[/i][/color] not actually be coming..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "1",
+          "image": "26012",
+          "text": "What?!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "19346"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "Why not?!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "19355"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "It's... Um... Kind of a funny story, actually... He...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19364"
+        },
+        {
+          "type": "narration",
+          "text": "Paula is cut off by an angry roar of complaints and accusations!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19374"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "1",
+          "image": "26007",
+          "text": "You totally tricked us into coming!",
+          "character_id": "9",
+          "expression": "1",
+          "offset": "19383"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "1",
+          "image": "2106",
+          "text": "I feel used and lied to!",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "19392"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "I can't believe I was willing to piss off Tina for `this!`",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "19401",
+          "text_bbcode": "I can't believe I was willing to piss off Tina for [color=#e23b3b][i]this![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "No! Wait! I...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19410"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "1",
+          "image": "26007",
+          "text": "I'm out of here, Paula!",
+          "character_id": "9",
+          "expression": "1",
+          "offset": "19419"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "1",
+          "image": "2106",
+          "text": "Yeah! Me too!",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "19428"
+        },
+        {
+          "type": "narration",
+          "text": "Everyone turns to leave... When the door flies open!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19438"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": false,
+          "offset": "19445"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hawk",
+          "emotion_code": "2",
+          "image": "26033",
+          "text": "Hawk-o! Is everyone to ready to get down with the Hawk... St. Patrick's Day style?",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "19454"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "4",
+          "image": "2369",
+          "text": "What the...?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "19463"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "2",
+          "image": "26008",
+          "text": "Holy! It's Hawk Gunner!",
+          "character_id": "9",
+          "expression": "2",
+          "offset": "19472"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hawk",
+          "emotion_code": "2",
+          "image": "26033",
+          "text": "That's Hawk `O'Gunner` to you today... Because I'm celebrating my Irish heritage!",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "19481",
+          "text_bbcode": "That's Hawk [color=#e23b3b][i]O'Gunner[/i][/color] to you today... Because I'm celebrating my Irish heritage!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Adam",
+          "emotion_code": "2",
+          "image": "26023",
+          "text": "This so awesome!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "19490"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "2",
+          "image": "26013",
+          "text": "I'm so excited I'm shaking!",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "19499"
+        },
+        {
+          "type": "narration",
+          "text": "Hawk saunters into the room with his entourage of bros!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19509"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hawk",
+          "emotion_code": "2",
+          "image": "26033",
+          "text": "I'm ready to get this party started...",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "19518"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hawk",
+          "emotion_code": "2",
+          "image": "26033",
+          "text": "But first, I just want to give a shout-out to the two special-sauce chicklets that put this whole thing together... Paula and Beth!",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "19527"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Uh... Right! Thanks! I... Um... Appreciate that!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19536"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hawk",
+          "emotion_code": "2",
+          "image": "26033",
+          "text": "Now everyone... It's time to `Hawk and Roll!`",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "19545",
+          "text_bbcode": "Now everyone... It's time to [color=#e23b3b][i]Hawk and Roll![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "People cheer and whoop! Raven blasts some party music, and everyone starts dancing!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19555"
+        },
+        {
+          "type": "narration",
+          "text": "Paula steps back, surprised... And finds herself standing next to Beth!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19565"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "4",
+          "image": "2369",
+          "text": "Beth! You're here! Are you... Are you seeing this?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "19574"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Yeah, I am... And it looks like `our` party is one heck of a success!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19583",
+          "text_bbcode": "Yeah, I am... And it looks like [color=#3b78e2][i]our[/i][/color] party is one heck of a success!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "4",
+          "image": "2369",
+          "text": "But... Hawk... How?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "19592"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Oh, I don't know... I guess we'll just have to write it off as 'luck of the Irish...'",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19601"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Also, I know this girl Lisa who works in Hollywood. She's pretty well-connected.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19610"
+        },
+        {
+          "type": "narration",
+          "text": "Paula turns to Beth.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19620"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Thanks, Beth. I... I hate saying this... But you were right, and I was wrong. I shouldn't have lied.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19629"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Yeah, well, keep that in mind for next time!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19638"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Next time?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19647"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Well, yeah...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19656"
+        },
+        {
+          "type": "narration",
+          "text": "Beth turns to survey the room, where everyone is having a great time! Hawk does his distinctive Hawk Shuffle in the middle of the room!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19666"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "I think this is the start of a pretty beautiful friendship...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19675"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Now come on! Let me get you a shamrock shake!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19684"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Sounds good!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19693"
+        },
+        {
+          "type": "narration",
+          "text": "Wow! Looks like Paula and Beth managed to work out their differences and throw a great party!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19703"
+        },
+        {
+          "type": "narration",
+          "text": "Have a happy St. Patrick's Day, and we'll see you next week!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19713"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_bg16726_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "16737",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "16744",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_bg16726_r"
+        }
+      ]
+    },
+    "s1_bg16726_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg16726_t",
+          "else": "s1_bg16726_r",
+          "offset": "16726",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg16726_r": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26000",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "16926"
+        },
+        {
+          "type": "set_ui_default",
+          "value": "16",
+          "offset": "16902"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26000",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "16926"
+        },
+        {
+          "type": "narration",
+          "text": "And now, in honor of St. Patrick's Day, please enjoy this `free` special short story!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "16957",
+          "text_bbcode": "And now, in honor of St. Patrick's Day, please enjoy this [b]free[/b] special short story!"
+        },
+        {
+          "type": "pov_change",
+          "character": "Paula",
+          "index": "0",
+          "offset": "16961"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "16970"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "16979"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "16988"
+        },
+        {
+          "type": "title_card",
+          "title": "O.M.G.! It's St. Patrick's Day!",
+          "subtitle": "Can Paula and Beth throw a great party?",
+          "asset_id": "1132",
+          "flag": "-1",
+          "offset": "17003"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "17010"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "0",
+          "offset": "17020"
+        },
+        {
+          "type": "narration",
+          "text": "It's morning at the O.M.G. Sorority at Centerscore U. Beth whistles as she moves around the kitchen, making some breakfast...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17030"
+        },
+        {
+          "type": "narration",
+          "text": "When the sorority's newest member wanders in!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17040"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Hi there! Want some muffins?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17049"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Ugh... You are `way` too chipper for 7 am.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17058",
+          "text_bbcode": "Ugh... You are [color=#3b78e2][i]way[/i][/color] too chipper for 7 am."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "...It's `10.`",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17067",
+          "text_bbcode": "...It's [color=#3b78e2][i]10.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Yeah, well, it's before noon, which means I'm enforcing my zero tolerance policy on whistling, dancing, or making eye-contact.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17076"
+        },
+        {
+          "type": "narration",
+          "text": "Paula walks over, grabs a muffin, and sits down. Beth cautiously joins her.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17086"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "So... How are you liking being a member of the sorority so far?",
+          "character_id": "1",
+          "offset": "17093"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Gee, Beth, I don't know. One year ago, I was the Queen Bee at my high school, dating the hottest guys and making everyone do whatever I wanted...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17102"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Now, thanks to a little legal... Misunderstanding... I'm wallowing at this third-tier state school, stuck at the lowest slot on the totem pole in some crappy sorority!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17111"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Oh...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17120"
+        },
+        {
+          "type": "narration",
+          "text": "Paula sighs.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17130"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "But I guess... Some of the other sisters... Aren't `so` bad...",
+          "character_id": "0",
+          "offset": "17137",
+          "text_bbcode": "But I guess... Some of the other sisters... Aren't [color=#3b78e2][i]so[/i][/color] bad..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Yay!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17146"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Do you have any big plans for the weekend?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17155"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Actually, yeah! Every six months, I get a `total` makeover.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17164",
+          "text_bbcode": "Actually, yeah! Every six months, I get a [color=#3b78e2][i]total[/i][/color] makeover."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "I'm talking haircut... Spa treatment... Massage... Mani... Pedi... Breddi...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17173"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "4",
+          "image": "26020",
+          "text": "What's a `Breddi`?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "17182",
+          "text_bbcode": "What's a [color=#3b78e2][i]Breddi[/i][/color]?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "If you have to ask, then you really shouldn't know. What are your plans?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17191"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Oh, I'm having a really romantic weekend with my boyfriend... We're gonna go take a trip down the coast, stop by some beaches, and stay at this really nice resort...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17200"
+        },
+        {
+          "type": "music",
+          "track_id": "8224",
+          "loop": false,
+          "offset": "17207"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "I hate to be the bearer of bad news, ladies... But you'll be doing no such things.",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17216"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Oh... Who am I kidding? I `love` being the bearer of bad news!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "17225",
+          "text_bbcode": "Oh... Who am I kidding? I [color=#3b78e2][i]love[/i][/color] being the bearer of bad news!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "What are you talking about, Tina?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17234"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "I'm talking about sorority business... Namely, the annual bake sale! We need to bake 500 cookies by Monday...",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17243"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "And of course, as the junior sisters, you'll be responsible for... All of them!",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "17252"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "What? That's ridiculous!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17261"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Are you going to help at least?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17270"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Uh, no? The other sisters and I are taking a girl's trip to Vegas! Can you say `part-ay!`",
+          "character_id": "7",
+          "expression": "2",
+          "offset": "17279",
+          "text_bbcode": "Uh, no? The other sisters and I are taking a girl's trip to Vegas! Can you say [color=#3b78e2][i]part-ay![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I can, but I choose not to...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17288"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Look, Tina, this is totally unfair! We're `not` your servants!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17297",
+          "text_bbcode": "Look, Tina, this is totally unfair! We're [color=#3b78e2][i]not[/i][/color] your servants!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "You can't make us do this!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17306"
+        },
+        {
+          "type": "narration",
+          "text": "Tina locks eyes with Paula and paces towards her...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17316"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "Now you listen here, `new girl,` and listen well. I am the Head Sister of this sorority. Do you know what that means?",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17325",
+          "text_bbcode": "Now you listen here, [color=#3b78e2][i]new girl,[/i][/color] and listen well. I am the Head Sister of this sorority. Do you know what that means?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "It `means` I know everything about you. I know exactly why you were kicked out of your high school, and why no other college would take you.",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17334",
+          "text_bbcode": "It [color=#3b78e2][i]means[/i][/color] I know everything about you. I know exactly why you were kicked out of your high school, and why no other college would take you."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "It means I took you into this sorority as an act of kindness, because frankly, no one else would have you...",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17343"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "But if you don't do exactly what I say... Then you'll be back out on your butt faster than you can say 'Mani Breddi.' Got it?",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17352"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "...Got it.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17361"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Well... What about me? I don't have any dark secret to be blackmailed with. Do `I` have to bake cookies?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17370",
+          "text_bbcode": "Well... What about me? I don't have any dark secret to be blackmailed with. Do [color=#3b78e2][i]I[/i][/color] have to bake cookies?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tina",
+          "emotion_code": "1",
+          "image": "26002",
+          "text": "...Shut up, Beth.",
+          "character_id": "7",
+          "expression": "1",
+          "offset": "17379"
+        },
+        {
+          "type": "narration",
+          "text": "Tina stalks off. When she's gone, Paula slams her fist down on the table!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17389"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "`Grrrr!` I hate her!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17398",
+          "text_bbcode": "[color=#3b78e2][i]Grrrr![/i][/color] I hate her!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "She's really been on kind of an angry tear lately...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17407"
+        },
+        {
+          "type": "narration",
+          "text": "Beth sighs deeply and starts taking out some baking supplies...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17417"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Whoa! Hey! What are you doing?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17426"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Well, 500 cookies aren't going to bake themselves...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17435"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Nuh-uh. No way. This girl does `not` bake.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17444",
+          "text_bbcode": "Nuh-uh. No way. This girl does [color=#3b78e2][i]not[/i][/color] bake."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "So what are you saying we should do?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17453"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "I say we fight back! Rebel! Viva la revolucion or whatever!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17462"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "But... How? She's the Head Sister!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17471"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Yeah? And how did she get to be the Head Sister in the first place?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17480"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "Don't you know that story? It's legendary!",
+          "character_id": "1",
+          "offset": "17487"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "When she was just a freshman and a new member, she went behind her Head Sister's back and threw a huge holiday party!",
+          "character_id": "1",
+          "offset": "17494"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "It was such a success, everyone rallied behind her! Ever since then, she's been untouchable!",
+          "character_id": "1",
+          "offset": "17501"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Well, that's it then, isn't it? We should do the same thing! We'll throw our own awesome holiday party!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17510"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Believe me, Beth... I know a thing or two about throwing a party...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17519"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "It's not that easy!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17528"
+        },
+        {
+          "type": "narration",
+          "text": "Beth walks over to a corkboard and points to a piece of paper.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17538"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "This is the Party Itinerary for the year... And Tina's already claimed all the major holidays!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17547"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Halloween... Christmas... Valentine's... Second Valentine's... Tina Day...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17556"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Sometimes she just makes holidays up!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17565"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "There has to be `something` she missed!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17574",
+          "text_bbcode": "There has to be [color=#3b78e2][i]something[/i][/color] she missed!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "Well... Actually... She did miss one thing... It looks like she didn't schedule a party for St. Patrick's Day!",
+          "character_id": "1",
+          "offset": "17581"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Are you thinking what I'm thinking?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17590"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "We spread rumors that Tina is racist against Irish people?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17599"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "4",
+          "image": "26020",
+          "text": "What? No! Why would you even think that?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "17608"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "We should throw a St. Patrick's Day party!",
+          "character_id": "1",
+          "offset": "17615"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Hmm... I suppose that works too...",
+          "character_id": "0",
+          "offset": "17622"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "Think about it! All the other sisters are out of the house this weekend! That means it's the perfect opportunity...",
+          "character_id": "1",
+          "offset": "17629"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Although... I don't know how we'd manage to do it in time... I mean, St. Patrick's Day is tonight!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17638"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "So that's... What... 5 hours, give or take, for two people to throw together a campus-wide party so good it'll completely destabilize the social order and result in a new regime?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17647"
+        },
+        {
+          "type": "narration",
+          "text": "Paula stands up and cracks her knuckles.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17657"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Piece of cake.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17666"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "4",
+          "image": "26020",
+          "text": "You're... Pretty scary...",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "17675"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "17681"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Yes, Beth. Yes, I am.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17690"
+        },
+        {
+          "type": "music",
+          "track_id": "8207",
+          "loop": false,
+          "offset": "17697"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1132",
+          "variant": "0",
+          "offset": "17707"
+        },
+        {
+          "type": "narration",
+          "text": "Moments later, Paula and Beth walk across the campus...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17717"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "All right, the first thing a party needs is great themed decor.",
+          "character_id": "0",
+          "offset": "17724"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Normally, I'd rely on either a squad of cheerleaders or cheap third-world laborers...",
+          "character_id": "0",
+          "offset": "17731"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I'm just going to pretend that's a joke...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "17740"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "But we don't have time to do this right. So it's time to go for the next best thing...",
+          "character_id": "0",
+          "offset": "17747"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Social outcasts!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17756"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1117",
+          "variant": "0",
+          "offset": "17766"
+        },
+        {
+          "type": "narration",
+          "text": "Paula leads Beth into the theater department. There, on the stage, Dinah and Raven are rehearsing for a play...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17776"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": "3",
+          "image": "26029",
+          "text": "If only we'd paid more attention... If only we'd been more caring and observant... We might have prevented this tragedy!",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "17785"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "3",
+          "image": "2108",
+          "text": "Don't blame yourself, Margaret... There's no way we could have known he had the disease where you slowly turn into a horse.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "17794"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "And I'm just going to stop you two right there!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17803"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "I was kind of curious to see where it was going...",
+          "character_id": "1",
+          "offset": "17810"
+        },
+        {
+          "type": "narration",
+          "text": "The two girls turn to stare at Paula.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17820"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": null,
+          "image": "2105",
+          "text": "What do you want, Paula?",
+          "character_id": "2",
+          "offset": "17829"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "I'm sure you've been waiting your whole life to hear this, Goth-face, but I need your help.",
+          "character_id": "0",
+          "offset": "17836"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "Oh, this is going to be good...",
+          "character_id": "4",
+          "offset": "17845"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Beth and I are throwing a St. Patrick's day party tomorrow, and we're going to need some assistance with the decorations.",
+          "character_id": "0",
+          "offset": "17852"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "3",
+          "image": "2108",
+          "text": "So you came to... Us?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "17861"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Don't play innocent, Pigtails. I know you've got a vault back there of props and costumes, and `some` of them have got to be a good match for St. Patrick's Day!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17870",
+          "text_bbcode": "Don't play innocent, Pigtails. I know you've got a vault back there of props and costumes, and [color=#3b78e2][i]some[/i][/color] of them have got to be a good match for St. Patrick's Day!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "Well... We do have all those pots of gold...",
+          "character_id": "4",
+          "offset": "17879"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": null,
+          "image": "2105",
+          "text": "And the leprechaun outfits...",
+          "character_id": "2",
+          "offset": "17888"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "And the banner saying 'Happy St. Patrick's Day 2012'... Man, that was a weird play...",
+          "character_id": "4",
+          "offset": "17897"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "See? I knew it! Now hand that stuff over, and we'll be on our way!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "17906"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "Uh, yeah, that's not going to happen.",
+          "character_id": "4",
+          "offset": "17915"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": null,
+          "image": "2105",
+          "text": "That stuff belongs to the Centerscore U. Theater Department! We can't just give it to you guys! What if its broken or messed up? Those parties get pretty rowdy...",
+          "character_id": "2",
+          "offset": "17924"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "Last time I went to a frat party, I saw a guy eat a frying pan!",
+          "character_id": "4",
+          "offset": "17933"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Look, I see how this is. You're not going to give us the props without something in exchange...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "17942"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": "3",
+          "image": "26029",
+          "text": "No, we're just not going to give you the props.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "17951"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Come on... There must be `something` we can bribe you with...",
+          "character_id": "0",
+          "offset": "17958",
+          "text_bbcode": "Come on... There must be [color=#3b78e2][i]something[/i][/color] we can bribe you with..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Oh! I know! We'll let you guys come to the party, and you can invite all your friends! And... `And...` You can handle all the music!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "17967",
+          "text_bbcode": "Oh! I know! We'll let you guys come to the party, and you can invite all your friends! And... [color=#3b78e2][i]And...[/i][/color] You can handle all the music!"
+        },
+        {
+          "type": "narration",
+          "text": "Dinah and Raven look at each other...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "17977"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": null,
+          "image": "2105",
+          "text": "Well... We `were` looking for something to do this weekend...",
+          "character_id": "2",
+          "offset": "17986",
+          "text_bbcode": "Well... We [color=#3b78e2][i]were[/i][/color] looking for something to do this weekend..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": null,
+          "image": "26026",
+          "text": "And I `was` kind of getting into DJ-ing...",
+          "character_id": "4",
+          "offset": "17995",
+          "text_bbcode": "And I [color=#3b78e2][i]was[/i][/color] kind of getting into DJ-ing..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Raven",
+          "emotion_code": "2",
+          "image": "26028",
+          "text": "What do you say, Paula? Do we have a deal?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "18004"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "...Fine. Deal. But no songs with the words 'blood,' 'maggot,' or 'corpse-tacular.'",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18013"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18019"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "2",
+          "image": "2107",
+          "text": "Deal!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "18028"
+        },
+        {
+          "type": "music",
+          "track_id": "8210",
+          "loop": false,
+          "offset": "18035"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1132",
+          "variant": "0",
+          "offset": "18045"
+        },
+        {
+          "type": "narration",
+          "text": "Paula and Beth walk out of the theater department...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18055"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "That went well!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "18064"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Are you kidding? Thanks to your little deal, we're going to have our party packed wall-to-wall with weirdos and vampires!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18073"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "But... We got all the decorations...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18082"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Yeah, and we could have got them way easier if you'd just let `me` handle it! Those girls were three keenly-observant insults from caving!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18091",
+          "text_bbcode": "Yeah, and we could have got them way easier if you'd just let [color=#3b78e2][i]me[/i][/color] handle it! Those girls were three keenly-observant insults from caving!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I don't know if that's true...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18100"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Just sit back and look cute from now on, okay? I've got this covered.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18109"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18115"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Okay...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18124"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1045",
+          "variant": "0",
+          "offset": "18134"
+        },
+        {
+          "type": "music",
+          "track_id": "8203",
+          "loop": false,
+          "offset": "18141"
+        },
+        {
+          "type": "narration",
+          "text": "And so, a little while later, at the MAN frat house...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18151"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "So... Can I count on you boys to make an appearance?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18160"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "2",
+          "image": "26013",
+          "text": "A St. Patrick's Day party... Heck yeah! That sounds awesome!",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "18169"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "2",
+          "image": "2067",
+          "text": "We'll be there!",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "18178"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Great!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "18187"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "2",
+          "image": "26008",
+          "text": "Is it okay with Tina if we bring dates?",
+          "character_id": "9",
+          "expression": "2",
+          "offset": "18196"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": null,
+          "image": "2365",
+          "text": "Actually... Tina's not really involved in this party.",
+          "character_id": "0",
+          "offset": "18203"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "It's just something Paula and I are doing!",
+          "character_id": "1",
+          "offset": "18210"
+        },
+        {
+          "type": "narration",
+          "text": "The guys immediately back away, startled...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18220"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "Whoa... So is this... An `unauthorized` party...?",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "18229",
+          "text_bbcode": "Whoa... So is this... An [color=#e23b3b][i]unauthorized[/i][/color] party...?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Well... I didn't know you had to 'authorize' a party, but...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "18238"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "3",
+          "image": "2068",
+          "text": "Yeah, sorry girls, but there's no way we can get mixed up in this...",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "18247"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "Tina gets `real` scary when people go behind her back. Last time someone tried something like this, we all ended up having to clean all the O.M.G. bathrooms!",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "18256",
+          "text_bbcode": "Tina gets [color=#e23b3b][i]real[/i][/color] scary when people go behind her back. Last time someone tried something like this, we all ended up having to clean all the O.M.G. bathrooms!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "3",
+          "image": "26014",
+          "text": "Girls are surprisingly messy...",
+          "character_id": "8",
+          "expression": "3",
+          "offset": "18265"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Let me get this straight... You guys won't got to a party... Because you're afraid Tina will be mad at you?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18274"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "That's about right, yeah.",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "18283"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "But it's not like she's a part of your frat! Why would she be able to make you do anything?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18292"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "3",
+          "image": "2068",
+          "text": "Tina is pretty persuasive...",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "18301"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Wow. Just wow. I thought I'd seen everything... But this is a new low.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18310"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "A bunch of college guys `utterly terrified` of a 100 pound girl. That's just `pathetic!`",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18319",
+          "text_bbcode": "A bunch of college guys [color=#3b78e2][i]utterly terrified[/i][/color] of a 100 pound girl. That's just [color=#3b78e2][i]pathetic![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "Hey, we... We're not terrified...",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "18328"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Are you kidding me? You're scared out of your minds! You're quaking in your boots!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18337"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "3",
+          "image": "2068",
+          "text": "No! We're just... You know... Respectful...",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "18346"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Respectful? Ha! Where's Tina's respect for your desire to party?!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18355"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Just admit... You guys are sad, little babies, scared crapless of her!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18364"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "1",
+          "image": "26007",
+          "text": "No way!",
+          "character_id": "9",
+          "expression": "1",
+          "offset": "18373"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "We're not scared of her!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "18382"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "But you still let her tell you what to do!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18391"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "1",
+          "image": "26012",
+          "text": "No! No one tells us what to do!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "18400"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Then stand up to her!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18409"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "2",
+          "image": "26008",
+          "text": "Yeah! We'll stand up to her! Who does she think she is?",
+          "character_id": "9",
+          "expression": "2",
+          "offset": "18418"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "Stupid Tina!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "18427"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "So if she doesn't want you to go this party...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18436"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "Then we're going to this party!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "18445"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "1",
+          "image": "26007",
+          "text": "Yeah!",
+          "character_id": "9",
+          "expression": "1",
+          "offset": "18454"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "1",
+          "image": "26012",
+          "text": "Party `party!`",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "18463",
+          "text_bbcode": "Party [color=#e23b3b][i]party![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Great! See you guys at eight o'clock, sharp! Wear green!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18472"
+        },
+        {
+          "type": "narration",
+          "text": "Paula and Beth leave...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18482"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "...Does anyone else feel like we just got conned?",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "18491"
+        },
+        {
+          "type": "music",
+          "track_id": "8207",
+          "loop": false,
+          "offset": "18498"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1123",
+          "variant": "0",
+          "offset": "18508"
+        },
+        {
+          "type": "narration",
+          "text": "And so, Paula spends the rest of the day going from person to person, manipulating...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18518"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Fabric Store Clerk",
+          "emotion_code": null,
+          "image": "2300",
+          "text": "A charity to help color-blind orphans? Why, of course I'll donate all my green fabric!",
+          "character_id": "14",
+          "offset": "18527"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1087",
+          "variant": "0",
+          "offset": "18537"
+        },
+        {
+          "type": "narration",
+          "text": "And deceiving...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18547"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nursery Clerk",
+          "emotion_code": null,
+          "image": "2305",
+          "text": "You represent the Irish Heritage Foundation, you say? That's wonderful! I'd love to offer you all my shamrocks and clovers!",
+          "character_id": "15",
+          "offset": "18556"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1093",
+          "variant": "0",
+          "offset": "18566"
+        },
+        {
+          "type": "narration",
+          "text": "And outright bullying!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18576"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "6",
+          "image": "2371",
+          "text": "`Cater my party!`",
+          "character_id": "0",
+          "expression": "6",
+          "offset": "18585",
+          "text_bbcode": "[color=#3b78e2][i]Cater my party![/i][/color]"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18591"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Waitress",
+          "emotion_code": "3",
+          "image": "2468",
+          "text": "Okay, okay! Just stop yelling!",
+          "character_id": "5",
+          "expression": "3",
+          "offset": "18600"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1132",
+          "variant": "0",
+          "offset": "18610"
+        },
+        {
+          "type": "narration",
+          "text": "As the sun sets, Paula and Beth head back towards the O.M.G sorority...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18620"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Phew! I can't even remember the last time I had to throw together a party just like that! Talk about a rush!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18629"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": null,
+          "image": "26016",
+          "text": "So we're done then?",
+          "character_id": "1",
+          "offset": "18636"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "We've got decorations, music, catering, and we've put out invites to the whole school... I'd say that counts as done, yeah!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18645"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I just feel gross... Like I've compromised every part of my moral code...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18654"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Yeah, you'll get over it.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18663"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I don't know... We lied to a lot of people...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18672"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "'Lied' is such a strong word, Beth. I prefer to think we 'took artistic license with the truth!'",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18681"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "It feels like you're lying to me right now!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18690"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "But... I suppose it was all for a good cause...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18699"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Exactly! And when we're the most popular girls on campus, and Tina's a pathetic loser stuck shining our shoes, you won't feel bad about a thing!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18708"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Why does she have to be shining my shoes?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18717"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "18723"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Just relax, would you? Everything's going to work out `just fine!`",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18732",
+          "text_bbcode": "Just relax, would you? Everything's going to work out [color=#3b78e2][i]just fine![/i][/color]"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "18742"
+        },
+        {
+          "type": "narration",
+          "text": "But an hour later...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18752"
+        },
+        {
+          "type": "music",
+          "track_id": "8209",
+          "loop": false,
+          "offset": "18759"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "This is a disaster! The party's about to start, and no one's here!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18768"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "I'm sure people are just coming fashionably late...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18777"
+        },
+        {
+          "type": "narration",
+          "text": "Beth clicks frantically on her laptop...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18787"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "I don't think so, Paula! I've been monitoring the party's Faceplace Event Page, and no one has RSVP-ed!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18796"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "All those people who promised us they'd come... They must have changed their minds!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18805"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Hmm... I was worried this might happen...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18814"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "We came so close...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18823"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Like my grandpa always said, close only counts in hand-shoes and horse-grenades. It's time for us to go to Plan B.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18832"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "There's a Plan B?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18841"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "There's `always` a Plan B. Give me that computer!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18850",
+          "text_bbcode": "There's [color=#3b78e2][i]always[/i][/color] a Plan B. Give me that computer!"
+        },
+        {
+          "type": "narration",
+          "text": "Paula takes Beth's laptop and starts typing...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18860"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "What are you doing?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18869"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Oh, just updating the party's description... Instead of being a boring old St. Patrick's Day party... It's now a special event commemorating visiting Irish superstar Hawk Gunner!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18878"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Wait, what? Is he even Irish?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18887"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Sure! Probably! Maybe? I don't know, does it even matter? People are going to be so excited to see him, they'll show up in droves!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18896"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "But... He's not actually going to be here, is he?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18905"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Uh, of course not! How would I possibly arrange that?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18914"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "So now we're lying to the `entire school?`",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18923",
+          "text_bbcode": "So now we're lying to the [color=#3b78e2][i]entire school?[/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "Paula reaches over and gently touches Beth's cheek.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18933"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Oh, Beth... Sweet, stupid Beth...  Of course we are!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18942"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "Won't they be upset?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18951"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Of course not! Once they get here, they'll be having such a good time, they'll forget all about it!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "18960"
+        },
+        {
+          "type": "narration",
+          "text": "Beth shakes her head and stands up.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "18970"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "3",
+          "image": "26019",
+          "text": "No.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "18979"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Excuse me?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "18988"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "1",
+          "image": "26017",
+          "text": "I said no, Paula. All day long, we've been getting our way by tricking and bribing and bullying people... And I've had enough!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "18997"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "1",
+          "image": "26017",
+          "text": "I am `not` lying to the whole school! I'm just not!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "19006",
+          "text_bbcode": "I am [color=#3b78e2][i]not[/i][/color] lying to the whole school! I'm just not!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Yeah, well, guess what, Goody Two-Shoes? It's not `your` choice!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "19015",
+          "text_bbcode": "Yeah, well, guess what, Goody Two-Shoes? It's not [color=#3b78e2][i]your[/i][/color] choice!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "1",
+          "image": "26017",
+          "text": "No, you're right, it's not. You can do whatever terrible thing you want.",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "19024"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "1",
+          "image": "26017",
+          "text": "But you know what? I'm out!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "19033"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "You're `out?`",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "19042",
+          "text_bbcode": "You're [color=#3b78e2][i]out?[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "1",
+          "image": "26017",
+          "text": "Yeah. I'm out. Have fun with your lying and cheating party, Paula.",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "19051"
+        },
+        {
+          "type": "narration",
+          "text": "Beth turns and storms out.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19061"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "19067"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Fine! I will! And I'll do enough lying and cheating for both of us!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "19076"
+        },
+        {
+          "type": "music",
+          "track_id": "8205",
+          "loop": false,
+          "offset": "19083"
+        },
+        {
+          "type": "narration",
+          "text": "And so, fifteen minutes later...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19093"
+        },
+        {
+          "type": "narration",
+          "text": "The house is packed full of party-goers!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19103"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "2",
+          "image": "2067",
+          "text": "Rocking party, Paula!",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "19112"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Thanks, Bryce!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19121"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Adam",
+          "emotion_code": "2",
+          "image": "26023",
+          "text": "Yeah, this is actually a lot of fun! And the music is awesome!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "19130"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Glad to hear it, Adam!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19139"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "2",
+          "image": "26013",
+          "text": "I'm having a blast!",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "19148"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Sure you are... Guy... Sure you are.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19157"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Stupid Beth... Storming out all huffy...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "19169"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "1",
+          "image": "2366",
+          "text": "Well, if she doesn't want to be popular, then that's her choice! I'll get all the benefit for myself!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "19181"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Anyone want any snacks? Drinks? We've got four-leaf-clover cupcakes... Shamrock shortcake... And some very special green punch...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19190"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": null,
+          "image": "26006",
+          "text": "Yeah, yeah... When's Hawk getting here?",
+          "character_id": "9",
+          "offset": "19199"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "2",
+          "image": "2067",
+          "text": "Yeah! That's what I'm pumped about! That guy is awesome!",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "19208"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "2",
+          "image": "2107",
+          "text": "I have to admit, I'm actually kind of excited to meet him too... He was so good in 'Eskimo Kisses...'",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "19217"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Right... Well... About that... He actually might be a little delayed...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19226"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "3",
+          "image": "26009",
+          "text": "What? Delayed? Weak!",
+          "character_id": "9",
+          "expression": "3",
+          "offset": "19235"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Right! Well... Why don't you all just hang out and enjoy the party... And... Uh... See what happens!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19244"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Come on... Just get into it... Forget all about stupid Hawk Gunner...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19256"
+        },
+        {
+          "type": "music",
+          "track_id": "8224",
+          "loop": false,
+          "offset": "19263"
+        },
+        {
+          "type": "narration",
+          "text": "But as the minutes creep by, the guests just get more and more irritated!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19273"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Adam",
+          "emotion_code": "1",
+          "image": "26022",
+          "text": "Come on! Where is he?!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "19282"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "Yeah, it's been half an hour already!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "19291"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "1",
+          "image": "26012",
+          "text": "He's an Irish hero!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "19300"
+        },
+        {
+          "type": "narration",
+          "text": "James narrows his gaze...",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19310"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "1",
+          "image": "26007",
+          "text": "What's the deal, Paula? Where's Hawk?",
+          "character_id": "9",
+          "expression": "1",
+          "offset": "19319"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Well... See... The thing is... Uh...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19328"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "Hawk `might` not actually be coming...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19337",
+          "text_bbcode": "Hawk [color=#3b78e2][i]might[/i][/color] not actually be coming..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "1",
+          "image": "26012",
+          "text": "What?!",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "19346"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "Why not?!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "19355"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "It's... Um... Kind of a funny story, actually... He...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19364"
+        },
+        {
+          "type": "narration",
+          "text": "Paula is cut off by an angry roar of complaints and accusations!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19374"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "1",
+          "image": "26007",
+          "text": "You totally tricked us into coming!",
+          "character_id": "9",
+          "expression": "1",
+          "offset": "19383"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "1",
+          "image": "2106",
+          "text": "I feel used and lied to!",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "19392"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Bryce",
+          "emotion_code": "1",
+          "image": "2066",
+          "text": "I can't believe I was willing to piss off Tina for `this!`",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "19401",
+          "text_bbcode": "I can't believe I was willing to piss off Tina for [color=#e23b3b][i]this![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "3",
+          "image": "2368",
+          "text": "No! Wait! I...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "19410"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "1",
+          "image": "26007",
+          "text": "I'm out of here, Paula!",
+          "character_id": "9",
+          "expression": "1",
+          "offset": "19419"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dinah",
+          "emotion_code": "1",
+          "image": "2106",
+          "text": "Yeah! Me too!",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "19428"
+        },
+        {
+          "type": "narration",
+          "text": "Everyone turns to leave... When the door flies open!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19438"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": false,
+          "offset": "19445"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hawk",
+          "emotion_code": "2",
+          "image": "26033",
+          "text": "Hawk-o! Is everyone to ready to get down with the Hawk... St. Patrick's Day style?",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "19454"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "4",
+          "image": "2369",
+          "text": "What the...?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "19463"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "James",
+          "emotion_code": "2",
+          "image": "26008",
+          "text": "Holy! It's Hawk Gunner!",
+          "character_id": "9",
+          "expression": "2",
+          "offset": "19472"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hawk",
+          "emotion_code": "2",
+          "image": "26033",
+          "text": "That's Hawk `O'Gunner` to you today... Because I'm celebrating my Irish heritage!",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "19481",
+          "text_bbcode": "That's Hawk [color=#e23b3b][i]O'Gunner[/i][/color] to you today... Because I'm celebrating my Irish heritage!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Adam",
+          "emotion_code": "2",
+          "image": "26023",
+          "text": "This so awesome!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "19490"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Dontae",
+          "emotion_code": "2",
+          "image": "26013",
+          "text": "I'm so excited I'm shaking!",
+          "character_id": "8",
+          "expression": "2",
+          "offset": "19499"
+        },
+        {
+          "type": "narration",
+          "text": "Hawk saunters into the room with his entourage of bros!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19509"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hawk",
+          "emotion_code": "2",
+          "image": "26033",
+          "text": "I'm ready to get this party started...",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "19518"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hawk",
+          "emotion_code": "2",
+          "image": "26033",
+          "text": "But first, I just want to give a shout-out to the two special-sauce chicklets that put this whole thing together... Paula and Beth!",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "19527"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Uh... Right! Thanks! I... Um... Appreciate that!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19536"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hawk",
+          "emotion_code": "2",
+          "image": "26033",
+          "text": "Now everyone... It's time to `Hawk and Roll!`",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "19545",
+          "text_bbcode": "Now everyone... It's time to [color=#e23b3b][i]Hawk and Roll![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "People cheer and whoop! Raven blasts some party music, and everyone starts dancing!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19555"
+        },
+        {
+          "type": "narration",
+          "text": "Paula steps back, surprised... And finds herself standing next to Beth!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19565"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "4",
+          "image": "2369",
+          "text": "Beth! You're here! Are you... Are you seeing this?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "19574"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Yeah, I am... And it looks like `our` party is one heck of a success!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19583",
+          "text_bbcode": "Yeah, I am... And it looks like [color=#3b78e2][i]our[/i][/color] party is one heck of a success!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "4",
+          "image": "2369",
+          "text": "But... Hawk... How?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "19592"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Oh, I don't know... I guess we'll just have to write it off as 'luck of the Irish...'",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19601"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Also, I know this girl Lisa who works in Hollywood. She's pretty well-connected.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19610"
+        },
+        {
+          "type": "narration",
+          "text": "Paula turns to Beth.",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19620"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Thanks, Beth. I... I hate saying this... But you were right, and I was wrong. I shouldn't have lied.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19629"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Yeah, well, keep that in mind for next time!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19638"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Next time?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19647"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Well, yeah...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19656"
+        },
+        {
+          "type": "narration",
+          "text": "Beth turns to survey the room, where everyone is having a great time! Hawk does his distinctive Hawk Shuffle in the middle of the room!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19666"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "I think this is the start of a pretty beautiful friendship...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19675"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Beth",
+          "emotion_code": "2",
+          "image": "26018",
+          "text": "Now come on! Let me get you a shamrock shake!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "19684"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Paula",
+          "emotion_code": "2",
+          "image": "2367",
+          "text": "Sounds good!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "19693"
+        },
+        {
+          "type": "narration",
+          "text": "Wow! Looks like Paula and Beth managed to work out their differences and throw a great party!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19703"
+        },
+        {
+          "type": "narration",
+          "text": "Have a happy St. Patrick's Day, and we'll see you next week!",
+          "character_id": "16",
+          "expression": "0",
+          "offset": "19713"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_enter_v0_bg16726_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "16737",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "16744",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg16726_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg16726_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg16726_t",
+          "else": "s1_enter_v0_bg16726_r",
+          "offset": "16726",
+          "op": "eq"
+        }
+      ]
+    }
+  },
+  "pack_id": "7",
+  "episode_id": "2005",
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "2365",
+          "name": "Paula",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "26016",
+          "name": "Beth",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "2105",
+          "name": "Dinah",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "26021",
+          "name": "Adam",
+          "format": 1
+        },
+        {
+          "id": "4",
+          "art": "26026",
+          "name": "Raven",
+          "format": 1
+        },
+        {
+          "id": "5",
+          "art": "2465",
+          "name": "Waitress",
+          "format": 1
+        },
+        {
+          "id": "6",
+          "art": "2065",
+          "name": "Bryce",
+          "format": 1
+        },
+        {
+          "id": "7",
+          "art": "26001",
+          "name": "Tina",
+          "format": 1
+        },
+        {
+          "id": "8",
+          "art": "26011",
+          "name": "Dontae",
+          "format": 1
+        },
+        {
+          "id": "9",
+          "art": "26006",
+          "name": "James",
+          "format": 1
+        },
+        {
+          "id": "10",
+          "art": "26016",
+          "name": "Beth",
+          "format": 1
+        },
+        {
+          "id": "11",
+          "art": "26026",
+          "name": "Raven",
+          "format": 1
+        },
+        {
+          "id": "12",
+          "art": "26021",
+          "name": "Adam",
+          "format": 1
+        },
+        {
+          "id": "13",
+          "art": "26031",
+          "name": "Hawk",
+          "format": 1
+        },
+        {
+          "id": "14",
+          "art": "2300",
+          "name": "Fabric Store Clerk",
+          "format": 1
+        },
+        {
+          "id": "15",
+          "art": "2305",
+          "name": "Nursery Clerk",
+          "format": 1
+        },
+        {
+          "id": "16",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "16"
+      }
+    }
+  },
+  "routines": {},
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0
+    },
+    "set_only": [
+      "1000",
+      "1001"
+    ]
+  },
+  "name_vars": {
+    "$Scott": {
+      "default": "Scott"
+    },
+    "$Travis": {
+      "default": "Travis"
+    },
+    "$ZOE": {
+      "default": "Zoe"
+    }
+  }
+}

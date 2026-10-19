@@ -1,0 +1,2406 @@
+{
+  "title": "MTX_Dr_Pepper_2",
+  "episode": "New Year's Connection",
+  "cast": [
+    "Angie",
+    "Scott",
+    "Waitress",
+    "Travis",
+    "Jane",
+    "Hannah",
+    "Spike"
+  ],
+  "main_characters": [
+    "Angie"
+  ],
+  "genders": {
+    "Angie": "F",
+    "Scott": "M",
+    "Waitress": "F",
+    "Travis": "M",
+    "Jane": "F",
+    "Hannah": "F",
+    "Spike": "M"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1",
+    "2": "s2",
+    "3": "s3"
+  },
+  "scene_minigame_banks": {
+    "1": {},
+    "2": {},
+    "3": {}
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "checkpoints": {
+        "sets": [],
+        "replays": [
+          {
+            "offset": "7597",
+            "target": "7493"
+          }
+        ]
+      },
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    },
+    "2": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "1",
+      "valid_values": [
+        "1"
+      ],
+      "cases": [
+        {
+          "value": "1",
+          "key": "2"
+        }
+      ]
+    },
+    "3": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "2",
+      "valid_values": [
+        "2"
+      ],
+      "cases": [
+        {
+          "value": "2",
+          "key": "2"
+        }
+      ]
+    }
+  },
+  "segments": {
+    "s1_02_after": {
+      "nodes": [
+        {
+          "type": "narration",
+          "text": "Angie looks around and spots a very tall hotel nearby.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8541"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "If I'm going to find him, I'm going to have to look higher. Much higher.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8553"
+        },
+        {
+          "type": "narration",
+          "text": "Angie tries to cut through the crowd to the hotel, but people are jostling her from all sides!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8563"
+        },
+        {
+          "type": "narration",
+          "text": "Moving is nearly impossible!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8573"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "8579"
+        },
+        {
+          "type": "narration",
+          "text": "Angie looks around desperately for another way through. She sees a small park and rushes toward it.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8589"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1069",
+          "variant": "1",
+          "offset": "8599"
+        },
+        {
+          "type": "narration",
+          "text": "In the park, Angie finds a huge ice skating rink!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8609"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "The most direct route to the hotel is through that rink...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8621"
+        },
+        {
+          "type": "narration",
+          "text": "Angie runs onto the ice!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8631"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": false,
+          "offset": "8638"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "4",
+          "image": "2034",
+          "text": "Whoa! This is more slippery than I thought it'd be!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "8650"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": true,
+          "offset": "8657"
+        },
+        {
+          "type": "minigame",
+          "minigame_type": "pick_word",
+          "kind": "action",
+          "prompt": "Make your choice! Run on the ice rink!",
+          "options": [
+            [
+              "Don't slip!",
+              "Stay steady!"
+            ],
+            [
+              "Slip!",
+              "Fall!",
+              "Trip!",
+              "Fumble!"
+            ]
+          ],
+          "offset": "8682"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "1000",
+          "offset": "8691"
+        },
+        {
+          "type": "music",
+          "track_id": "8210",
+          "loop": false,
+          "offset": "8713"
+        },
+        {
+          "type": "narration",
+          "text": "Angie treads quickly and carefully across the ice, dodging ice skaters and rough patches.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8723"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "This is much quicker than wading through the crowds!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "8735"
+        },
+        {
+          "type": "narration",
+          "text": "Eventually, she makes it the other side.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8745"
+        },
+        {
+          "type": "notification",
+          "kind": "score",
+          "text": "Score Up!",
+          "offset": "8751"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "I did it!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "8760"
+        },
+        {
+          "type": "narration",
+          "text": "Back on asphalt, she starts running towards the hotel.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8770"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "8779"
+        },
+        {
+          "type": "narration",
+          "text": "Angie slips!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8789"
+        },
+        {
+          "type": "narration",
+          "text": "She falls backwards, taking a skating couple out with her. They fall into a huge pile.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8799"
+        },
+        {
+          "type": "narration",
+          "text": "A group of little kids holding hands sees them, but can't dodge in time. They crash into Angie and the other skaters!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8809"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "4",
+          "image": "2034",
+          "text": "Ahhhh!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "8818"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "I'm stuck at the bottom! I can't move!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8830"
+        },
+        {
+          "type": "narration",
+          "text": "Angie tries to free herself, but manages to end up in a great tangle with the skaters!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8840"
+        },
+        {
+          "type": "narration",
+          "text": "A precious ten minutes later...",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8850"
+        },
+        {
+          "type": "narration",
+          "text": "Angie frees herself.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8860"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "I don't have much time to find $Scott... That really tripped me up.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8872"
+        },
+        {
+          "type": "narration",
+          "text": "She slides carefully off the ice until she reaches a concrete path. She starts sprinting towards the hotel.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8882"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "8888"
+        },
+        {
+          "type": "narration",
+          "text": "Angie rushes to the very top of the hotel and pushes the door out onto the rooftop.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8898"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26006",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "8910"
+        },
+        {
+          "type": "narration",
+          "text": "Angie looks around and sees..",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8930"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "$Scott?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "8939"
+        },
+        {
+          "type": "narration",
+          "text": "At the ledge, $Scott turns around.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8949"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Angie! I was looking all over for you.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "8958"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "I was looking for you all over too! What happened?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8967"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "You tried to lead me up the hill, but a group of tourists swept me a short ways down.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "8976"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "When I turned around, you were gone!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "8985"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Then I thought of coming up here to see if I could spot you...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "8994"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "But I found you instead!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9003"
+        },
+        {
+          "type": "music",
+          "track_id": "8210",
+          "loop": false,
+          "offset": "9010"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "And right on time too! Look!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9019"
+        },
+        {
+          "type": "narration",
+          "text": "He points out from the rooftop. The rooftop boasts a great view of the Ball Drop and the fireworks.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9029"
+        },
+        {
+          "type": "narration",
+          "text": "A countdown from below sounds. $Scott takes Angie's hands, and they count down together.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9039"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "10... 9... 8...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9048"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "7... 6... 5...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9057"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "4... 3... 2...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9066"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "1...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9075"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "`Happy New Year!`",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9084",
+          "text_bbcode": "[color=#e23b3b][i]Happy New Year![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "`Happy New Year!`",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9093",
+          "text_bbcode": "[color=#3b78e2][i]Happy New Year![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "They share a kiss on the rooftop.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9103"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "To this year...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9112"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "To next year...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9121"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "And to all the years to come!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9130"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "I hope I get to spend them with you.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9139"
+        },
+        {
+          "type": "narration",
+          "text": "$Scott and Angie share a special New Year's kiss amidst the colorful sprays of fireworks in the distance.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9149"
+        },
+        {
+          "type": "narration",
+          "text": "Congratulations! You helped Angie find $Scott just in time!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9159"
+        },
+        {
+          "type": "narration",
+          "text": "Happy New Year from Surviving High School!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9169"
+        },
+        {
+          "type": "narration",
+          "text": "Angie looks around and sees...",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9182"
+        },
+        {
+          "type": "narration",
+          "text": "Nothing.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9192"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Oh... Somehow, I thought he'd be here.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "9204"
+        },
+        {
+          "type": "narration",
+          "text": "She rushes to the ledge and looks out, hoping to see his face.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9214"
+        },
+        {
+          "type": "narration",
+          "text": "Around her, people start counting down...",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9224"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Travis",
+          "emotion_code": "2",
+          "image": "2457",
+          "text": "10... 9... 8...",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "9233"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jane",
+          "emotion_code": "2",
+          "image": "2232",
+          "text": "7... 6... 5...",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9242"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "No... I was hoping to find $Scott, so we could be together when...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "9254"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hannah",
+          "emotion_code": "2",
+          "image": "2202",
+          "text": "`Happy New Year!`",
+          "character_id": "5",
+          "expression": "2",
+          "offset": "9263",
+          "text_bbcode": "[color=#3b78e2][i]Happy New Year![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Spike",
+          "emotion_code": "2",
+          "image": "2402",
+          "text": "`Happy New Year!`",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "9272",
+          "text_bbcode": "[color=#e23b3b][i]Happy New Year![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Happy new year to you, $Scott... Wherever you are...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "9284"
+        },
+        {
+          "type": "narration",
+          "text": "Oh no! Angie and $Scott are separated at midnight? That's a horrible way to ring in the New Year!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9294"
+        },
+        {
+          "type": "narration",
+          "text": "Try again and see if you can get them together this time!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "9304"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 1,
+          "offset": "9311"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s2",
+          "section_register": {
+            "var": "1001",
+            "value": "1"
+          },
+          "offset": "9318"
+        }
+      ]
+    },
+    "s1_03_opt0": {
+      "nodes": [
+        {
+          "type": "narration",
+          "text": "Angie hops onto the nearest park bench and scans the crowd.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8437"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "8443"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Shoot! I'm too close to everyone! All I can see are hats and heads!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8455"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "I'll never find $Scott this way!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8467"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_04_opt1": {
+      "nodes": [
+        {
+          "type": "narration",
+          "text": "Angie gets to the top of the hill and looks over the crowd.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8485"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "8491"
+        },
+        {
+          "type": "notification",
+          "kind": "score",
+          "text": "Score Up!",
+          "offset": "8497"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "Perfect! I can see everyone in the vicinity!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "8509"
+        },
+        {
+          "type": "narration",
+          "text": "She slowly examines each face but doesn't see $Scott.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8519"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Doesn't look like he's even here... I don't know where I'm supposed to look next...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8531"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_01_after": {
+      "nodes": [
+        {
+          "type": "music",
+          "track_id": "8207",
+          "loop": false,
+          "offset": "8377"
+        },
+        {
+          "type": "narration",
+          "text": "In the area around the square, Angie spots a park bench to one side and a hill on the other.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8387"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": null,
+          "image": "2030",
+          "text": "I should...",
+          "mode": "-2",
+          "character_id": "0",
+          "offset": "8397"
+        },
+        {
+          "type": "choice",
+          "prompt": "I should...",
+          "options": [
+            {
+              "index": "0",
+              "label": "Stand on a park bench.",
+              "next": "s1_03_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Get to the top of the hill.",
+              "next": "s1_04_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "I should...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_02_after"
+        }
+      ]
+    },
+    "s1_05_opt0": {
+      "nodes": [
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "8123"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "8129"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Well, there's a good a spot to look as any.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8138"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1096",
+          "variant": "1",
+          "offset": "8148"
+        },
+        {
+          "type": "narration",
+          "text": "Angie walks back to the restaurant.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8158"
+        },
+        {
+          "type": "narration",
+          "text": "She approaches a waitress.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8168"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Excuse me... I'm looking for my boyfriend. I lost him in the crowd.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8177"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "He's approximately six inches taller than me, he's got great eyes, and he looks very Vice Presidential.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "8186"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Waitress",
+          "emotion_code": "2",
+          "image": "2467",
+          "text": "I know who you're talking about.",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "8195"
+        },
+        {
+          "type": "notification",
+          "kind": "score",
+          "text": "Score Up!",
+          "offset": "8201"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "You do?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "8210"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Waitress",
+          "emotion_code": null,
+          "image": "2465",
+          "text": "Someone stopped by just a minute ago asking about you.",
+          "character_id": "2",
+          "offset": "8219"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Waitress",
+          "emotion_code": "3",
+          "image": "2468",
+          "text": "He went back to Centerscore Square though.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "8228"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Can you tell me where he might be headed?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8237"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Waitress",
+          "emotion_code": "3",
+          "image": "2468",
+          "text": "Afraid not. But if you keep thinking like him, I'm sure you'll find him eventually.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "8246"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "8252"
+        },
+        {
+          "type": "narration",
+          "text": "Angie walks back to the square.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8262"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26006",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "8274"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "There must be some other way to find him... Maybe I can see him in the crowd if I get high enough.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8286"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1_06_opt1": {
+      "nodes": [
+        {
+          "type": "narration",
+          "text": "Angie elbows to the middle of the square where a statue of the founding fathers is.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8299"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Doesn't look like he's here...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8311"
+        },
+        {
+          "type": "narration",
+          "text": "Angie runs into someone and is knocked to the ground!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8321"
+        },
+        {
+          "type": "narration",
+          "text": "She hits her elbow on the hard concrete.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8331"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "4",
+          "image": "2034",
+          "text": "Ow!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "8340"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "8346"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "I got a bruise, `and` $Scott's not here.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8358",
+          "text_bbcode": "I got a bruise, [color=#3b78e2][i]and[/i][/color] $Scott's not here."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "There must be some other way to find him... Maybe I can see him in the crowd if I get high enough.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8370"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg7430_1"
+        }
+      ]
+    },
+    "s2": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 2,
+          "offset": "45"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s3",
+          "section_register": {
+            "var": "1001",
+            "value": "2"
+          },
+          "offset": "52"
+        }
+      ]
+    },
+    "s3": {
+      "nodes": [
+        {
+          "type": "call",
+          "routine": "s3_r10",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing!"
+            },
+            1
+          ],
+          "offset": "121"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_enter_v0": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "7",
+          "offset": "7589"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg7430_1"
+        }
+      ]
+    },
+    "s3_r10_b1": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 33,
+          "name": "show_card",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            4000
+          ]
+        },
+        {
+          "type": "yield",
+          "yield": 7,
+          "name": "end_episode",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            {
+              "local": -3
+            }
+          ]
+        },
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s1_bg7430_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "7",
+          "offset": "7589"
+        },
+        {
+          "type": "pov_change",
+          "character": "Angie",
+          "index": "0",
+          "offset": "7614"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "7623"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "7632"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "7641"
+        },
+        {
+          "type": "title_card",
+          "title": "New Year's Connection",
+          "subtitle": "3... 2... 1...",
+          "asset_id": "26006",
+          "flag": "-1",
+          "section_start": true,
+          "offset": "7653"
+        },
+        {
+          "type": "narration",
+          "text": "Happy Holidays! Welcome to a special premium mini-episode of Surviving High School!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7660"
+        },
+        {
+          "type": "narration",
+          "text": "You'll be playing as Angie. Can you help her find $Scott in time for New Year's?",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7667"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "7673"
+        },
+        {
+          "type": "narration",
+          "text": "Find out now!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7683"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1135",
+          "variant": "1",
+          "offset": "7693"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "7700"
+        },
+        {
+          "type": "narration",
+          "text": "It's December 31, and $Scott and Angie are out, celebrating New Year's together.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7710"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "Oh, $Scott, thank you for the wonderful dinner.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7719"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "I didn't even know there was an entire restaurant devoted to people with organizational skills.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7728"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "The way the plates were served perfectly centered on the place mat, and the way the vegetables were in a precise circle around the meat...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7737"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "The second I saw the waiters use rulers to arrange food I knew it was the place for you.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7746"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "It was magical!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7755"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Well, I had to make up for last year when I was being mopey over Hector's party.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7764"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "That's right! I can't believe that was a year ago.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7773"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "It's been a good year...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7782"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "Well, except for that part where Justin blackmailed you into breaking up with me so he could be President.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "7791"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "`That` wasn't good.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "7800",
+          "text_bbcode": "[color=#e23b3b][i]That[/i][/color] wasn't good."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "But here we are now, together. And Justin is President and one of my good friends.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7809"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Yeah, about that...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7818"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "You're not still mad at him, are you? He's done some pretty great things as President. You two could actually get along.",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "7827"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "1",
+          "image": "2031",
+          "text": "Yeah, right. I'll be sure to make `that` one of my New Year's resolutions.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "7836",
+          "text_bbcode": "Yeah, right. I'll be sure to make [color=#3b78e2][i]that[/i][/color] one of my New Year's resolutions."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "As long as it's far below giving your boyfriend a kiss every day.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7845"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "Of course!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7854"
+        },
+        {
+          "type": "narration",
+          "text": "$Scott and Angie kiss.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7864"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "So where are we going now?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7873"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Well, we have thirty minutes until the Ball Drop in Centerscore Square.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7882"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "I thought we'd make our way there early, so that we can find a good spot...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7891"
+        },
+        {
+          "type": "narration",
+          "text": "They walk to the square where people have gathered for the New Year's Ball Drop.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7901"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "Whoa, I'm glad we're here now. It's `really` packed.",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "7910",
+          "text_bbcode": "Whoa, I'm glad we're here now. It's [color=#e23b3b][i]really[/i][/color] packed."
+        },
+        {
+          "type": "narration",
+          "text": "They try to navigate through the thick crowd.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7920"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "Where do you think we should stand?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7929"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "I'm not sure... Maybe somewhere over near that hill?",
+          "character_id": "1",
+          "offset": "7936"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": null,
+          "image": "2030",
+          "text": "Normally, I'd agree, but because of the buildings, our view of the Centerscore Ball might get blocked.",
+          "character_id": "0",
+          "offset": "7943"
+        },
+        {
+          "type": "narration",
+          "text": "She lets go of $Scott's hand to get a better view of the land. She points in another direction.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7953"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "How about on those park benches over there?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7962"
+        },
+        {
+          "type": "narration",
+          "text": "$Scott doesn't reply.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7972"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "4",
+          "image": "2034",
+          "text": "...$Scott?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7981"
+        },
+        {
+          "type": "music",
+          "track_id": "8224",
+          "loop": false,
+          "offset": "7988"
+        },
+        {
+          "type": "narration",
+          "text": "Angie looks back in $Scott's direction, but he's nowhere to be found!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7998"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "4",
+          "image": "2034",
+          "text": "Oh no! $Scott?! Where are you?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "8007"
+        },
+        {
+          "type": "narration",
+          "text": "She walks around in a circle, calling his name. She gets bumped around in the crowd.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8017"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "It's no use... He probably can't hear me above everyone here anyway...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8029"
+        },
+        {
+          "type": "narration",
+          "text": "Angie pulls out her phone and calls $Scott's. It goes straight to his voicemail.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8039"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "He must have turned it off or something.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8051"
+        },
+        {
+          "type": "narration",
+          "text": "Angie wanders back to where she lost $Scott.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8061"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "There's a smart way to find him. If I were $Scott, where would I go if we were separated?",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8073"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "I would go...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8082"
+        },
+        {
+          "type": "choice",
+          "prompt": "I would go...",
+          "options": [
+            {
+              "index": "0",
+              "label": "Back to the restaurant we ate at!",
+              "next": "s1_05_opt0"
+            },
+            {
+              "index": "1",
+              "label": "To the middle of the square!",
+              "next": "s1_06_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "I would go...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after"
+        }
+      ]
+    },
+    "s1_bg7430_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "7441",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "7448",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_bg7430_r"
+        }
+      ]
+    },
+    "s1_bg7430_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg7430_t",
+          "else": "s1_bg7430_r",
+          "offset": "7430",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg7430_r": {
+      "nodes": [
+        {
+          "type": "pov_change",
+          "character": "Angie",
+          "index": "0",
+          "offset": "7614"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "7623"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "7632"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "7641"
+        },
+        {
+          "type": "title_card",
+          "title": "New Year's Connection",
+          "subtitle": "3... 2... 1...",
+          "asset_id": "26006",
+          "flag": "-1",
+          "section_start": true,
+          "offset": "7653"
+        },
+        {
+          "type": "narration",
+          "text": "Happy Holidays! Welcome to a special premium mini-episode of Surviving High School!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7660"
+        },
+        {
+          "type": "narration",
+          "text": "You'll be playing as Angie. Can you help her find $Scott in time for New Year's?",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7667"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "7673"
+        },
+        {
+          "type": "narration",
+          "text": "Find out now!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7683"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1135",
+          "variant": "1",
+          "offset": "7693"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "7700"
+        },
+        {
+          "type": "narration",
+          "text": "It's December 31, and $Scott and Angie are out, celebrating New Year's together.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7710"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "Oh, $Scott, thank you for the wonderful dinner.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7719"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "I didn't even know there was an entire restaurant devoted to people with organizational skills.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7728"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "The way the plates were served perfectly centered on the place mat, and the way the vegetables were in a precise circle around the meat...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7737"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "The second I saw the waiters use rulers to arrange food I knew it was the place for you.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7746"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "It was magical!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7755"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Well, I had to make up for last year when I was being mopey over Hector's party.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7764"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "That's right! I can't believe that was a year ago.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7773"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "It's been a good year...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7782"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "Well, except for that part where Justin blackmailed you into breaking up with me so he could be President.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "7791"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "`That` wasn't good.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "7800",
+          "text_bbcode": "[color=#e23b3b][i]That[/i][/color] wasn't good."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "But here we are now, together. And Justin is President and one of my good friends.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7809"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "Yeah, about that...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7818"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "You're not still mad at him, are you? He's done some pretty great things as President. You two could actually get along.",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "7827"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "1",
+          "image": "2031",
+          "text": "Yeah, right. I'll be sure to make `that` one of my New Year's resolutions.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "7836",
+          "text_bbcode": "Yeah, right. I'll be sure to make [color=#3b78e2][i]that[/i][/color] one of my New Year's resolutions."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "As long as it's far below giving your boyfriend a kiss every day.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7845"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "Of course!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7854"
+        },
+        {
+          "type": "narration",
+          "text": "$Scott and Angie kiss.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7864"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "So where are we going now?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7873"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Well, we have thirty minutes until the Ball Drop in Centerscore Square.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7882"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "I thought we'd make our way there early, so that we can find a good spot...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7891"
+        },
+        {
+          "type": "narration",
+          "text": "They walk to the square where people have gathered for the New Year's Ball Drop.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7901"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "Whoa, I'm glad we're here now. It's `really` packed.",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "7910",
+          "text_bbcode": "Whoa, I'm glad we're here now. It's [color=#e23b3b][i]really[/i][/color] packed."
+        },
+        {
+          "type": "narration",
+          "text": "They try to navigate through the thick crowd.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7920"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "Where do you think we should stand?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7929"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Scott",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "I'm not sure... Maybe somewhere over near that hill?",
+          "character_id": "1",
+          "offset": "7936"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": null,
+          "image": "2030",
+          "text": "Normally, I'd agree, but because of the buildings, our view of the Centerscore Ball might get blocked.",
+          "character_id": "0",
+          "offset": "7943"
+        },
+        {
+          "type": "narration",
+          "text": "She lets go of $Scott's hand to get a better view of the land. She points in another direction.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7953"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "2",
+          "image": "2032",
+          "text": "How about on those park benches over there?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "7962"
+        },
+        {
+          "type": "narration",
+          "text": "$Scott doesn't reply.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7972"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "4",
+          "image": "2034",
+          "text": "...$Scott?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7981"
+        },
+        {
+          "type": "music",
+          "track_id": "8224",
+          "loop": false,
+          "offset": "7988"
+        },
+        {
+          "type": "narration",
+          "text": "Angie looks back in $Scott's direction, but he's nowhere to be found!",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "7998"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "4",
+          "image": "2034",
+          "text": "Oh no! $Scott?! Where are you?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "8007"
+        },
+        {
+          "type": "narration",
+          "text": "She walks around in a circle, calling his name. She gets bumped around in the crowd.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8017"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "It's no use... He probably can't hear me above everyone here anyway...",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8029"
+        },
+        {
+          "type": "narration",
+          "text": "Angie pulls out her phone and calls $Scott's. It goes straight to his voicemail.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8039"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "He must have turned it off or something.",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8051"
+        },
+        {
+          "type": "narration",
+          "text": "Angie wanders back to where she lost $Scott.",
+          "character_id": "7",
+          "expression": "0",
+          "offset": "8061"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "There's a smart way to find him. If I were $Scott, where would I go if we were separated?",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8073"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Angie",
+          "emotion_code": "3",
+          "image": "2033",
+          "text": "I would go...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "8082"
+        },
+        {
+          "type": "choice",
+          "prompt": "I would go...",
+          "options": [
+            {
+              "index": "0",
+              "label": "Back to the restaurant we ate at!",
+              "next": "s1_05_opt0"
+            },
+            {
+              "index": "1",
+              "label": "To the middle of the square!",
+              "next": "s1_06_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "I would go...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after"
+        }
+      ]
+    },
+    "s1_enter_v0_bg7430_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "7441",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "7448",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg7430_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg7430_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg7430_t",
+          "else": "s1_enter_v0_bg7430_r",
+          "offset": "7430",
+          "op": "eq"
+        }
+      ]
+    }
+  },
+  "pack_id": "5000",
+  "episode_id": "2",
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "2030",
+          "name": "Angie",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "26001",
+          "name": "$Scott",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "2465",
+          "name": "Waitress",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "2455",
+          "name": "$Travis",
+          "format": 1
+        },
+        {
+          "id": "4",
+          "art": "2230",
+          "name": "Jane",
+          "format": 1
+        },
+        {
+          "id": "5",
+          "art": "2200",
+          "name": "Hannah",
+          "format": 1
+        },
+        {
+          "id": "6",
+          "art": "2400",
+          "name": "Spike",
+          "format": 1
+        },
+        {
+          "id": "7",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "7",
+        "74": "0"
+      }
+    },
+    "2": {
+      "characters": [],
+      "ui_defaults": {}
+    },
+    "3": {
+      "characters": [],
+      "ui_defaults": {}
+    }
+  },
+  "routines": {
+    "s3_r10": {
+      "entry": "s3_r10_b1",
+      "params": 3,
+      "offset": "81"
+    }
+  },
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0
+    },
+    "set_only": [
+      "1000",
+      "1001"
+    ]
+  },
+  "name_vars": {
+    "$Scott": {
+      "default": "Scott"
+    },
+    "$Travis": {
+      "default": "Travis"
+    },
+    "$ZOE": {
+      "default": "Zoe"
+    }
+  }
+}

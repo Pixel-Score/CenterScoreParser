@@ -1,0 +1,1997 @@
+{
+  "title": "MTX_Gossip_Files",
+  "episode": "Gossip Files",
+  "cast": [
+    "Taylor",
+    "Erik",
+    "Justin"
+  ],
+  "main_characters": [
+    "Erik"
+  ],
+  "genders": {
+    "Erik": "M",
+    "Justin": "M"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1"
+  },
+  "scene_minigame_banks": {
+    "1": {}
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    }
+  },
+  "segments": {
+    "s1_02_opt0": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_02_opt0_bg1852_1"
+        }
+      ]
+    },
+    "s1_03_opt1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_03_opt1_bg1852_1"
+        }
+      ]
+    },
+    "s1_04_opt2": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_04_opt2_bg1852_1"
+        }
+      ]
+    },
+    "s1_05_opt3": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_05_opt3_bg1852_1"
+        }
+      ]
+    },
+    "s1_01_var2000_eq0": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_01_var2000_eq0_bg1852_1"
+        }
+      ]
+    },
+    "s1_08_opt0": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_09_opt1": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_10_opt2": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_11_opt3": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_12_opt4": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_07_var2000_eq1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_07_var2000_eq1_bg1975_1"
+        }
+      ]
+    },
+    "s1_15_opt0": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_16_opt1": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_17_opt2": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_18_opt3": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_19_opt4": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_20_opt5": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_14_var2000_eq2": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_14_var2000_eq2_bg2207_1"
+        }
+      ]
+    },
+    "s1_23_opt0": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_24_opt1": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_25_opt2": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_26_opt3": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_27_opt4": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_28_opt5": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_29_opt6": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_22_var2000_eq3": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_22_var2000_eq3_bg2475_1"
+        }
+      ]
+    },
+    "s1_32_opt0": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_32_opt0_bg2791_1"
+        }
+      ]
+    },
+    "s1_33_opt1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_33_opt1_bg2791_1"
+        }
+      ]
+    },
+    "s1_34_opt2": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_34_opt2_bg2791_1"
+        }
+      ]
+    },
+    "s1_35_opt3": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_35_opt3_bg2791_1"
+        }
+      ]
+    },
+    "s1_31_var2000_eq4": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_31_var2000_eq4_bg2791_1"
+        }
+      ]
+    },
+    "s1_38_opt0": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_39_opt1": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_40_opt2": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_41_opt3": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_37_var2000_eq5": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_37_var2000_eq5_bg2921_1"
+        }
+      ]
+    },
+    "s1_44_opt0": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_45_opt1": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_46_opt2": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_47_opt3": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_48_opt4": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_43_var2000_eq6": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_43_var2000_eq6_bg3117_1"
+        }
+      ]
+    },
+    "s1_51_opt0": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_52_opt1": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_53_opt2": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_54_opt3": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_55_opt4": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_50_var2000_eq7": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_50_var2000_eq7_bg3361_1"
+        }
+      ]
+    },
+    "s1_49_else": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "2001",
+          "expr": {
+            "var": 2000
+          },
+          "offset": "3338"
+        },
+        {
+          "type": "var_set",
+          "var": "2000",
+          "value": 7,
+          "offset": "3347"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "7",
+          "offset": "3361",
+          "then": "s1_50_var2000_eq7"
+        }
+      ]
+    },
+    "s1_42_else": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "2001",
+          "expr": {
+            "var": 2000
+          },
+          "offset": "3094"
+        },
+        {
+          "type": "var_set",
+          "var": "2000",
+          "value": 6,
+          "offset": "3103"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "6",
+          "offset": "3117",
+          "then": "s1_43_var2000_eq6",
+          "else": "s1_49_else"
+        }
+      ]
+    },
+    "s1_36_else": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "2001",
+          "expr": {
+            "var": 2000
+          },
+          "offset": "2898"
+        },
+        {
+          "type": "var_set",
+          "var": "2000",
+          "value": 5,
+          "offset": "2907"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "5",
+          "offset": "2921",
+          "then": "s1_37_var2000_eq5",
+          "else": "s1_42_else"
+        }
+      ]
+    },
+    "s1_30_else": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "2001",
+          "expr": {
+            "var": 2000
+          },
+          "offset": "2768"
+        },
+        {
+          "type": "var_set",
+          "var": "2000",
+          "value": 4,
+          "offset": "2777"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "4",
+          "offset": "2791",
+          "then": "s1_31_var2000_eq4",
+          "else": "s1_36_else"
+        }
+      ]
+    },
+    "s1_21_else": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "2001",
+          "expr": {
+            "var": 2000
+          },
+          "offset": "2452"
+        },
+        {
+          "type": "var_set",
+          "var": "2000",
+          "value": 3,
+          "offset": "2461"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "3",
+          "offset": "2475",
+          "then": "s1_22_var2000_eq3",
+          "else": "s1_30_else"
+        }
+      ]
+    },
+    "s1_13_else": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "2001",
+          "expr": {
+            "var": 2000
+          },
+          "offset": "2184"
+        },
+        {
+          "type": "var_set",
+          "var": "2000",
+          "value": 2,
+          "offset": "2193"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "2",
+          "offset": "2207",
+          "then": "s1_14_var2000_eq2",
+          "else": "s1_21_else"
+        }
+      ]
+    },
+    "s1_06_else": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "2001",
+          "expr": {
+            "var": 2000
+          },
+          "offset": "1956"
+        },
+        {
+          "type": "var_set",
+          "var": "2000",
+          "value": 1,
+          "offset": "1963"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "1",
+          "offset": "1975",
+          "then": "s1_07_var2000_eq1",
+          "else": "s1_13_else"
+        }
+      ]
+    },
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg1476_1"
+        }
+      ]
+    },
+    "s1_enter_v0": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "3",
+          "offset": "1635"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg1476_1"
+        }
+      ]
+    },
+    "s1_02_opt0_bg1852_r": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_06_else"
+        }
+      ]
+    },
+    "s1_02_opt0_bg1852_t": {
+      "nodes": [
+        {
+          "type": "call",
+          "segment": "s1_06_else",
+          "offset": "1897"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_opt0_bg1852_r"
+        }
+      ]
+    },
+    "s1_02_opt0_bg1852_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "0",
+          "then": "s1_02_opt0_bg1852_t",
+          "else": "s1_02_opt0_bg1852_r",
+          "offset": "1852",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_03_opt1_bg1852_r": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_06_else"
+        }
+      ]
+    },
+    "s1_03_opt1_bg1852_t": {
+      "nodes": [
+        {
+          "type": "call",
+          "segment": "s1_13_else",
+          "offset": "1911"
+        },
+        {
+          "type": "next",
+          "next": "s1_03_opt1_bg1852_r"
+        }
+      ]
+    },
+    "s1_03_opt1_bg1852_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "0",
+          "then": "s1_03_opt1_bg1852_t",
+          "else": "s1_03_opt1_bg1852_r",
+          "offset": "1852",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_04_opt2_bg1852_r": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_06_else"
+        }
+      ]
+    },
+    "s1_04_opt2_bg1852_t": {
+      "nodes": [
+        {
+          "type": "call",
+          "segment": "s1_21_else",
+          "offset": "1927"
+        },
+        {
+          "type": "next",
+          "next": "s1_04_opt2_bg1852_r"
+        }
+      ]
+    },
+    "s1_04_opt2_bg1852_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "0",
+          "then": "s1_04_opt2_bg1852_t",
+          "else": "s1_04_opt2_bg1852_r",
+          "offset": "1852",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_05_opt3_bg1852_r": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_05_opt3_bg1852_t": {
+      "nodes": [
+        {
+          "type": "call",
+          "segment": "s1_30_else",
+          "offset": "1934"
+        },
+        {
+          "type": "next",
+          "next": "s1_05_opt3_bg1852_r"
+        }
+      ]
+    },
+    "s1_05_opt3_bg1852_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "0",
+          "then": "s1_05_opt3_bg1852_t",
+          "else": "s1_05_opt3_bg1852_r",
+          "offset": "1852",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_01_var2000_eq0_bg1852_r": {
+      "nodes": [
+        {
+          "type": "choice",
+          "prompt": "Who do you want to know about?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Cheerleaders!",
+              "next": "s1_02_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Nerds!",
+              "next": "s1_03_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Hot Guys!",
+              "next": "s1_04_opt2"
+            },
+            {
+              "index": "3",
+              "label": "More!",
+              "next": "s1_05_opt3"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Who do you want to know about?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          }
+        }
+      ]
+    },
+    "s1_01_var2000_eq0_bg1852_t": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26065",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "1864"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_var2000_eq0_bg1852_r"
+        }
+      ]
+    },
+    "s1_01_var2000_eq0_bg1852_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "0",
+          "then": "s1_01_var2000_eq0_bg1852_t",
+          "else": "s1_01_var2000_eq0_bg1852_r",
+          "offset": "1852",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_07_var2000_eq1_bg1975_r": {
+      "nodes": [
+        {
+          "type": "choice",
+          "prompt": "Which cheerleader?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Amanda.",
+              "next": "s1_08_opt0"
+            },
+            {
+              "index": "1",
+              "label": "The New Girl.",
+              "next": "s1_09_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Nicole.",
+              "next": "s1_10_opt2"
+            },
+            {
+              "index": "3",
+              "label": "Jessica.",
+              "next": "s1_11_opt3"
+            },
+            {
+              "index": "4",
+              "label": "Go Back.",
+              "next": "s1_12_opt4"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Which cheerleader?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          }
+        }
+      ]
+    },
+    "s1_07_var2000_eq1_bg1975_t": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26065",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "1987"
+        },
+        {
+          "type": "next",
+          "next": "s1_07_var2000_eq1_bg1975_r"
+        }
+      ]
+    },
+    "s1_07_var2000_eq1_bg1975_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "1",
+          "then": "s1_07_var2000_eq1_bg1975_t",
+          "else": "s1_07_var2000_eq1_bg1975_r",
+          "offset": "1975",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_14_var2000_eq2_bg2207_r": {
+      "nodes": [
+        {
+          "type": "choice",
+          "prompt": "Which nerd?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Justin.",
+              "next": "s1_15_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Erik.",
+              "next": "s1_16_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Brendan.",
+              "next": "s1_17_opt2"
+            },
+            {
+              "index": "3",
+              "label": "Angie.",
+              "next": "s1_18_opt3"
+            },
+            {
+              "index": "4",
+              "label": "Ben.",
+              "next": "s1_19_opt4"
+            },
+            {
+              "index": "5",
+              "label": "Go Back.",
+              "next": "s1_20_opt5"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Which nerd?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          }
+        }
+      ]
+    },
+    "s1_14_var2000_eq2_bg2207_t": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26065",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "2219"
+        },
+        {
+          "type": "next",
+          "next": "s1_14_var2000_eq2_bg2207_r"
+        }
+      ]
+    },
+    "s1_14_var2000_eq2_bg2207_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "2",
+          "then": "s1_14_var2000_eq2_bg2207_t",
+          "else": "s1_14_var2000_eq2_bg2207_r",
+          "offset": "2207",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_22_var2000_eq3_bg2475_r": {
+      "nodes": [
+        {
+          "type": "choice",
+          "prompt": "Which guy?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Howard.",
+              "next": "s1_23_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Spencer.",
+              "next": "s1_24_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Jacob.",
+              "next": "s1_25_opt2"
+            },
+            {
+              "index": "3",
+              "label": "Colt.",
+              "next": "s1_26_opt3"
+            },
+            {
+              "index": "4",
+              "label": "Hector.",
+              "next": "s1_27_opt4"
+            },
+            {
+              "index": "5",
+              "label": "Scott.",
+              "next": "s1_28_opt5"
+            },
+            {
+              "index": "6",
+              "label": "Go Back",
+              "next": "s1_29_opt6"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Which guy?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          }
+        }
+      ]
+    },
+    "s1_22_var2000_eq3_bg2475_t": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26065",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "2487"
+        },
+        {
+          "type": "next",
+          "next": "s1_22_var2000_eq3_bg2475_r"
+        }
+      ]
+    },
+    "s1_22_var2000_eq3_bg2475_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "3",
+          "then": "s1_22_var2000_eq3_bg2475_t",
+          "else": "s1_22_var2000_eq3_bg2475_r",
+          "offset": "2475",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_32_opt0_bg2791_r": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_36_else"
+        }
+      ]
+    },
+    "s1_32_opt0_bg2791_t": {
+      "nodes": [
+        {
+          "type": "call",
+          "segment": "s1_36_else",
+          "offset": "2836"
+        },
+        {
+          "type": "next",
+          "next": "s1_32_opt0_bg2791_r"
+        }
+      ]
+    },
+    "s1_32_opt0_bg2791_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "4",
+          "then": "s1_32_opt0_bg2791_t",
+          "else": "s1_32_opt0_bg2791_r",
+          "offset": "2791",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_33_opt1_bg2791_r": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_36_else"
+        }
+      ]
+    },
+    "s1_33_opt1_bg2791_t": {
+      "nodes": [
+        {
+          "type": "call",
+          "segment": "s1_42_else",
+          "offset": "2850"
+        },
+        {
+          "type": "next",
+          "next": "s1_33_opt1_bg2791_r"
+        }
+      ]
+    },
+    "s1_33_opt1_bg2791_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "4",
+          "then": "s1_33_opt1_bg2791_t",
+          "else": "s1_33_opt1_bg2791_r",
+          "offset": "2791",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_34_opt2_bg2791_r": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_34_opt2_bg2791_t": {
+      "nodes": [
+        {
+          "type": "call",
+          "segment": "s1_49_else",
+          "offset": "2866"
+        },
+        {
+          "type": "next",
+          "next": "s1_34_opt2_bg2791_r"
+        }
+      ]
+    },
+    "s1_34_opt2_bg2791_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "4",
+          "then": "s1_34_opt2_bg2791_t",
+          "else": "s1_34_opt2_bg2791_r",
+          "offset": "2791",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_35_opt3_bg2791_r": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_35_opt3_bg2791_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "2000",
+          "value": 0,
+          "offset": "2877"
+        },
+        {
+          "type": "next",
+          "next": "s1_35_opt3_bg2791_r"
+        }
+      ]
+    },
+    "s1_35_opt3_bg2791_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "4",
+          "then": "s1_35_opt3_bg2791_t",
+          "else": "s1_35_opt3_bg2791_r",
+          "offset": "2791",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_31_var2000_eq4_bg2791_r": {
+      "nodes": [
+        {
+          "type": "choice",
+          "prompt": "Who else do you want to know about?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Enemies!",
+              "next": "s1_32_opt0"
+            },
+            {
+              "index": "1",
+              "label": "College kids!",
+              "next": "s1_33_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Freaks!",
+              "next": "s1_34_opt2"
+            },
+            {
+              "index": "3",
+              "label": "Go Back!",
+              "next": "s1_35_opt3"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Who else do you want to know about?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          }
+        }
+      ]
+    },
+    "s1_31_var2000_eq4_bg2791_t": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26065",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "2803"
+        },
+        {
+          "type": "next",
+          "next": "s1_31_var2000_eq4_bg2791_r"
+        }
+      ]
+    },
+    "s1_31_var2000_eq4_bg2791_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "4",
+          "then": "s1_31_var2000_eq4_bg2791_t",
+          "else": "s1_31_var2000_eq4_bg2791_r",
+          "offset": "2791",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_37_var2000_eq5_bg2921_r": {
+      "nodes": [
+        {
+          "type": "choice",
+          "prompt": "Which enemy?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Paige.",
+              "next": "s1_38_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Linda.",
+              "next": "s1_39_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Sam.",
+              "next": "s1_40_opt2"
+            },
+            {
+              "index": "3",
+              "label": "Go Back.",
+              "next": "s1_41_opt3"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Which enemy?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          }
+        }
+      ]
+    },
+    "s1_37_var2000_eq5_bg2921_t": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26065",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "2933"
+        },
+        {
+          "type": "next",
+          "next": "s1_37_var2000_eq5_bg2921_r"
+        }
+      ]
+    },
+    "s1_37_var2000_eq5_bg2921_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "5",
+          "then": "s1_37_var2000_eq5_bg2921_t",
+          "else": "s1_37_var2000_eq5_bg2921_r",
+          "offset": "2921",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_43_var2000_eq6_bg3117_r": {
+      "nodes": [
+        {
+          "type": "choice",
+          "prompt": "Which college kid?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Chuck.",
+              "next": "s1_44_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Beth.",
+              "next": "s1_45_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Raven.",
+              "next": "s1_46_opt2"
+            },
+            {
+              "index": "3",
+              "label": "Dinah.",
+              "next": "s1_47_opt3"
+            },
+            {
+              "index": "4",
+              "label": "Go Back.",
+              "next": "s1_48_opt4"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Which college kid?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          }
+        }
+      ]
+    },
+    "s1_43_var2000_eq6_bg3117_t": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26065",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "3129"
+        },
+        {
+          "type": "next",
+          "next": "s1_43_var2000_eq6_bg3117_r"
+        }
+      ]
+    },
+    "s1_43_var2000_eq6_bg3117_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "6",
+          "then": "s1_43_var2000_eq6_bg3117_t",
+          "else": "s1_43_var2000_eq6_bg3117_r",
+          "offset": "3117",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_50_var2000_eq7_bg3361_r": {
+      "nodes": [
+        {
+          "type": "choice",
+          "prompt": "Which freak?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Andy.",
+              "next": "s1_51_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Denni.",
+              "next": "s1_52_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Astrid.",
+              "next": "s1_53_opt2"
+            },
+            {
+              "index": "3",
+              "label": "Sara.",
+              "next": "s1_54_opt3"
+            },
+            {
+              "index": "4",
+              "label": "Go Back.",
+              "next": "s1_55_opt4"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Which freak?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          }
+        }
+      ]
+    },
+    "s1_50_var2000_eq7_bg3361_t": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26065",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "3373"
+        },
+        {
+          "type": "next",
+          "next": "s1_50_var2000_eq7_bg3361_r"
+        }
+      ]
+    },
+    "s1_50_var2000_eq7_bg3361_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "7",
+          "then": "s1_50_var2000_eq7_bg3361_t",
+          "else": "s1_50_var2000_eq7_bg3361_r",
+          "offset": "3361",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_bg1476_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "3",
+          "offset": "1635"
+        },
+        {
+          "type": "pov_change",
+          "character": "Erik",
+          "index": "1",
+          "offset": "1643"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "1652"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "1661"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "1670"
+        },
+        {
+          "type": "title_card",
+          "title": "Taylor's Gossip Files",
+          "subtitle": "Are you ready to find out the secrets of Centerscore High?",
+          "asset_id": "1078",
+          "flag": "-1",
+          "section_start": true,
+          "offset": "1682"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1015",
+          "variant": "1",
+          "offset": "1692"
+        },
+        {
+          "type": "narration",
+          "text": "One night, Erik and Justin are up late. Justin types on his laptop while Erik watches.",
+          "character_id": "3",
+          "expression": "0",
+          "offset": "1699"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": "1",
+          "image": "26061",
+          "text": "I'm not sure we should be doing this...",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "1708"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": null,
+          "image": "26060",
+          "text": "Come on, aren't you curious to see what Taylor knows about everyone?",
+          "character_id": "2",
+          "offset": "1717"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": null,
+          "image": "26060",
+          "text": "I heard she digitized her entire gossip files and burned the actual book to 'keep it safe'...",
+          "character_id": "2",
+          "offset": "1726"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": "2",
+          "image": "26062",
+          "text": "As though there's a computer I couldn't hack into!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "1735"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26055",
+          "text": "But... What if it says something bad about us?",
+          "character_id": "1",
+          "offset": "1742"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": "1",
+          "image": "26061",
+          "text": "I don't care what it says about `us.` I want to know what's really going on at our school!",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "1751",
+          "text_bbcode": "I don't care what it says about [color=#e23b3b][i]us.[/i][/color] I want to know what's really going on at our school!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": "2",
+          "image": "26062",
+          "text": "There! I've got it!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "1760"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26059",
+          "text": "That was fast. You must know a lot about computers.",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "1769"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": null,
+          "image": "26060",
+          "text": "When I was seven, I asked my parents for a puppy. They bought me a laptop.",
+          "character_id": "2",
+          "offset": "1778"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26057",
+          "text": "Did you use it to look up videos of puppies?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "1787"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": "3",
+          "image": "26063",
+          "text": "Every single day.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "1796"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": null,
+          "image": "26060",
+          "text": "Anyway, now that we're in, let's see what Taylor has to say about...",
+          "character_id": "2",
+          "offset": "1805"
+        },
+        {
+          "type": "var_set",
+          "var": "2000",
+          "value": 0,
+          "offset": "1824"
+        },
+        {
+          "type": "var_set",
+          "var": "2001",
+          "value": 0,
+          "offset": "1831"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "0",
+          "offset": "1852",
+          "then": "s1_01_var2000_eq0",
+          "else": "s1_06_else"
+        }
+      ]
+    },
+    "s1_bg1476_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "1487",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "1494",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_bg1476_r"
+        }
+      ]
+    },
+    "s1_bg1476_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg1476_t",
+          "else": "s1_bg1476_r",
+          "offset": "1476",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg1476_r": {
+      "nodes": [
+        {
+          "type": "pov_change",
+          "character": "Erik",
+          "index": "1",
+          "offset": "1643"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "1652"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "1661"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "1670"
+        },
+        {
+          "type": "title_card",
+          "title": "Taylor's Gossip Files",
+          "subtitle": "Are you ready to find out the secrets of Centerscore High?",
+          "asset_id": "1078",
+          "flag": "-1",
+          "section_start": true,
+          "offset": "1682"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1015",
+          "variant": "1",
+          "offset": "1692"
+        },
+        {
+          "type": "narration",
+          "text": "One night, Erik and Justin are up late. Justin types on his laptop while Erik watches.",
+          "character_id": "3",
+          "expression": "0",
+          "offset": "1699"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": "1",
+          "image": "26061",
+          "text": "I'm not sure we should be doing this...",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "1708"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": null,
+          "image": "26060",
+          "text": "Come on, aren't you curious to see what Taylor knows about everyone?",
+          "character_id": "2",
+          "offset": "1717"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": null,
+          "image": "26060",
+          "text": "I heard she digitized her entire gossip files and burned the actual book to 'keep it safe'...",
+          "character_id": "2",
+          "offset": "1726"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": "2",
+          "image": "26062",
+          "text": "As though there's a computer I couldn't hack into!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "1735"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": null,
+          "image": "26055",
+          "text": "But... What if it says something bad about us?",
+          "character_id": "1",
+          "offset": "1742"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": "1",
+          "image": "26061",
+          "text": "I don't care what it says about `us.` I want to know what's really going on at our school!",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "1751",
+          "text_bbcode": "I don't care what it says about [color=#e23b3b][i]us.[/i][/color] I want to know what's really going on at our school!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": "2",
+          "image": "26062",
+          "text": "There! I've got it!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "1760"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "4",
+          "image": "26059",
+          "text": "That was fast. You must know a lot about computers.",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "1769"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": null,
+          "image": "26060",
+          "text": "When I was seven, I asked my parents for a puppy. They bought me a laptop.",
+          "character_id": "2",
+          "offset": "1778"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Erik",
+          "emotion_code": "2",
+          "image": "26057",
+          "text": "Did you use it to look up videos of puppies?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "1787"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": "3",
+          "image": "26063",
+          "text": "Every single day.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "1796"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Justin",
+          "emotion_code": null,
+          "image": "26060",
+          "text": "Anyway, now that we're in, let's see what Taylor has to say about...",
+          "character_id": "2",
+          "offset": "1805"
+        },
+        {
+          "type": "var_set",
+          "var": "2000",
+          "value": 0,
+          "offset": "1824"
+        },
+        {
+          "type": "var_set",
+          "var": "2001",
+          "value": 0,
+          "offset": "1831"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "0",
+          "offset": "1852",
+          "then": "s1_01_var2000_eq0",
+          "else": "s1_06_else"
+        }
+      ]
+    },
+    "s1_enter_v0_bg1476_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "1487",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "1494",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg1476_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg1476_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg1476_t",
+          "else": "s1_enter_v0_bg1476_r",
+          "offset": "1476",
+          "op": "eq"
+        }
+      ]
+    }
+  },
+  "pack_id": "100",
+  "episode_id": "101",
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "2425",
+          "name": "Taylor",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "26055",
+          "name": "Erik",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "26060",
+          "name": "Justin",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "3",
+        "74": "1"
+      }
+    }
+  },
+  "routines": {},
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0,
+      "2000": 0,
+      "2001": 0
+    },
+    "set_only": [
+      "1000",
+      "1001",
+      "2000",
+      "2001"
+    ]
+  },
+  "name_vars": {
+    "$Scott": {
+      "default": "Scott"
+    },
+    "$Travis": {
+      "default": "Travis"
+    },
+    "$ZOE": {
+      "default": "Zoe"
+    }
+  }
+}

@@ -1,0 +1,2446 @@
+{
+  "title": "MTX_Dr_Pepper_3",
+  "episode": "A Tom Prince New Year's Eve",
+  "cast": [
+    "Tom",
+    "Kim",
+    "Bear",
+    "Waitress",
+    "Porscha",
+    "Jeeves"
+  ],
+  "main_characters": [
+    "Tom"
+  ],
+  "genders": {
+    "Tom": "M",
+    "Kim": "F",
+    "Waitress": "F",
+    "Porscha": "F",
+    "Jeeves": "M"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1",
+    "2": "s2",
+    "3": "s3"
+  },
+  "scene_minigame_banks": {
+    "1": {},
+    "2": {},
+    "3": {}
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "checkpoints": {
+        "sets": [],
+        "replays": [
+          {
+            "offset": "9545",
+            "target": "9457"
+          }
+        ]
+      },
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    },
+    "2": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "1",
+      "valid_values": [
+        "1"
+      ],
+      "cases": [
+        {
+          "value": "1",
+          "key": "2"
+        }
+      ]
+    },
+    "3": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "2",
+      "valid_values": [
+        "2"
+      ],
+      "cases": [
+        {
+          "value": "2",
+          "key": "2"
+        }
+      ]
+    }
+  },
+  "segments": {
+    "s1_03_after": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 1,
+          "offset": "11217"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s2",
+          "section_register": {
+            "var": "1001",
+            "value": "1"
+          },
+          "offset": "11224"
+        }
+      ]
+    },
+    "s1_04_opt0": {
+      "nodes": [
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "10771"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "New Year's Eve in Las Vegas? Wow, this really is over the top!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "10780"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1096",
+          "variant": "1",
+          "offset": "10790"
+        },
+        {
+          "type": "narration",
+          "text": "And so, a short plane-ride later... Kim and Tom are in the fanciest restaurant in Las Vegas!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10800"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "More oysters? The shells are plated with gold!",
+          "character_id": "0",
+          "offset": "10807"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "I'm still trying to decide whether I want the truffle gnocchi or the lobster bisque.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10816"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "10822"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Order them both!",
+          "character_id": "0",
+          "offset": "10829"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1012",
+          "variant": "1",
+          "offset": "10839"
+        },
+        {
+          "type": "narration",
+          "text": "And later on a secluded man-made beach at one of the Las Vegas resorts...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10849"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I rented out this part of the beach for tonight.",
+          "character_id": "0",
+          "offset": "10856"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Is that why Jeeves is fending off those tourists?",
+          "character_id": "1",
+          "offset": "10863"
+        },
+        {
+          "type": "narration",
+          "text": "Nearby, Jeeves fends a tourist off with a cane.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10873"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jeeves",
+          "emotion_code": null,
+          "image": "26006",
+          "text": "And stay out, plebeian!",
+          "character_id": "5",
+          "offset": "10882"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Exactly. But we'll leave the beach to them soon enough... I just wanted to bring you here for dessert.",
+          "character_id": "0",
+          "offset": "10889"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "For dessert? What kind of dessert are we having?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "10898"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "Have you ever had fresh pineapple skewers with coconut shavings? I had some flown in from Fiji.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10907"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "This is the best thing I've ever eaten in my life! I'm going to have to start baking with more pineapple...",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "10916"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "10922"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "I'm so glad you like it.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10931"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26022",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "10943"
+        },
+        {
+          "type": "narration",
+          "text": "And at midnight...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10953"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "Tom, this has been the most magical night of my life.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10962"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "So you think you could get used to living like this?",
+          "character_id": "0",
+          "offset": "10969"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "I mean, I don't need this `every` day, but once in a while, I guess it's nice to let you plan a date `your` way.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10978",
+          "text_bbcode": "I mean, I don't need this [color=#3b78e2][i]every[/i][/color] day, but once in a while, I guess it's nice to let you plan a date [color=#3b78e2][i]your[/i][/color] way."
+        },
+        {
+          "type": "narration",
+          "text": "Kim pulls Tom close and gives him a kiss!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10988"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10997"
+        },
+        {
+          "type": "narration",
+          "text": "Congratulations! You helped Tom take Kim out on the best New Year's Eve date ever!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "11007"
+        },
+        {
+          "type": "narration",
+          "text": "That's all for this mini-episode! See you next time and happy holidays!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "11017"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 1,
+          "offset": "11217"
+        },
+        {
+          "type": "return",
+          "offset": "11020"
+        }
+      ]
+    },
+    "s1_05_opt1": {
+      "nodes": [
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "11026"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Wow! You really are pulling out all the stops!",
+          "character_id": "1",
+          "offset": "11033"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1096",
+          "variant": "1",
+          "offset": "11043"
+        },
+        {
+          "type": "narration",
+          "text": "And so, a very long plane-ride later...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "11053"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "3",
+          "image": "2253",
+          "text": "Yawn... This place is... Yawn... So fancy.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "11062"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "Yawn... Sorry, Kim, I forgot how `long` it takes to get to France...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "11071",
+          "text_bbcode": "Yawn... Sorry, Kim, I forgot how [color=#e23b3b][i]long[/i][/color] it takes to get to France..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "It's okay... But... Tom, I've been studying this menu for twenty minutes, and I don't even know what most of these things on the menu are...",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "11080"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "Is this written in French?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "11089"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Of course. It wouldn't be a very good French restaurant if the menu was in English.",
+          "character_id": "0",
+          "offset": "11096"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Waitress",
+          "emotion_code": null,
+          "image": "2465",
+          "text": "Good evening! Are you two ready to order?",
+          "character_id": "3",
+          "offset": "11105"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "3",
+          "image": "2253",
+          "text": "Um...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "11114"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Waitress",
+          "emotion_code": null,
+          "image": "2465",
+          "text": "Would you like a few more minutes? I can come back.",
+          "character_id": "3",
+          "offset": "11123"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "3",
+          "image": "2253",
+          "text": "No, no. We should order. By the time you get back, I might be asleep.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "11132"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "And besides, I want to make sure we're able to watch the ball drop at midnight.",
+          "character_id": "1",
+          "offset": "11139"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Waitress",
+          "emotion_code": "4",
+          "image": "2469",
+          "text": "Midnight? But it's 5 o'clock!",
+          "character_id": "3",
+          "expression": "4",
+          "offset": "11148"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "How is that possible?!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "11157"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "Er...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "11166"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "3",
+          "image": "2253",
+          "text": "What's wrong?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "11175"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I... Made a slight miscalculation... And we were in the air when the ball dropped.",
+          "character_id": "0",
+          "offset": "11182"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "What?!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "11191"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "Sorry, Kim... We missed ringing in the new year.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "11200"
+        },
+        {
+          "type": "narration",
+          "text": "Oh no! Tom ruined Kim's new year! Try again and see if you can get the good ending!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "11210"
+        },
+        {
+          "type": "next",
+          "next": "s1_03_after"
+        }
+      ]
+    },
+    "s1_02_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "Airport?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "10721"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "What kind of a second-rate date are you expecting? How could we leave town without the jet?",
+          "character_id": "0",
+          "offset": "10728"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Where are we going?",
+          "character_id": "1",
+          "offset": "10735"
+        },
+        {
+          "type": "choice",
+          "prompt": "Where are we going?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Las Vegas.",
+              "next": "s1_04_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Paris, France.",
+              "next": "s1_05_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Where are we going?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_03_after"
+        }
+      ]
+    },
+    "s1_06_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "A mariachi band?!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "10420"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "They're going to serenade us while we journey to dinner.",
+          "character_id": "0",
+          "offset": "10427"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1042",
+          "variant": "1",
+          "offset": "10437"
+        },
+        {
+          "type": "music",
+          "track_id": "8221",
+          "loop": false,
+          "offset": "10444"
+        },
+        {
+          "type": "narration",
+          "text": "Kim and Tom climb into the limo as the band begins to play.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10454"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "This date is already great!",
+          "character_id": "1",
+          "offset": "10461"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "What? I can't hear you over the band!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "10470"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "3",
+          "image": "2253",
+          "text": "I said this `date` is `great!`",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "10479",
+          "text_bbcode": "I said this [color=#3b78e2][i]date[/i][/color] is [color=#3b78e2][i]great![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "You `already ate?` But we're going to `dinner!`",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "10488",
+          "text_bbcode": "You [color=#e23b3b][i]already ate?[/i][/color] But we're going to [color=#e23b3b][i]dinner![/i][/color]"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "10494"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "I know, it `is` a real `winner!`",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10503",
+          "text_bbcode": "I know, it [color=#3b78e2][i]is[/i][/color] a real [color=#3b78e2][i]winner![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "And so, a few minutes later...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10513"
+        },
+        {
+          "type": "narration",
+          "text": "As the limo pulls up to the restaurant, the band stops playing, and Tom nearly shouts his last sentence...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10523"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "And that's the moment I knew I was really falling for you.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10532"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "3",
+          "image": "2253",
+          "text": "Huh? What are you talking about? I thought you were telling me an anecdote about your time in Argentina...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "10541"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "I was pouring out my heart to you!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "10550"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "10556"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "Maybe this mariachi band at such close proximity was a bad idea...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "10565"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "3",
+          "image": "2253",
+          "text": "It was very sweet!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "10574"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Well, don't worry. There's no way dinner could possibly go wrong. Ah, I believe we're at the airport now...",
+          "character_id": "0",
+          "offset": "10581"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_07_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "Tom! I've never seen so many roses! This is amazing!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "10593"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1042",
+          "variant": "1",
+          "offset": "10603"
+        },
+        {
+          "type": "music",
+          "track_id": "8221",
+          "loop": false,
+          "offset": "10610"
+        },
+        {
+          "type": "narration",
+          "text": "Kim dives into the back seat of the limo, and Tom follows her.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10620"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "Two thousand and twelve red roses to ring in the new year... That's so romantic!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10629"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Well, there are two thousand and eleven red roses...",
+          "character_id": "0",
+          "offset": "10636"
+        },
+        {
+          "type": "narration",
+          "text": "Tom pulls a single white rose from the bunch.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10646"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "And one white... For this last year that we've spent together.",
+          "character_id": "0",
+          "offset": "10653"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "Tom... That's... So sweet...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10662"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "10668"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "I'm glad you like it.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10677"
+        },
+        {
+          "type": "narration",
+          "text": "Kim takes the rose and kisses Tom!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10687"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10696"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Hey, the limo's stopping.",
+          "character_id": "1",
+          "offset": "10703"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "We must be at the airport. Come, my lady. The rest of our evening awaits!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10712"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_01_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "For our New Year's Eve together three years ago, Tom hired a helicopter to hover above Times Square while we watched the ball drop!",
+          "character_id": "4",
+          "offset": "10040"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "Are you telling me that can't compare to a day spent churning out sweets for my New Year's Eve party?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10049"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "1",
+          "image": "2251",
+          "text": "Actually, about that...",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "10058"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "1",
+          "image": "2251",
+          "text": "You make a good point. You know what? We won't be taking any more orders for the holidays.",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "10067"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "Oh?",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "10076"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "We're going to be closed. Tom's taking me on an extravagant date.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10085"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "I am?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10094"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Yes. Pull out all the stops.",
+          "character_id": "1",
+          "offset": "10101"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "3",
+          "image": "26004",
+          "text": "But... I was planning to order three hundred gingerbread houses!",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "10110"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "Sorry, I'll be too busy indulging to bake.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10119"
+        },
+        {
+          "type": "narration",
+          "text": "Porscha leaves in a huff.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10129"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "Did you really mean it? I can take you out on a `real` date?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10138",
+          "text_bbcode": "Did you really mean it? I can take you out on a [color=#e23b3b][i]real[/i][/color] date?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "You know, I'm up for giving it a try.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10147"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "Excellent! Leave all the planning to me. I'll pick you up at eight on New Year's Eve!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10156"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Great! Um... But first, we've got some cookies to get out of the oven...",
+          "character_id": "1",
+          "offset": "10163"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "10169"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Right!",
+          "character_id": "0",
+          "offset": "10176"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1021",
+          "variant": "2",
+          "offset": "10188"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": false,
+          "offset": "10195"
+        },
+        {
+          "type": "narration",
+          "text": "And so, on New Year's Eve...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10205"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Everything has to be perfect today, Jeeves. I can't disappoint Kim.",
+          "character_id": "0",
+          "offset": "10212"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jeeves",
+          "emotion_code": null,
+          "image": "26006",
+          "text": "All is in order, young master. Why, I do believe this will be your finest hour.",
+          "character_id": "5",
+          "offset": "10221"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I hope so.",
+          "character_id": "0",
+          "offset": "10228"
+        },
+        {
+          "type": "narration",
+          "text": "Jeeves' phone beeps. He looks down at it.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10238"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jeeves",
+          "emotion_code": null,
+          "image": "26006",
+          "text": "Ah, very good. The limo has arrived.",
+          "character_id": "5",
+          "offset": "10247"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I guess it's time to start this night off.",
+          "character_id": "0",
+          "offset": "10254"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "10260"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Jeeves",
+          "emotion_code": null,
+          "image": "26006",
+          "text": "Good luck, sir.",
+          "character_id": "5",
+          "offset": "10269"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1057",
+          "variant": "1",
+          "offset": "10279"
+        },
+        {
+          "type": "narration",
+          "text": "A few minutes later, Tom steps out of his limo and runs up to Kim's door.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10289"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8004",
+          "offset": "10295"
+        },
+        {
+          "type": "narration",
+          "text": "Tom rings the bell, and Kim throws open the door.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10305"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "Tom! Happy New Year's Eve!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10314"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "Are you ready for the most extravagant night of your life?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10323"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "Yes!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10332"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Great. Your limo awaits!",
+          "character_id": "0",
+          "offset": "10339"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "A limo! So fancy!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10348"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "And that's not all. Just wait till you see what's inside...",
+          "character_id": "0",
+          "offset": "10355"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "What is it?",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10364"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Just a little something I set up earlier.",
+          "character_id": "0",
+          "offset": "10371"
+        },
+        {
+          "type": "narration",
+          "text": "Tom leads Kim to the limo and throws open the door!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "10381"
+        },
+        {
+          "type": "choice",
+          "prompt": "What's waiting in the limo?",
+          "options": [
+            {
+              "index": "0",
+              "label": "A mariachi band.",
+              "next": "s1_06_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Two thousand and twelve long stem roses.",
+              "next": "s1_07_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "What's waiting in the limo?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_02_after"
+        }
+      ]
+    },
+    "s1_08_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "She's... Not... Impressed... By... Money?",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "9904"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Kim, I thought if I told you about all the extravagant dates I'm capable of planning, you'd only scold me for not giving more money to impoverished orphans.",
+          "character_id": "0",
+          "offset": "9911"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "9917"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "That's true...",
+          "character_id": "1",
+          "offset": "9924"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "Not... Impressed... By... Money?",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "9933"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Are you okay, Porscha?",
+          "character_id": "1",
+          "offset": "9940"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "I simply can't believe it. You mean to tell me that you have no interest in a typical Tom Prince date?",
+          "character_id": "4",
+          "offset": "9949"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "Do you even realize what you're missing?",
+          "character_id": "4",
+          "offset": "9958"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1_09_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "A terrible time? You said you'd never had more fun in your entire life! Why... I think I have some pictures right here.",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "9970"
+        },
+        {
+          "type": "narration",
+          "text": "Porscha flips open her phone and goes to an old photo album.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9980"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "Here's a picture of us kissing at the top of the Eiffel tower... And here's one of us shopping for diamond bracelets for my birthday!",
+          "character_id": "4",
+          "offset": "9989"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "9995"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "1",
+          "image": "2251",
+          "text": "I don't know, Tom, you look pretty happy.",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "10004"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "And here's the article where the London news covered Tom's purchase of a horse and buggy for me.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10013"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "1",
+          "image": "2251",
+          "text": "'Tom Prince tipped his hat to this reporter and said, 'I'm having a wonderful time and this is so meaningful to me.' Then he rode off with his beloved globetrotting girlfriend.'",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "10022"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "And that's nothing compared to how Tom would take me out when we had a real reason to celebrate.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10031"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg9378_1"
+        }
+      ]
+    },
+    "s2": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 2,
+          "offset": "45"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s3",
+          "section_register": {
+            "var": "1001",
+            "value": "2"
+          },
+          "offset": "52"
+        }
+      ]
+    },
+    "s3": {
+      "nodes": [
+        {
+          "type": "call",
+          "routine": "s3_r10",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing!"
+            },
+            1
+          ],
+          "offset": "121"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_enter_v0": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "6",
+          "offset": "9537"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg9378_1"
+        }
+      ]
+    },
+    "s3_r10_b1": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 33,
+          "name": "show_card",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            4000
+          ]
+        },
+        {
+          "type": "yield",
+          "yield": 7,
+          "name": "end_episode",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            {
+              "local": -3
+            }
+          ]
+        },
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s1_bg9378_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "6",
+          "offset": "9537"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26016",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "9568"
+        },
+        {
+          "type": "pov_change",
+          "character": "Tom",
+          "index": "0",
+          "offset": "9572"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "9581"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "9590"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "9599"
+        },
+        {
+          "type": "title_card",
+          "title": "A Tom Prince New Year's Eve",
+          "subtitle": "Because New Year's Eve comes but once a year...",
+          "asset_id": "26022",
+          "flag": "-1",
+          "section_start": true,
+          "offset": "9611"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "9618"
+        },
+        {
+          "type": "narration",
+          "text": "Happy Holidays! Welcome to a special premium mini-episode of Surviving High School!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9625"
+        },
+        {
+          "type": "narration",
+          "text": "For this mini-episode, we're going to see what happens on New Year's Eve when Tom Prince takes his girlfriend, Kim, out for a night of extravagance!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9632"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1093",
+          "variant": "0",
+          "offset": "9642"
+        },
+        {
+          "type": "narration",
+          "text": "But first, you might be wondering why Kim decided to go against her usual practical nature and indulge. So, this story begins at the bakery where Kim works...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9652"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Tom, could you give me a hand with this tray of gingerbread cookies?",
+          "character_id": "1",
+          "offset": "9659"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "But of course.",
+          "character_id": "0",
+          "offset": "9666"
+        },
+        {
+          "type": "narration",
+          "text": "Tom sweeps the tray out of Kim's hands and delivers it to the oven.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9676"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "Thanks. I really appreciate all of your help.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9685"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I know how busy the holidays are for you. Besides, I'd rather be toiling away in a bakery with you than relaxing on even my finest yacht without you.",
+          "character_id": "0",
+          "offset": "9692"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "That's very sweet of you.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9701"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Of course, if I could convince you to take a few days off and `join` me on a yacht...",
+          "character_id": "0",
+          "offset": "9708",
+          "text_bbcode": "Of course, if I could convince you to take a few days off and [color=#e23b3b][i]join[/i][/color] me on a yacht..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "3",
+          "image": "2253",
+          "text": "Tom, you know I'm not some rich girl who wants weekends in the Bahamas. All that stuff makes me feel a little uncomfortable.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "9717"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "I know... But if you ever want to give it a chance, I can promise you that luxury is very easy to get used to.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "9726"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Tom... I can't. I have to be here. What would my wonderful clients do if the bakery shut down for the holidays?",
+          "character_id": "1",
+          "offset": "9733"
+        },
+        {
+          "type": "narration",
+          "text": "The bell above the door chimes as a new customer walks in.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9743"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "What a quaint bakery! Ahem, I'm here to place an order for the holidays and...",
+          "character_id": "4",
+          "offset": "9752"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "Tom? Tom Prince? Is that you?",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "9761"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Hello, Porscha.",
+          "character_id": "0",
+          "offset": "9768"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "An apron... Flour on your hands... This... Tom, this looks like manual labor.",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "9777"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "1",
+          "image": "2251",
+          "text": "There's nothing wrong with manual labor.",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "9786"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Porscha, this is my girlfriend, Kim. She owns this bakery, and I'm helping her out for the holidays.",
+          "character_id": "0",
+          "offset": "9793"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "I see. So this... This is what you `do` now. Amazing. I never would have guessed you'd be reduced to... This.",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "9802",
+          "text_bbcode": "I see. So this... This is what you [color=#3b78e2][i]do[/i][/color] now. Amazing. I never would have guessed you'd be reduced to... This."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "1",
+          "image": "2251",
+          "text": "What's that supposed to mean?",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "9811"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "My, my. I only mean that the last time Tom Prince took `me` out on a date, it was a little bit different.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9820",
+          "text_bbcode": "My, my. I only mean that the last time Tom Prince took [color=#3b78e2][i]me[/i][/color] out on a date, it was a little bit different."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "You two... Dated?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "9829"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "Tom never mentioned it? Well, I'm sure our time together must pale in comparison to your little scullery dates.",
+          "character_id": "4",
+          "offset": "9838"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "I mean, jetting to Paris for crepes and London for high tea, taking weekend expeditions to find the rarest and most exotic birds for my personal aviary...",
+          "character_id": "4",
+          "offset": "9847"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "1",
+          "image": "2251",
+          "text": "It `is` hard to believe Tom never mentioned `any` of this...",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "9856",
+          "text_bbcode": "It [color=#3b78e2][i]is[/i][/color] hard to believe Tom never mentioned [color=#3b78e2][i]any[/i][/color] of this..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "That's only because...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "9865"
+        },
+        {
+          "type": "choice",
+          "prompt": "That's only because...",
+          "options": [
+            {
+              "index": "0",
+              "label": "You aren't impressed by money.",
+              "next": "s1_08_opt0"
+            },
+            {
+              "index": "1",
+              "label": "I had a terrible time and it meant nothing to me.",
+              "next": "s1_09_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "That's only because...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after"
+        }
+      ]
+    },
+    "s1_bg9378_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "9389"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "9396"
+        },
+        {
+          "type": "next",
+          "next": "s1_bg9378_r"
+        }
+      ]
+    },
+    "s1_bg9378_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg9378_t",
+          "else": "s1_bg9378_r",
+          "offset": "9378",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg9378_r": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26016",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "9568"
+        },
+        {
+          "type": "pov_change",
+          "character": "Tom",
+          "index": "0",
+          "offset": "9572"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "9581"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "9590"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "9599"
+        },
+        {
+          "type": "title_card",
+          "title": "A Tom Prince New Year's Eve",
+          "subtitle": "Because New Year's Eve comes but once a year...",
+          "asset_id": "26022",
+          "flag": "-1",
+          "section_start": true,
+          "offset": "9611"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "9618"
+        },
+        {
+          "type": "narration",
+          "text": "Happy Holidays! Welcome to a special premium mini-episode of Surviving High School!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9625"
+        },
+        {
+          "type": "narration",
+          "text": "For this mini-episode, we're going to see what happens on New Year's Eve when Tom Prince takes his girlfriend, Kim, out for a night of extravagance!",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9632"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1093",
+          "variant": "0",
+          "offset": "9642"
+        },
+        {
+          "type": "narration",
+          "text": "But first, you might be wondering why Kim decided to go against her usual practical nature and indulge. So, this story begins at the bakery where Kim works...",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9652"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Tom, could you give me a hand with this tray of gingerbread cookies?",
+          "character_id": "1",
+          "offset": "9659"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "But of course.",
+          "character_id": "0",
+          "offset": "9666"
+        },
+        {
+          "type": "narration",
+          "text": "Tom sweeps the tray out of Kim's hands and delivers it to the oven.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9676"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "Thanks. I really appreciate all of your help.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9685"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I know how busy the holidays are for you. Besides, I'd rather be toiling away in a bakery with you than relaxing on even my finest yacht without you.",
+          "character_id": "0",
+          "offset": "9692"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "2",
+          "image": "2252",
+          "text": "That's very sweet of you.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9701"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Of course, if I could convince you to take a few days off and `join` me on a yacht...",
+          "character_id": "0",
+          "offset": "9708",
+          "text_bbcode": "Of course, if I could convince you to take a few days off and [color=#e23b3b][i]join[/i][/color] me on a yacht..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "3",
+          "image": "2253",
+          "text": "Tom, you know I'm not some rich girl who wants weekends in the Bahamas. All that stuff makes me feel a little uncomfortable.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "9717"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "I know... But if you ever want to give it a chance, I can promise you that luxury is very easy to get used to.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "9726"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": null,
+          "image": "2250",
+          "text": "Tom... I can't. I have to be here. What would my wonderful clients do if the bakery shut down for the holidays?",
+          "character_id": "1",
+          "offset": "9733"
+        },
+        {
+          "type": "narration",
+          "text": "The bell above the door chimes as a new customer walks in.",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "9743"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "What a quaint bakery! Ahem, I'm here to place an order for the holidays and...",
+          "character_id": "4",
+          "offset": "9752"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "Tom? Tom Prince? Is that you?",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "9761"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Hello, Porscha.",
+          "character_id": "0",
+          "offset": "9768"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "An apron... Flour on your hands... This... Tom, this looks like manual labor.",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "9777"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "1",
+          "image": "2251",
+          "text": "There's nothing wrong with manual labor.",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "9786"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Porscha, this is my girlfriend, Kim. She owns this bakery, and I'm helping her out for the holidays.",
+          "character_id": "0",
+          "offset": "9793"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "4",
+          "image": "26005",
+          "text": "I see. So this... This is what you `do` now. Amazing. I never would have guessed you'd be reduced to... This.",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "9802",
+          "text_bbcode": "I see. So this... This is what you [color=#3b78e2][i]do[/i][/color] now. Amazing. I never would have guessed you'd be reduced to... This."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "1",
+          "image": "2251",
+          "text": "What's that supposed to mean?",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "9811"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": "2",
+          "image": "26003",
+          "text": "My, my. I only mean that the last time Tom Prince took `me` out on a date, it was a little bit different.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9820",
+          "text_bbcode": "My, my. I only mean that the last time Tom Prince took [color=#3b78e2][i]me[/i][/color] out on a date, it was a little bit different."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "4",
+          "image": "2254",
+          "text": "You two... Dated?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "9829"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "Tom never mentioned it? Well, I'm sure our time together must pale in comparison to your little scullery dates.",
+          "character_id": "4",
+          "offset": "9838"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Porscha",
+          "emotion_code": null,
+          "image": "26001",
+          "text": "I mean, jetting to Paris for crepes and London for high tea, taking weekend expeditions to find the rarest and most exotic birds for my personal aviary...",
+          "character_id": "4",
+          "offset": "9847"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kim",
+          "emotion_code": "1",
+          "image": "2251",
+          "text": "It `is` hard to believe Tom never mentioned `any` of this...",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "9856",
+          "text_bbcode": "It [color=#3b78e2][i]is[/i][/color] hard to believe Tom never mentioned [color=#3b78e2][i]any[/i][/color] of this..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "That's only because...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "9865"
+        },
+        {
+          "type": "choice",
+          "prompt": "That's only because...",
+          "options": [
+            {
+              "index": "0",
+              "label": "You aren't impressed by money.",
+              "next": "s1_08_opt0"
+            },
+            {
+              "index": "1",
+              "label": "I had a terrible time and it meant nothing to me.",
+              "next": "s1_09_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "That's only because...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after"
+        }
+      ]
+    },
+    "s1_enter_v0_bg9378_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "9389"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "9396"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg9378_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg9378_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg9378_t",
+          "else": "s1_enter_v0_bg9378_r",
+          "offset": "9378",
+          "op": "eq"
+        }
+      ]
+    }
+  },
+  "pack_id": "5000",
+  "episode_id": "3",
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "2450",
+          "name": "Tom",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "2250",
+          "name": "Kim",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "26011",
+          "name": "Bear",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "2465",
+          "name": "Waitress",
+          "format": 1
+        },
+        {
+          "id": "4",
+          "art": "26001",
+          "name": "Porscha",
+          "format": 1
+        },
+        {
+          "id": "5",
+          "art": "26006",
+          "name": "Jeeves",
+          "format": 1
+        },
+        {
+          "id": "6",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "6",
+        "74": "0"
+      }
+    },
+    "2": {
+      "characters": [],
+      "ui_defaults": {}
+    },
+    "3": {
+      "characters": [],
+      "ui_defaults": {}
+    }
+  },
+  "routines": {
+    "s3_r10": {
+      "entry": "s3_r10_b1",
+      "params": 3,
+      "offset": "81"
+    }
+  },
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0
+    },
+    "set_only": [
+      "1000",
+      "1001"
+    ]
+  },
+  "name_vars": {
+    "$Scott": {
+      "default": "Scott"
+    },
+    "$Travis": {
+      "default": "Travis"
+    },
+    "$ZOE": {
+      "default": "Zoe"
+    }
+  }
+}

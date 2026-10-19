@@ -1,0 +1,3338 @@
+{
+  "title": "MTX_Dr_Pepper_1",
+  "episode": "The Mistletoe Match",
+  "cast": [
+    "Howard",
+    "Zoe",
+    "Hector",
+    "Amanda",
+    "Clerk"
+  ],
+  "main_characters": [
+    "Hector"
+  ],
+  "genders": {
+    "Howard": "M",
+    "Zoe": "F",
+    "Hector": "M",
+    "Amanda": "F",
+    "Clerk": "M"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1",
+    "2": "s2",
+    "3": "s3"
+  },
+  "scene_minigame_banks": {
+    "1": {},
+    "2": {},
+    "3": {}
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "checkpoints": {
+        "sets": [],
+        "replays": [
+          {
+            "offset": "9411",
+            "target": "9337"
+          }
+        ]
+      },
+      "timed_choices": {
+        "10067": {
+          "timer_ms": "8000",
+          "labels": [
+            "Cupcakes.",
+            "Tiramisu.",
+            "Candy."
+          ],
+          "timeout_offset": "10236"
+        },
+        "10454": {
+          "timer_ms": "8000",
+          "labels": [
+            "In Europe.",
+            "At Russian New Year.",
+            "During the Crosstown Races."
+          ],
+          "timeout_offset": "10679"
+        },
+        "10960": {
+          "timer_ms": "8000",
+          "labels": [
+            "Clothes.",
+            "Losing me.",
+            "Fractions."
+          ],
+          "timeout_offset": "11129"
+        }
+      },
+      "bindings": [
+        {
+          "value": null,
+          "section_offset": "10242",
+          "enter_at_section": true
+        },
+        {
+          "value": null,
+          "section_offset": "10685",
+          "enter_at_section": true
+        },
+        {
+          "value": null,
+          "section_offset": "11135",
+          "enter_at_section": true
+        }
+      ],
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    },
+    "2": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "1",
+      "valid_values": [
+        "1"
+      ],
+      "cases": [
+        {
+          "value": "1",
+          "key": "2"
+        }
+      ]
+    },
+    "3": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "2",
+      "valid_values": [
+        "2"
+      ],
+      "cases": [
+        {
+          "value": "2",
+          "key": "2"
+        }
+      ]
+    }
+  },
+  "segments": {
+    "s1_03_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "It's time to announce the winners...",
+          "character_id": "4",
+          "offset": "11168"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Hector and Amanda, you have successfully answered more questions correctly than Howard and $ZOE!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "11187"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Congratulations! You've won the Mistletoe Match Game!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "11196"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Please step forward and claim your prize!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "11205"
+        },
+        {
+          "type": "narration",
+          "text": "Hector takes the bracelet from the man.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11215"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "Bye! Thanks for playing! Congratulations again!",
+          "character_id": "4",
+          "offset": "11224"
+        },
+        {
+          "type": "narration",
+          "text": "The couples turn to one another.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11234"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "3",
+          "image": "2213",
+          "text": "Oh well.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "11243"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Good game, man.",
+          "character_id": "0",
+          "offset": "11250"
+        },
+        {
+          "type": "narration",
+          "text": "Hector and Howard shake hands while the girls hug.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11260"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "2",
+          "image": "26002",
+          "text": "You two deserve it. Merry Christmas you guys!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "11269"
+        },
+        {
+          "type": "narration",
+          "text": "Howard and $ZOE leave the store and head for the cafe nearby.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11279"
+        },
+        {
+          "type": "music",
+          "track_id": "8210",
+          "loop": false,
+          "offset": "11286"
+        },
+        {
+          "type": "narration",
+          "text": "In the store, Hector fastens the bracelet on Amanda's wrist.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11296"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Oh, Hector, I absolutely love it! The horn on the unicorn even sparkles!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "11305"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "I'm glad you like it.",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "11314"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "We really have been through a lot, haven't we?",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "11323"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Yes... And I'm looking forward to going through so much more...",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "11332"
+        },
+        {
+          "type": "narration",
+          "text": "Amanda links her hand through Hector's.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11342"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "With you.",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "11351"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "I love you, Manda-Panda.",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "11360"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "I love you too.",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "11369"
+        },
+        {
+          "type": "narration",
+          "text": "Thanks for playing this special holiday segment of `Surviving High School!`",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11379",
+          "text_bbcode": "Thanks for playing this special holiday segment of [b]Surviving High School![/b]"
+        },
+        {
+          "type": "narration",
+          "text": "Happy holidays and happy new year!",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11389"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "4",
+          "image": "2144",
+          "text": "But since both couples have earned the same amount of points, it's a tie!",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "11409"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Oh no!",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "11418"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "3",
+          "image": "2143",
+          "text": "Now, after reviewing what I've witnessed...",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "11427"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "It seems that taking a point from Howard and $Zoe in on the last question was a little hasty.",
+          "character_id": "4",
+          "offset": "11436"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "Their answer is close enough and now counts. Which means...",
+          "character_id": "4",
+          "offset": "11445"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Howard and $ZOE, you have successfully answered more questions correctly than Hector and Amanda!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "11454"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Congratulations! You've won the Mistletoe Match Game!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "11463"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Please step forward and claim your prize!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "11472"
+        },
+        {
+          "type": "narration",
+          "text": "Howard takes the bracelet from the man and fastens it on $ZOE's wrist.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11482"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "2",
+          "image": "26002",
+          "text": "Howard, we won!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "11491"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "I couldn't have done it without you...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "11500"
+        },
+        {
+          "type": "narration",
+          "text": "They share a kiss.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11510"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Good game, man.",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "11519"
+        },
+        {
+          "type": "narration",
+          "text": "Hector and Howard shake hands as the girls hug. When they leave, Amanda looks sadly at the floor.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11529"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "What's wrong, Manda-Panda?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "11538"
+        },
+        {
+          "type": "music",
+          "track_id": "8212",
+          "loop": false,
+          "offset": "11545"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "I'm beginning to think we don't really belong together...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "11554"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "First, the bear cape... Now this...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "11563"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "It's like you don't know me at all!",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "11572"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "No, Amanda... It's not like that...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "11581"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "I know a lot of things about you! Just not the things on those cards...",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "11590"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Like what? Name one thing that I really like.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "11599"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Uh... Er... Lizards?",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "11608"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Lizards? `Lizards?!`",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "11617",
+          "text_bbcode": "Lizards? [color=#3b78e2][i]Lizards?![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "1",
+          "image": "2016",
+          "text": "You know how I feel about lizard bellies!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "11626"
+        },
+        {
+          "type": "narration",
+          "text": "Amanda runs off!",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11636"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "No, wait! Amanda!",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "11645"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "`Amanda!`",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "11654",
+          "text_bbcode": "[color=#e23b3b][i]Amanda![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "Oh no! It seems like Hector and Amanda are going to have a rough holiday season ahead of them!",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11664"
+        },
+        {
+          "type": "narration",
+          "text": "Try again and see if you can help Hector win Amanda that charm!",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "11674"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 1,
+          "offset": "11681"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s2",
+          "section_register": {
+            "var": "1001",
+            "value": "1"
+          },
+          "offset": "11688"
+        }
+      ]
+    },
+    "s1_04_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "3",
+          "image": "2143",
+          "text": "I'm sorry to say that's totally incorrect.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "11029"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "1",
+          "image": "2016",
+          "text": "You think I'm scared of clothes?!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "11038"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "11044"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Well, aren't you afraid of clown pants?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "11053"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "1",
+          "image": "2016",
+          "text": "Because they're on `clowns!`",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "11062",
+          "text_bbcode": "Because they're on [color=#3b78e2][i]clowns![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "I'm afraid of fractions! All my denominators are uncommon!",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "11071"
+        },
+        {
+          "type": "next",
+          "next": "s1_03_after"
+        }
+      ]
+    },
+    "s1_05_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "3",
+          "image": "2143",
+          "text": "That is totally wrong.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "11090"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "I put down fractions.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "11099"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "11105"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "You're more afraid of fractions than losing me?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "11114"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Well, you don't go around dividing yourself!",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "11123"
+        },
+        {
+          "type": "next",
+          "next": "s1_03_after"
+        }
+      ]
+    },
+    "s1_06_opt2": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "4",
+          "image": "2144",
+          "text": "Well, that's not what I would've gone with...",
+          "character_id": "4",
+          "expression": "4",
+          "offset": "10986"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "10992"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "But it's `absolutely correct!`",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "11001",
+          "text_bbcode": "But it's [color=#e23b3b][i]absolutely correct![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Fractions are scary!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "11010"
+        },
+        {
+          "type": "next",
+          "next": "s1_03_after"
+        }
+      ]
+    },
+    "s1_07_timeout": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Oh... Um...",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "11135"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "11141"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "3",
+          "image": "2143",
+          "text": "Sorry, Hector... You've used up all your time.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "11150"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "It was fractions...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "11159"
+        },
+        {
+          "type": "next",
+          "next": "s1_03_after"
+        }
+      ]
+    },
+    "s1_02_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "And we're on to round three!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10744"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "And we're on to round three!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10764"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "All right... At this point in the game, both couples are neck and neck.",
+          "character_id": "4",
+          "offset": "10773"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "The final question will determine which one wins the charm bracelet...",
+          "character_id": "4",
+          "offset": "10782"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "And we're on to round three!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10794"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "All right... It seems like Howard and $ZOE have taken an early lead.",
+          "character_id": "4",
+          "offset": "10803"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "But, Hector, pay attention. Answering this question might prove that you actually know your girlfriend...",
+          "character_id": "4",
+          "offset": "10812"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Awww...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "10821"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "We asked the girls to name the one thing that scares them the most...",
+          "character_id": "4",
+          "offset": "10830"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "3",
+          "image": "2213",
+          "text": "I don't know what it is that scares $ZOE the most...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "10839"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "But she is a really thoughtful girlfriend.",
+          "character_id": "0",
+          "offset": "10846"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "2",
+          "image": "26002",
+          "text": "Aww, you're so sweet.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10855"
+        },
+        {
+          "type": "narration",
+          "text": "$ZOE kisses Howard.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "10865"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "1",
+          "image": "2206",
+          "text": "Come on, he hasn't even answered the question yet.",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "10874"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "I'm getting there. `Because` $ZOE is so thoughtful, the thing that scares her the most is when all of her loved ones are unhappy.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10883",
+          "text_bbcode": "I'm getting there. [color=#e23b3b][i]Because[/i][/color] $ZOE is so thoughtful, the thing that scares her the most is when all of her loved ones are unhappy."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "2",
+          "image": "26002",
+          "text": "I put that I'm scared of seeing all of my friends and family upset at the same time!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10892"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "3",
+          "image": "2143",
+          "text": "Oh, I'm sorry, but I don't think I can count that. She specifically said when they're unhappy `at the same time.`",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "10901",
+          "text_bbcode": "Oh, I'm sorry, but I don't think I can count that. She specifically said when they're unhappy [color=#e23b3b][i]at the same time.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "1",
+          "image": "2211",
+          "text": "What? Come on!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "10910"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "3",
+          "image": "26003",
+          "text": "It's okay, Howard. I know in my heart you were right...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "10919"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "So, Hector, you're up. What is Amanda most scared of?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10928"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Amanda is most scared of...",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "10937"
+        },
+        {
+          "type": "choice",
+          "prompt": "Choose one!",
+          "options": [
+            {
+              "index": "0",
+              "label": "Clothes.",
+              "next": "s1_04_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Losing me.",
+              "next": "s1_05_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Fractions.",
+              "next": "s1_06_opt2"
+            }
+          ],
+          "menu": {
+            "title": "Choose one!",
+            "text": "Amanda is scared of...",
+            "timeout_ms": "8000",
+            "timeout_result": "1000",
+            "character_id": "2",
+            "reserved": "0",
+            "portrait_mode": "1"
+          },
+          "after": "s1_03_after",
+          "on_timeout": "s1_07_timeout.json",
+          "timed": true,
+          "timer_ms": "8000"
+        }
+      ]
+    },
+    "s1_08_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "In Europe.",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "10539"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "No...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10548"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "10554"
+        },
+        {
+          "type": "narration",
+          "text": "Amanda turns her card over. It reads 'Rushin New Year'.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "10564"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "That was the time I realized you were the one I wanted to be with.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10573"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Well, what was wrong with Europe?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "10582"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Hector, we made out in Europe because we were both feeling lonely.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10591"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_09_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "The Russian New Year...",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "10478"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "10484"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Yes!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "10493"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "4",
+          "image": "2214",
+          "text": "Just curious, why is that kiss so special?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "10502"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "It was the first time I kissed Hector when I knew I wanted to be with him!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "10511"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "The most special kiss in the world!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "10520"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_10_opt2": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "During the Crosstown Races!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "10612"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "No...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10621"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "10627"
+        },
+        {
+          "type": "narration",
+          "text": "Amanda turns her card over. It reads 'Rushin New Year'.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "10637"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "That was the time I realized you were the one I wanted to be with.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10646"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Well, what was wrong with the Crosstown Races?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "10655"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "I was still sad about breaking up with Zach.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10664"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Oh...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "10673"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_11_timeout": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Oh... Uh... I can't choose...",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "10685"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "10691"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "3",
+          "image": "2143",
+          "text": "Sorry, Hector... Time's up.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "10700"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "It was Russian New Year! That was the one with the most feeling!",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10709"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Weren't they all important?",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "10718"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "I guess...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10727"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_01_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Okay, on to round two!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10275"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Both of your girlfriends have told me you've been together for a long time.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10284"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "But let's take a look at the beginning of your relationships...",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10293"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Where did you two have your first kiss?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10302"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "4",
+          "image": "2214",
+          "text": "Uh...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "10311"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "I know!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10320"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "At the football game right after you were voted onto the cheerleading squad!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "10329"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "3",
+          "image": "26003",
+          "text": "Howard... Our `real` first kiss was after our date at the coffee shop.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "10338",
+          "text_bbcode": "Howard... Our [color=#3b78e2][i]real[/i][/color] first kiss was after our date at the coffee shop."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "3",
+          "image": "2213",
+          "text": "Oh yeah...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "10347"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "10353"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Hector, you're up. Where did you and Amanda have your first kiss?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10362"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "There were a couple of 'first' kisses for us...",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "10371"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "There was Europe where we first made out...",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "10380"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "There was Russian New Year where we kissed, and we weren't dating, but that was a special 'first'...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "10389"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "10395"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "And then, after I got out of Boot Camp, we had a date and kissed at the Crosstown Races...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "10404"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "I chose the most special one! The kiss I gave you with the most feeling!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "10413"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "3",
+          "image": "2143",
+          "text": "I'm afraid she can't clarify further. You'll have to figure out which kiss she wrote on the card.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "10422"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "It's...",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "10431"
+        },
+        {
+          "type": "choice",
+          "prompt": "Choose one!",
+          "options": [
+            {
+              "index": "0",
+              "label": "In Europe.",
+              "next": "s1_08_opt0"
+            },
+            {
+              "index": "1",
+              "label": "At Russian New Year.",
+              "next": "s1_09_opt1"
+            },
+            {
+              "index": "2",
+              "label": "During the Crosstown Races.",
+              "next": "s1_10_opt2"
+            }
+          ],
+          "menu": {
+            "title": "Choose one!",
+            "text": "Our first kiss was...",
+            "timeout_ms": "8000",
+            "timeout_result": "1000",
+            "character_id": "2",
+            "reserved": "0",
+            "portrait_mode": "1"
+          },
+          "after": "s1_02_after",
+          "on_timeout": "s1_11_timeout.json",
+          "timed": true,
+          "timer_ms": "8000"
+        }
+      ]
+    },
+    "s1_12_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Cupcakes?",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "10197"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "10203"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "1",
+          "image": "2016",
+          "text": "That's $ZOE's favorite dessert!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "10212"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Mine is candy!",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10221"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "3",
+          "image": "2143",
+          "text": "Sorry, Hector... Looks like $ZOE and Howard pull ahead.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "10230"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1_13_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Tiramisu?",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "10145"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Amanda, what did you write?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10154"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "I wrote 'candy'... Hector, you know anything with caffeine in it makes me super shaky!",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10163"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "10169"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Yeah...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "10178"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1_14_opt2": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "It's got to be candy.",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "10093"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Gummy Mares are her favorite!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "10102"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Amanda, what did you write?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10111"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Candy!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "10120"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "10126"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1_15_timeout": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Uh... Uh...",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "10242"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "10248"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "3",
+          "image": "2143",
+          "text": "Sorry, Hector... Time's up. Maybe you'll have better luck with the next question.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "10257"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "It was candy...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "10266"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg9244_1"
+        }
+      ]
+    },
+    "s2": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 2,
+          "offset": "45"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s3",
+          "section_register": {
+            "var": "1001",
+            "value": "2"
+          },
+          "offset": "52"
+        }
+      ]
+    },
+    "s3": {
+      "nodes": [
+        {
+          "type": "call",
+          "routine": "s3_r10",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing!"
+            },
+            1
+          ],
+          "offset": "121"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_enter_v0": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "5",
+          "offset": "9403"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg9244_1"
+        }
+      ]
+    },
+    "s3_r10_b1": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 33,
+          "name": "show_card",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            4000
+          ]
+        },
+        {
+          "type": "yield",
+          "yield": 7,
+          "name": "end_episode",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            {
+              "local": -3
+            }
+          ]
+        },
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s1_bg9244_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "5",
+          "offset": "9403"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26005",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "9437"
+        },
+        {
+          "type": "pov_change",
+          "character": "Hector",
+          "index": "2",
+          "offset": "9443"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "9452"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "9461"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "9470"
+        },
+        {
+          "type": "title_card",
+          "title": "The Mistletoe Match",
+          "subtitle": "The perfect present...",
+          "asset_id": "1072",
+          "flag": "0",
+          "section_start": true,
+          "_prev_section_jump": "9337",
+          "offset": "9480"
+        },
+        {
+          "type": "narration",
+          "text": "Happy Holidays! Welcome to a special premium mini-episode of Surviving High School!",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9487"
+        },
+        {
+          "type": "narration",
+          "text": "You'll be playing as Hector. Can you help him win Amanda a great gift?",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9494"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "9500"
+        },
+        {
+          "type": "narration",
+          "text": "Find out now!",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9510"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26007",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "9522"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "9529"
+        },
+        {
+          "type": "narration",
+          "text": "It's the day after Christmas, and Hector and Amanda are shopping at the mall...",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9539"
+        },
+        {
+          "type": "narration",
+          "text": "But not everything is going well with these two...",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9549"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Manda-Panda, I'm sorry you didn't like the Christmas gift I gave you...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9558"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "But it was all the things you said you wanted...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9567"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Soft, furry, funny, sunny...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9576"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Hector, a `bear fur cape` is soft and furry, but it's definitely `not` funny...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "9585",
+          "text_bbcode": "Hector, a [color=#3b78e2][i]bear fur cape[/i][/color] is soft and furry, but it's definitely [color=#3b78e2][i]not[/i][/color] funny..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "`Or` sunny!",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "9594",
+          "text_bbcode": "[color=#3b78e2][i]Or[/i][/color] sunny!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "9603"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "9609"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Hey, don't be sad. I'll... I'll make it up to you...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9618"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1123",
+          "variant": "0",
+          "offset": "9628"
+        },
+        {
+          "type": "narration",
+          "text": "Hector and Amanda enter a store. Hector looks around.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9638"
+        },
+        {
+          "type": "narration",
+          "text": "In the jewelry section, a silver bracelet with a single unicorn charm hangs prettily in a case.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9648"
+        },
+        {
+          "type": "narration",
+          "text": "Hector steers Amanda towards the jewelry counter.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9658"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "I was hoping to see your charm bracelets, good sir.",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "9667"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Especially `that` one.",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "9676",
+          "text_bbcode": "Especially [color=#e23b3b][i]that[/i][/color] one."
+        },
+        {
+          "type": "narration",
+          "text": "Hector points to the bracelet in the case.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9686"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Oh, that is delightful! Unfortunately... I can't sell that to you.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9695"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Oh...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9704"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "But you can `win` it if you participate in our Mistletoe Match Game...",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9713",
+          "text_bbcode": "But you can [color=#e23b3b][i]win[/i][/color] it if you participate in our Mistletoe Match Game..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "A Mistletoe Match game?",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "9722"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Yes, we're running it as an after-Christmas promotion.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9731"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "If you join now, we can get started, since we already have another couple here to compete with you.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9740"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Yes, we'll do it!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "9749"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Ooh, I love matching!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "9758"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "What do you have to do?",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "9767"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Well, first, you can meet the couple you're up against.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9776"
+        },
+        {
+          "type": "narration",
+          "text": "The clerk waves his hand to the other side of the counter where Howard and $ZOE are waiting.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9786"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "4",
+          "image": "26004",
+          "text": "Oh, hello, Hector!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "9795"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "What are you two doing here?",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "9804"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "I participated in this thing last year and thought it would be fun to do it again.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9813"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "With my `actual` girlfriend this time. I think we have a good shot.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9822",
+          "text_bbcode": "With my [color=#e23b3b][i]actual[/i][/color] girlfriend this time. I think we have a good shot."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "3",
+          "image": "2213",
+          "text": "Oh, but can we make this quick? $ZOE and I are kind of looking after my younger sisters...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "9831"
+        },
+        {
+          "type": "narration",
+          "text": "Howard looks out the window to the toy store where two young girls are holding out a baby to strangers.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9841"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Of course, sir. Let's get started.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9850"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "Great! May the best couple win.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9859"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "Now the rules are simple. I'll have your girlfriend write down the answer to three different challenge questions...",
+          "character_id": "4",
+          "offset": "9868"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "Then we'll tell you the question, and ask you what `her` answer was. The couple who answers the most questions correctly wins the charm bracelet. Ready?",
+          "character_id": "4",
+          "offset": "9877",
+          "text_bbcode": "Then we'll tell you the question, and ask you what [color=#e23b3b][i]her[/i][/color] answer was. The couple who answers the most questions correctly wins the charm bracelet. Ready?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Yeah!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "9886"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "2",
+          "image": "26002",
+          "text": "Yep!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9895"
+        },
+        {
+          "type": "narration",
+          "text": "The clerk takes the girls aside. Hector watches them scribble hastily on cards.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9905"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Shoot! Howard and $ZOE have been together `forever.` They probably know tons about each other.",
+          "mode": "-2",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9917",
+          "text_bbcode": "Shoot! Howard and $ZOE have been together [color=#e23b3b][i]forever.[/i][/color] They probably know tons about each other."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "But then again... So do Amanda and I. We can win this... If I can figure out what she's thinking...",
+          "mode": "-2",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "9929"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "...And that about does it, girls. Boyfriends, are you ready?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9938"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": false,
+          "offset": "9945"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Okay, here goes...",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9954"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "We asked Amanda and $ZOE to name their favorite `dessert`...",
+          "character_id": "4",
+          "offset": "9963",
+          "text_bbcode": "We asked Amanda and $ZOE to name their favorite [color=#e23b3b][i]dessert[/i][/color]..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "Howard, what is $ZOE's dessert of choice?",
+          "character_id": "4",
+          "offset": "9972"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "That's easy. Cupcakes.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9981"
+        },
+        {
+          "type": "narration",
+          "text": "$ZOE holds up a card that reads 'cupcakes'.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9991"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "2",
+          "image": "26002",
+          "text": "He's right!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10000"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "And that's a point for Howard and $ZOE.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10009"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Now Hector, what is Amanda's favorite dessert?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10023"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Uh... She likes everything sweet? What's the sweetest thing we've ever eaten?",
+          "mode": "-2",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "10035"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Amanda's favorite dessert is...",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "10044"
+        },
+        {
+          "type": "choice",
+          "prompt": "Choose one!",
+          "options": [
+            {
+              "index": "0",
+              "label": "Cupcakes.",
+              "next": "s1_12_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Tiramisu.",
+              "next": "s1_13_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Candy.",
+              "next": "s1_14_opt2"
+            }
+          ],
+          "menu": {
+            "title": "Choose one!",
+            "text": "Amanda's favorite dessert is...",
+            "timeout_ms": "8000",
+            "timeout_result": "1000",
+            "character_id": "2",
+            "reserved": "0",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after",
+          "on_timeout": "s1_15_timeout.json",
+          "timed": true,
+          "timer_ms": "8000"
+        }
+      ]
+    },
+    "s1_bg9244_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "9255",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "9262",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_bg9244_r"
+        }
+      ]
+    },
+    "s1_bg9244_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg9244_t",
+          "else": "s1_bg9244_r",
+          "offset": "9244",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg9244_r": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26005",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "9437"
+        },
+        {
+          "type": "pov_change",
+          "character": "Hector",
+          "index": "2",
+          "offset": "9443"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "9452"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "9461"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "9470"
+        },
+        {
+          "type": "title_card",
+          "title": "The Mistletoe Match",
+          "subtitle": "The perfect present...",
+          "asset_id": "1072",
+          "flag": "0",
+          "section_start": true,
+          "_prev_section_jump": "9337",
+          "offset": "9480"
+        },
+        {
+          "type": "narration",
+          "text": "Happy Holidays! Welcome to a special premium mini-episode of Surviving High School!",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9487"
+        },
+        {
+          "type": "narration",
+          "text": "You'll be playing as Hector. Can you help him win Amanda a great gift?",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9494"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "9500"
+        },
+        {
+          "type": "narration",
+          "text": "Find out now!",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9510"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26007",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "9522"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "9529"
+        },
+        {
+          "type": "narration",
+          "text": "It's the day after Christmas, and Hector and Amanda are shopping at the mall...",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9539"
+        },
+        {
+          "type": "narration",
+          "text": "But not everything is going well with these two...",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9549"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Manda-Panda, I'm sorry you didn't like the Christmas gift I gave you...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9558"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "But it was all the things you said you wanted...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9567"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Soft, furry, funny, sunny...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9576"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Hector, a `bear fur cape` is soft and furry, but it's definitely `not` funny...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "9585",
+          "text_bbcode": "Hector, a [color=#3b78e2][i]bear fur cape[/i][/color] is soft and furry, but it's definitely [color=#3b78e2][i]not[/i][/color] funny..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "`Or` sunny!",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "9594",
+          "text_bbcode": "[color=#3b78e2][i]Or[/i][/color] sunny!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "9603"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "9609"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Hey, don't be sad. I'll... I'll make it up to you...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9618"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1123",
+          "variant": "0",
+          "offset": "9628"
+        },
+        {
+          "type": "narration",
+          "text": "Hector and Amanda enter a store. Hector looks around.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9638"
+        },
+        {
+          "type": "narration",
+          "text": "In the jewelry section, a silver bracelet with a single unicorn charm hangs prettily in a case.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9648"
+        },
+        {
+          "type": "narration",
+          "text": "Hector steers Amanda towards the jewelry counter.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9658"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "I was hoping to see your charm bracelets, good sir.",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "9667"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Especially `that` one.",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "9676",
+          "text_bbcode": "Especially [color=#e23b3b][i]that[/i][/color] one."
+        },
+        {
+          "type": "narration",
+          "text": "Hector points to the bracelet in the case.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9686"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Oh, that is delightful! Unfortunately... I can't sell that to you.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9695"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Oh...",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9704"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "But you can `win` it if you participate in our Mistletoe Match Game...",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9713",
+          "text_bbcode": "But you can [color=#e23b3b][i]win[/i][/color] it if you participate in our Mistletoe Match Game..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "A Mistletoe Match game?",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "9722"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Yes, we're running it as an after-Christmas promotion.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9731"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "If you join now, we can get started, since we already have another couple here to compete with you.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9740"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "Yes, we'll do it!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "9749"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Ooh, I love matching!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "9758"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "What do you have to do?",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "9767"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Well, first, you can meet the couple you're up against.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9776"
+        },
+        {
+          "type": "narration",
+          "text": "The clerk waves his hand to the other side of the counter where Howard and $ZOE are waiting.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9786"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "4",
+          "image": "26004",
+          "text": "Oh, hello, Hector!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "9795"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "What are you two doing here?",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "9804"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "I participated in this thing last year and thought it would be fun to do it again.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9813"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "With my `actual` girlfriend this time. I think we have a good shot.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9822",
+          "text_bbcode": "With my [color=#e23b3b][i]actual[/i][/color] girlfriend this time. I think we have a good shot."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "3",
+          "image": "2213",
+          "text": "Oh, but can we make this quick? $ZOE and I are kind of looking after my younger sisters...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "9831"
+        },
+        {
+          "type": "narration",
+          "text": "Howard looks out the window to the toy store where two young girls are holding out a baby to strangers.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9841"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Of course, sir. Let's get started.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9850"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "Great! May the best couple win.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9859"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "Now the rules are simple. I'll have your girlfriend write down the answer to three different challenge questions...",
+          "character_id": "4",
+          "offset": "9868"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "Then we'll tell you the question, and ask you what `her` answer was. The couple who answers the most questions correctly wins the charm bracelet. Ready?",
+          "character_id": "4",
+          "offset": "9877",
+          "text_bbcode": "Then we'll tell you the question, and ask you what [color=#e23b3b][i]her[/i][/color] answer was. The couple who answers the most questions correctly wins the charm bracelet. Ready?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Yeah!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "9886"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "2",
+          "image": "26002",
+          "text": "Yep!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "9895"
+        },
+        {
+          "type": "narration",
+          "text": "The clerk takes the girls aside. Hector watches them scribble hastily on cards.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9905"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Shoot! Howard and $ZOE have been together `forever.` They probably know tons about each other.",
+          "mode": "-2",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "9917",
+          "text_bbcode": "Shoot! Howard and $ZOE have been together [color=#e23b3b][i]forever.[/i][/color] They probably know tons about each other."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "2",
+          "image": "2207",
+          "text": "But then again... So do Amanda and I. We can win this... If I can figure out what she's thinking...",
+          "mode": "-2",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "9929"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "...And that about does it, girls. Boyfriends, are you ready?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9938"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": false,
+          "offset": "9945"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Okay, here goes...",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "9954"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "We asked Amanda and $ZOE to name their favorite `dessert`...",
+          "character_id": "4",
+          "offset": "9963",
+          "text_bbcode": "We asked Amanda and $ZOE to name their favorite [color=#e23b3b][i]dessert[/i][/color]..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": null,
+          "image": "2140",
+          "text": "Howard, what is $ZOE's dessert of choice?",
+          "character_id": "4",
+          "offset": "9972"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": "2",
+          "image": "2212",
+          "text": "That's easy. Cupcakes.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "9981"
+        },
+        {
+          "type": "narration",
+          "text": "$ZOE holds up a card that reads 'cupcakes'.",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "9991"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Zoe",
+          "emotion_code": "2",
+          "image": "26002",
+          "text": "He's right!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "10000"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "And that's a point for Howard and $ZOE.",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10009"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Clerk",
+          "emotion_code": "2",
+          "image": "2142",
+          "text": "Now Hector, what is Amanda's favorite dessert?",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "10023"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "3",
+          "image": "2208",
+          "text": "Uh... She likes everything sweet? What's the sweetest thing we've ever eaten?",
+          "mode": "-2",
+          "character_id": "2",
+          "expression": "3",
+          "offset": "10035"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Hector",
+          "emotion_code": "4",
+          "image": "2209",
+          "text": "Amanda's favorite dessert is...",
+          "character_id": "2",
+          "expression": "4",
+          "offset": "10044"
+        },
+        {
+          "type": "choice",
+          "prompt": "Choose one!",
+          "options": [
+            {
+              "index": "0",
+              "label": "Cupcakes.",
+              "next": "s1_12_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Tiramisu.",
+              "next": "s1_13_opt1"
+            },
+            {
+              "index": "2",
+              "label": "Candy.",
+              "next": "s1_14_opt2"
+            }
+          ],
+          "menu": {
+            "title": "Choose one!",
+            "text": "Amanda's favorite dessert is...",
+            "timeout_ms": "8000",
+            "timeout_result": "1000",
+            "character_id": "2",
+            "reserved": "0",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after",
+          "on_timeout": "s1_15_timeout.json",
+          "timed": true,
+          "timer_ms": "8000"
+        }
+      ]
+    },
+    "s1_enter_v0_bg9244_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "9255",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "9262",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg9244_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg9244_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg9244_t",
+          "else": "s1_enter_v0_bg9244_r",
+          "offset": "9244",
+          "op": "eq"
+        }
+      ]
+    }
+  },
+  "pack_id": "5000",
+  "episode_id": "1",
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "2210",
+          "name": "Howard",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "26000",
+          "name": "$ZOE",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "2205",
+          "name": "Hector",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "2015",
+          "name": "Amanda",
+          "format": 1
+        },
+        {
+          "id": "4",
+          "art": "2140",
+          "name": "Clerk",
+          "format": 1
+        },
+        {
+          "id": "5",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "5",
+        "74": "2"
+      }
+    },
+    "2": {
+      "characters": [],
+      "ui_defaults": {}
+    },
+    "3": {
+      "characters": [],
+      "ui_defaults": {}
+    }
+  },
+  "routines": {
+    "s3_r10": {
+      "entry": "s3_r10_b1",
+      "params": 3,
+      "offset": "81"
+    }
+  },
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0
+    },
+    "set_only": [
+      "1000",
+      "1001"
+    ]
+  },
+  "name_vars": {
+    "$Scott": {
+      "default": "Scott"
+    },
+    "$Travis": {
+      "default": "Travis"
+    },
+    "$ZOE": {
+      "default": "Zoe"
+    }
+  }
+}

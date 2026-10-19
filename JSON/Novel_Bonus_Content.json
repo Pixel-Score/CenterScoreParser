@@ -1,0 +1,2516 @@
+{
+  "title": "Novel_Bonus_Content",
+  "episode": "Special Novel Chapter",
+  "cast": [
+    "Emily",
+    "Ben",
+    "Driver",
+    "Kimi",
+    "Nicole",
+    "Maria",
+    "Amanda",
+    "Dominique",
+    "Coach Kessler",
+    "Nick"
+  ],
+  "main_characters": [
+    "Emily"
+  ],
+  "genders": {
+    "Emily": "F",
+    "Ben": "M",
+    "Driver": "M",
+    "Kimi": "F",
+    "Nicole": "F",
+    "Maria": "F",
+    "Amanda": "F"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1"
+  },
+  "scene_minigame_banks": {
+    "1": {}
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    }
+  },
+  "segments": {
+    "s1_01": {
+      "nodes": [
+        {
+          "type": "title_card",
+          "title": "Special Bonus Chapter",
+          "subtitle": "The San Francisco Date Debacle",
+          "asset_id": "1012",
+          "flag": "0",
+          "section_start": true,
+          "_prev_section_jump": "12319",
+          "offset": "12516"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1027",
+          "variant": "0",
+          "offset": "12526"
+        },
+        {
+          "type": "narration",
+          "text": "One Friday afternoon at Twin Branches High, Emily Kessler bounds happily over to the Center Table, where Maria, Nicole, and Amanda are all sitting.",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "12536"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "12545"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": null,
+          "image": "2545",
+          "text": "What're you so happy about, Kessler?",
+          "character_id": "5",
+          "offset": "12554"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Oh, nothing... Just looking forward to the weekend.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "12563"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nicole",
+          "emotion_code": null,
+          "image": "2350",
+          "text": "Why's that? Is your dad `finally` going to let you take a five minute break from swim practice?",
+          "character_id": "4",
+          "offset": "12572",
+          "text_bbcode": "Why's that? Is your dad [color=#3b78e2][i]finally[/i][/color] going to let you take a five minute break from swim practice?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Actually, my dad's going to be gone all day tomorrow to go to a conference on swim team recruitment...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "12581"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "So Ben and I are going to drive to San Francisco for a date!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "12590"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "That sounds like fun!",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "12599"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Oh, it's going to be great! I've planned it all out...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "12608"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "We're going to start by visiting the Science Center... And then we'll swing by the Street Arts Festival... And we'll stop by this great bookstore I keep hearing about...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "12617"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "3",
+          "image": "2018",
+          "text": "Oh... That sounds... Um... Fun?",
+          "character_id": "6",
+          "expression": "3",
+          "offset": "12626"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": "3",
+          "image": "2548",
+          "text": "Yeah... Fun...",
+          "character_id": "5",
+          "expression": "3",
+          "offset": "12635"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Why'd you say it like that? Why do you guys have sad faces?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12644"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nicole",
+          "emotion_code": "3",
+          "image": "2353",
+          "text": "It's just... A science museum? An arts festival? A bookstore?",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "12653"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": "3",
+          "image": "2548",
+          "text": "Do you `really` think that's what Ben wants to do in the city?",
+          "character_id": "5",
+          "expression": "3",
+          "offset": "12662",
+          "text_bbcode": "Do you [color=#3b78e2][i]really[/i][/color] think that's what Ben wants to do in the city?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Well... He likes science... And the festival sounded fun... And the bookstore got great reviews online...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12671"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Why, what do you guys think Ben would want to do in the city?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12680"
+        },
+        {
+          "type": "narration",
+          "text": "The three girls glance at each other uneasily...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "12690"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nicole",
+          "emotion_code": "3",
+          "image": "2353",
+          "text": "...Should we tell her?",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "12699"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": "3",
+          "image": "2548",
+          "text": "I don't know, it seems mean...",
+          "character_id": "5",
+          "expression": "3",
+          "offset": "12708"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Tell me what? What seems mean?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12717"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nicole",
+          "emotion_code": null,
+          "image": "2350",
+          "text": "Well... You've heard about Ben's ex, right? Jessica? She used to go here...",
+          "character_id": "4",
+          "offset": "12726"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "I've heard of her...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12735"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nicole",
+          "emotion_code": "2",
+          "image": "2352",
+          "text": "One time, she and Ben took a trip down to San Francisco and... Well, let's just say it's kind of a legendary story...",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "12744"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Legendary how?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12753"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": null,
+          "image": "2545",
+          "text": "Well, they were supposed to be going to some party with Jessica's cousin... She's a college student, and she was going to get them into her sorority...",
+          "character_id": "5",
+          "offset": "12762"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": "2",
+          "image": "2547",
+          "text": "But on the way up, they drove by this awesome parade, and Jessica just had to join in!",
+          "character_id": "5",
+          "expression": "2",
+          "offset": "12771"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nicole",
+          "emotion_code": "2",
+          "image": "2352",
+          "text": "She climbed up on a float and was dancing and everything!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "12780"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Did Ben join in?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12789"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": "2",
+          "image": "2547",
+          "text": "Well, yeah! Ben did everything with Jessica! And then, the craziest part is, these guys saw Jessica dancing, and thought she was awesome, so they all started hanging out...",
+          "character_id": "5",
+          "expression": "2",
+          "offset": "12798"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "And it turned out they were the members of `Seven Minutes in Heaven!`",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "12807",
+          "text_bbcode": "And it turned out they were the members of [color=#3b78e2][i]Seven Minutes in Heaven![/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": null,
+          "image": "2570",
+          "text": "Oh... Them... They're a... Music group... Right?",
+          "character_id": "0",
+          "offset": "12814"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nicole",
+          "emotion_code": "2",
+          "image": "2352",
+          "text": "Uh, they're `amazing?` Their single 'Love Grrls' was in the Top 40 for like, six months!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "12823",
+          "text_bbcode": "Uh, they're [color=#3b78e2][i]amazing?[/i][/color] Their single 'Love Grrls' was in the Top 40 for like, six months!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "They're `soooo` cute!",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "12832",
+          "text_bbcode": "They're [color=#3b78e2][i]soooo[/i][/color] cute!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": "2",
+          "image": "2547",
+          "text": "Totally! And then they invited Jessica and Ben to go to their concert, `and` gave them backstage passes to party with them!",
+          "character_id": "5",
+          "expression": "2",
+          "offset": "12841",
+          "text_bbcode": "Totally! And then they invited Jessica and Ben to go to their concert, [color=#3b78e2][i]and[/i][/color] gave them backstage passes to party with them!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nicole",
+          "emotion_code": "2",
+          "image": "2352",
+          "text": "According to Jessica, it was one of the best nights of her life!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "12850"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "That sounds amazing... I'm sure Ben loved it...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12859"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "And it's `way` more exciting than what I had planned!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12871",
+          "text_bbcode": "And it's [color=#3b78e2][i]way[/i][/color] more exciting than what I had planned!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "This Jessica... She was really spontaneous, huh?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12880"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nicole",
+          "emotion_code": "2",
+          "image": "2352",
+          "text": "Are you kidding? She was totally wild!",
+          "character_id": "4",
+          "expression": "2",
+          "offset": "12889"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": "2",
+          "image": "2547",
+          "text": "She was straight cray. I mean, she was `cray` cray...",
+          "character_id": "5",
+          "expression": "2",
+          "offset": "12898",
+          "text_bbcode": "She was straight cray. I mean, she was [color=#3b78e2][i]cray[/i][/color] cray..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Amanda",
+          "emotion_code": "2",
+          "image": "2017",
+          "text": "Cray cray cray cray cray...",
+          "character_id": "6",
+          "expression": "2",
+          "offset": "12907"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": "1",
+          "image": "2546",
+          "text": "Amanda! Focus! We're talking about Jessica, not just making mouth sounds!",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "12916"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "I guess I see how Ben would have liked that... He's always throwing parties and pulling pranks...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12925"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "I bet he would've really enjoyed a date like that...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12934"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Maria",
+          "emotion_code": null,
+          "image": "2545",
+          "text": "Aw, don't feel bad, Emily!",
+          "character_id": "5",
+          "offset": "12943"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Nicole",
+          "emotion_code": null,
+          "image": "2350",
+          "text": "Yeah! I'm sure he'll like your lame science and books date too!",
+          "character_id": "4",
+          "offset": "12952"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "12958"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Yeah... Thanks...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "12967"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1018",
+          "variant": "1",
+          "offset": "12977"
+        },
+        {
+          "type": "music",
+          "track_id": "8226",
+          "loop": true,
+          "offset": "12984"
+        },
+        {
+          "type": "narration",
+          "text": "Later that night, Emily hangs out with her best friend, Kimi...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "12994"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Sigh...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13003"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": "3",
+          "image": "2598",
+          "text": "Wow, you are really letting this Jessica thing get to you, huh?",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "13012"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Well, kind of! I mean, it sounds like she was just this wild, crazy ball of excitement and spontaneity...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13021"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": null,
+          "image": "2595",
+          "text": "Oh, yeah, she totally was. I tried to get some gossip on her, and it sounds like she was basically the human version of an out-of-control party...",
+          "character_id": "3",
+          "offset": "13030"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Exactly! And what does that make me? The human version of a girl who swims all the time and never does anything fun?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13039"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": null,
+          "image": "2595",
+          "text": "That's not true! You're going to San Francisco tomorrow, aren't you? That's fun!",
+          "character_id": "3",
+          "offset": "13048"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Only because I lied to my dad! And I have to be home by seven, just so he doesn't find out! How does that make me fun?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13057"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": null,
+          "image": "2595",
+          "text": "Look, I `really` don't think you have to worry about it... I mean, it sounds like Jessica had a lot of issues, and she and Ben had a `seriously` messy breakup...",
+          "character_id": "3",
+          "offset": "13066",
+          "text_bbcode": "Look, I [color=#3b78e2][i]really[/i][/color] don't think you have to worry about it... I mean, it sounds like Jessica had a lot of issues, and she and Ben had a [color=#3b78e2][i]seriously[/i][/color] messy breakup..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": null,
+          "image": "2595",
+          "text": "But... If you're `really` worried about it...",
+          "character_id": "3",
+          "offset": "13075",
+          "text_bbcode": "But... If you're [color=#3b78e2][i]really[/i][/color] worried about it..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": null,
+          "image": "2570",
+          "text": "Yeah?",
+          "character_id": "0",
+          "offset": "13082"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": "2",
+          "image": "2597",
+          "text": "Why don't you do something spontaneous on the trip?",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "13091"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": null,
+          "image": "2570",
+          "text": "You think Ben would like that?",
+          "character_id": "0",
+          "offset": "13098"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": null,
+          "image": "2595",
+          "text": "Of course! Every guy likes a little excitement in his life!",
+          "character_id": "3",
+          "offset": "13107"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": null,
+          "image": "2595",
+          "text": "...Or so the latest issue of 'Teen Girl' tells me.",
+          "character_id": "3",
+          "offset": "13116"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": null,
+          "image": "2570",
+          "text": "Hmmm... Something spontaneous... I'm sure I could fit that into the schedule...",
+          "character_id": "0",
+          "offset": "13123"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": "2",
+          "image": "2597",
+          "text": "Uh, no, dummy, you can't `plan` something spontaneous! That totally defeats the point!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "13132",
+          "text_bbcode": "Uh, no, dummy, you can't [color=#3b78e2][i]plan[/i][/color] something spontaneous! That totally defeats the point!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": null,
+          "image": "2570",
+          "text": "I can't argue with that, but... How am I supposed to know what to do?",
+          "character_id": "0",
+          "offset": "13139"
+        },
+        {
+          "type": "narration",
+          "text": "Kimi walks over and puts her hands on Emily's shoulders...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13149"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": "2",
+          "image": "2597",
+          "text": "When the moment strikes, Emily... You'll know `exactly` what do to!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "13158",
+          "text_bbcode": "When the moment strikes, Emily... You'll know [color=#3b78e2][i]exactly[/i][/color] what do to!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "...Teen Girl Magazine?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13167"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "13173"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kimi",
+          "emotion_code": "2",
+          "image": "2597",
+          "text": "'Ten Ways To Have The Perfect Date', May 2012!",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "13182"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1042",
+          "variant": "0",
+          "offset": "13192"
+        },
+        {
+          "type": "music",
+          "track_id": "8203",
+          "loop": true,
+          "offset": "13199"
+        },
+        {
+          "type": "narration",
+          "text": "The next day, Ben and Emily drive along Highway 1, up to San Francisco...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13209"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Ah... This is nice... I always did like driving along the coast...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13218"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": null,
+          "image": "2570",
+          "text": "Yeah, it's pretty...",
+          "character_id": "0",
+          "offset": "13225"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "I can't get wait to get into the city though... I `love` going to the science center...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13234",
+          "text_bbcode": "I can't get wait to get into the city though... I [color=#e23b3b][i]love[/i][/color] going to the science center..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Oh... You've been there before...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13243"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": null,
+          "image": "2590",
+          "text": "Well, yeah. My dad used to take me there all the time when I was a kid. It was, like, my favorite place...",
+          "character_id": "1",
+          "offset": "13250"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Oh. Right. Of course.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13259"
+        },
+        {
+          "type": "narration",
+          "text": "The two drive in silence for a moment as they enter San Francisco...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13269"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": null,
+          "image": "2590",
+          "text": "Uh... Emily... Is something wrong?",
+          "character_id": "1",
+          "offset": "13276"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "No... Of course not. Why?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13285"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": null,
+          "image": "2590",
+          "text": "Well... You just seem like you have something on your mind.",
+          "character_id": "1",
+          "offset": "13292"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "It's just... You don't really talk much about your ex-girlfriend, Jessica, do you?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13301"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "Oh man. Did you hear people talking about her?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13310"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": null,
+          "image": "2570",
+          "text": "Maybe.",
+          "character_id": "0",
+          "offset": "13317"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "Look, I... I don't know what you heard but... Things with Jessica were complicated, okay?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13326"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": null,
+          "image": "2570",
+          "text": "What was she like?",
+          "character_id": "0",
+          "offset": "13333"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "...Wild. Crazy. She loved having a good time, and she did everything she could to make sure the good times never stopped.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13342"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Right.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13351"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "I know you probably heard some pretty bad things about her... Especially about why we broke up... And they're all probably true.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13360"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "But that doesn't change the fact that she and I had a real connection, at least for a while. I don't want you to think otherwise. That wouldn't be honest.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13369"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "I think I understand. You two... You had a lot of fun.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13378"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "Yeah... I... I suppose we did.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13387"
+        },
+        {
+          "type": "narration",
+          "text": "Emily stares out the window, watching the beach fly by... And then an idea pops into her head!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13397"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": null,
+          "image": "2570",
+          "text": "Kimi said I should try something spontaneous... This is my chance!",
+          "mode": "-2",
+          "character_id": "0",
+          "offset": "13407"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": true,
+          "offset": "13414"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Hey! I have a great idea! Let's go for a swim!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13423"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "2594",
+          "text": "What? Here? Now?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "13432"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Why not? Let's do something fun and crazy!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13441"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "2594",
+          "text": "Uh... Sure... Okay...",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "13450"
+        },
+        {
+          "type": "narration",
+          "text": "Ben pulls over on the side of the road...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13460"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "I'm not sure I can park here...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13469"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Come on, it'll only be a few minutes! It'll be fine!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13478"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": null,
+          "image": "2590",
+          "text": "Yeah... You're probably right...",
+          "character_id": "1",
+          "offset": "13485"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1012",
+          "variant": "0",
+          "offset": "13495"
+        },
+        {
+          "type": "narration",
+          "text": "Emily and Ben hop out and rush off across the beach...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13505"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Bet you can't beat me to the water!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13514"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Oh, it's on!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13523"
+        },
+        {
+          "type": "narration",
+          "text": "The two rush up to the water and dive in! They swim through the crashing waves...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13533"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Keep up, slow-poke!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13542"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "No fair! You're, like, a world-class swimmer!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13551"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Aw, should I slow down?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13560"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Actually, you probably shouldn't... Because `I'm` a world-class splasher!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13569",
+          "text_bbcode": "Actually, you probably shouldn't... Because [color=#e23b3b][i]I'm[/i][/color] a world-class splasher!"
+        },
+        {
+          "type": "narration",
+          "text": "Ben squeezes his hands together, shooting a perfect spout of water right at Emily!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13579"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Ah!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13588"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "We call that the Kale Cannon! I perfected it when I was 7!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13597"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Well, I'm impressed...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13606"
+        },
+        {
+          "type": "narration",
+          "text": "Emily swims over to Ben, and the two embrace in the water...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13616"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "This is fun, right? We're having fun?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13625"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Of course we are! Why wouldn't we be? I always have fun with you!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "13634"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "I know but... Isn't this crazy and spontaneous?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "13643"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "Uh... Sure...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13652"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "Emily, is there something you want to talk about?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13661"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "4",
+          "image": "2574",
+          "text": "No... Of course not...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "13670"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "4",
+          "image": "2574",
+          "text": "Uh... Splash attack!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "13679"
+        },
+        {
+          "type": "narration",
+          "text": "Emily splashes Ben! He laughs and dodges it... And then freezes!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13689"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "2594",
+          "text": "Oh no! My car!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "13698"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "4",
+          "image": "2574",
+          "text": "What about it?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "13707"
+        },
+        {
+          "type": "music",
+          "track_id": "8224",
+          "loop": true,
+          "offset": "13714"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "1",
+          "image": "2591",
+          "text": "`It's getting towed!`",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "13723",
+          "text_bbcode": "[color=#e23b3b][i]It's getting towed![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "Emily spins around to see that back on the shore, Ben's car has been rigged to the back of a tow truck!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13733"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "4",
+          "image": "2574",
+          "text": "Oh no!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "13742"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "2594",
+          "text": "Hurry!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "13751"
+        },
+        {
+          "type": "narration",
+          "text": "Emily and Ben swim as fast as they can...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13761"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1012",
+          "variant": "0",
+          "offset": "13771"
+        },
+        {
+          "type": "narration",
+          "text": "But it's too late. They get back to the road just in time to see the tow truck drive away.",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13781"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "1",
+          "image": "2591",
+          "text": "You have `got` to be kidding me!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "13790",
+          "text_bbcode": "You have [color=#e23b3b][i]got[/i][/color] to be kidding me!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Oh, Ben... I'm so sorry... What do we do now?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13799"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "1",
+          "image": "2591",
+          "text": "What `can` we do? All I've got is 25 bucks... That's not enough to get my car out of the impound!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "13808",
+          "text_bbcode": "What [color=#e23b3b][i]can[/i][/color] we do? All I've got is 25 bucks... That's not enough to get my car out of the impound!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "We're going to have to walk to the train station, and take one down to Twin Branches... My dad'll just have to come back for the car later...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13817"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "He's going to kill me... If your dad doesn't kill me first. I mean, if we have to take the train, there's no way we'll be back by 7!",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13826"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Oh no...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13835"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "13841"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "I'm sorry, Emily.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13850"
+        },
+        {
+          "type": "music",
+          "track_id": "8223",
+          "loop": true,
+          "offset": "13857"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26006",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "13869"
+        },
+        {
+          "type": "narration",
+          "text": "A little while later, Ben and Emily walk through Chinatown on the way to the train station.",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13879"
+        },
+        {
+          "type": "narration",
+          "text": "Ben consults a train schedule...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13889"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "Well... It looks like we'll be back in town by 9:30... That's not `that` bad...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13898",
+          "text_bbcode": "Well... It looks like we'll be back in town by 9:30... That's not [color=#e23b3b][i]that[/i][/color] bad..."
+        },
+        {
+          "type": "narration",
+          "text": "Emily tries to say something, then bursts into tears!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13908"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "Hey... `Hey.` It's okay. It's not that bad.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13917",
+          "text_bbcode": "Hey... [color=#e23b3b][i]Hey.[/i][/color] It's okay. It's not that bad."
+        },
+        {
+          "type": "narration",
+          "text": "Ben puts his arm around Emily.",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "13927"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "I'm sure your dad'll get over it...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13936"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "It's not that, Ben! It's... It's...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13945"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "This is `all` my fault!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13954",
+          "text_bbcode": "This is [color=#3b78e2][i]all[/i][/color] my fault!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "No... It could've happened to anyone...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "13963"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "No, Ben, it couldn't! It wouldn't have happened to Jessica!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13972"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "2594",
+          "text": "Huh? What does Jessica have to do with this!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "13981"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "She has `everything` to do with it, Ben!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13990",
+          "text_bbcode": "She has [color=#3b78e2][i]everything[/i][/color] to do with it, Ben!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "If you'd been with her, the two of you would've had a crazy adventure swimming together, and then you would've run into some kind of a party boat, and they would've taken you on board, and you would've had the best time!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "13999"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "But I try to do `one` fun thing, one crazy thing, and it turns into a total disaster!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "14008",
+          "text_bbcode": "But I try to do [color=#3b78e2][i]one[/i][/color] fun thing, one crazy thing, and it turns into a total disaster!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "I'm the worst, Ben! I suck! I'm no fun at all!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "14017"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "3",
+          "image": "2593",
+          "text": "Is... Is `that` what all this is about? You're anxious because you heard about Jessica?",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "14026",
+          "text_bbcode": "Is... Is [color=#e23b3b][i]that[/i][/color] what all this is about? You're anxious because you heard about Jessica?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "Well... Yeah!",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "14035"
+        },
+        {
+          "type": "narration",
+          "text": "Ben pulls Emily close and starts laughing.",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14045"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "What? Why are you laughing? What's funny?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "14054"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "It's just... Out of everything you could be insecure about... That is the absolute silliest possible thing.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14063"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Emily, I swear to you... You are a thousand, million, `billion` times better girlfriend than Jessica `ever` was!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14072",
+          "text_bbcode": "Emily, I swear to you... You are a thousand, million, [color=#e23b3b][i]billion[/i][/color] times better girlfriend than Jessica [color=#e23b3b][i]ever[/i][/color] was!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "3",
+          "image": "2573",
+          "text": "But... You guys all had these fun adventures... She was so crazy and wild...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "14081"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Uh, yeah, exactly. She was `crazy` and `wild.` Those are nice words for `unstable.`",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14090",
+          "text_bbcode": "Uh, yeah, exactly. She was [color=#e23b3b][i]crazy[/i][/color] and [color=#e23b3b][i]wild.[/i][/color] Those are nice words for [color=#e23b3b][i]unstable.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Honestly, Em, she was `exhausting.` All day, every day, it was just this whirlwind. It was like dating a tornado. Also, possibly a sociopath.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14099",
+          "text_bbcode": "Honestly, Em, she was [color=#e23b3b][i]exhausting.[/i][/color] All day, every day, it was just this whirlwind. It was like dating a tornado. Also, possibly a sociopath."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "With you, I'm relaxed. I'm happy. I'm myself.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14108"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "And before you ask... I have more fun with you in one week than I did in my entire relationship with Jessica.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14117"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Really?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14126"
+        },
+        {
+          "type": "narration",
+          "text": "Ben kisses Emily.",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14136"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Really.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14145"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Oh, Ben, I...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14154"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "4",
+          "image": "2574",
+          "text": "Your car!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "14163"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "2594",
+          "text": "Huh?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "14172"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "4",
+          "image": "2574",
+          "text": "There! Look! Your car!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "14181"
+        },
+        {
+          "type": "narration",
+          "text": "Emily points down the street! There, driving down a parallel street, is the tow truck!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14191"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "2594",
+          "text": "You're right! But... What do we do?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "14200"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "...Something spontaneous.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14209"
+        },
+        {
+          "type": "music",
+          "track_id": "8229",
+          "loop": true,
+          "offset": "14216"
+        },
+        {
+          "type": "narration",
+          "text": "Emily grins and takes off running!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14226"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "4",
+          "image": "2594",
+          "text": "`Emily!`",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "14235",
+          "text_bbcode": "[color=#e23b3b][i]Emily![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "Using the incredible athleticism she's honed as a swimmer, she races down the crowded Chinatown streets, weaving around food stands, statues, and pedestrians...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14245"
+        },
+        {
+          "type": "narration",
+          "text": "And comes out right in front of the tow truck! It screeches to a halt!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14255"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "`Gotcha!`",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14264",
+          "text_bbcode": "[color=#3b78e2][i]Gotcha![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "She runs around the side and bangs on the driver's door. It swings open...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14274"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Driver",
+          "emotion_code": "1",
+          "image": "2341",
+          "text": "Hey, lady, what's the big idea?!",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "14283"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": null,
+          "image": "2570",
+          "text": "Sorry to bother you, sir, but that red sedan happens to be my boyfriend's car... And we'd like it back!",
+          "character_id": "0",
+          "offset": "14290"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Driver",
+          "emotion_code": "1",
+          "image": "2341",
+          "text": "Uh, no-can-do, lady. I can't just go around giving people back their cars! I gotta take 'em to the impound!",
+          "character_id": "2",
+          "expression": "1",
+          "offset": "14299"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "I'll pay you twenty bucks.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14308"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Driver",
+          "emotion_code": "2",
+          "image": "2342",
+          "text": "Deal!",
+          "character_id": "2",
+          "expression": "2",
+          "offset": "14317"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "14323"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Yes!",
+          "mode": "-2",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14335"
+        },
+        {
+          "type": "music",
+          "track_id": "8230",
+          "loop": true,
+          "offset": "14342"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1042",
+          "variant": "0",
+          "offset": "14352"
+        },
+        {
+          "type": "narration",
+          "text": "And so, a few minutes later, Emily and Ben drive through San Francisco...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14362"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "That was `amazing!` I can't believe you chased down a tow truck!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14371",
+          "text_bbcode": "That was [color=#e23b3b][i]amazing![/i][/color] I can't believe you chased down a tow truck!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Oh, it was nothing...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14380"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Nothing? Are you kidding me? You hopped over a sizzling noodle stand!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14389"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Okay, that `was` kind of cool, I'll admit...",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14398",
+          "text_bbcode": "Okay, that [color=#3b78e2][i]was[/i][/color] kind of cool, I'll admit..."
+        },
+        {
+          "type": "narration",
+          "text": "Ben leans over and squeezes Emily's hand.",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14408"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "I meant what I said earlier, you know.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14417"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Emily Kessler, you're the best girlfriend I could ever want.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14426"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "And you're the very best boyfriend in the world.",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14435"
+        },
+        {
+          "type": "narration",
+          "text": "Emily and Ben kiss.",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14445"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Emily",
+          "emotion_code": "2",
+          "image": "2572",
+          "text": "Do you still want to go the Science Museum?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "14454"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "Uh, yeah, are you kidding? The Science Museum is great!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14463"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ben",
+          "emotion_code": "2",
+          "image": "2592",
+          "text": "They've got this one exhibit where you fill balloons with hydrogen and then blow them up...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "14472"
+        },
+        {
+          "type": "narration",
+          "text": "It looks like Ben and Emily are on their way to having a great date!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14482"
+        },
+        {
+          "type": "narration",
+          "text": "Thanks for playing this special content, and for reading the Surviving High School novel...",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14492"
+        },
+        {
+          "type": "narration",
+          "text": "And if you want to see more adventures of Ben and Emily, check out the next season, now available in `More Episodes!`",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "14502",
+          "text_bbcode": "And if you want to see more adventures of Ben and Emily, check out the next season, now available in [b]More Episodes![/b]"
+        },
+        {
+          "type": "call",
+          "routine": "s1_r24",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing!"
+            },
+            0
+          ],
+          "offset": "14512"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg12250_1"
+        }
+      ]
+    },
+    "s1_enter_v0": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "10",
+          "offset": "12437"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg12250_1"
+        }
+      ]
+    },
+    "s1_r24_b1": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 33,
+          "name": "show_card",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            4000
+          ]
+        },
+        {
+          "type": "yield",
+          "yield": 7,
+          "name": "end_episode",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            {
+              "local": -3
+            }
+          ]
+        },
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s1_bg12250_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "10",
+          "offset": "12437"
+        },
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "12450"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "12459"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "12468"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26005",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "12480"
+        },
+        {
+          "type": "narration",
+          "text": "Welcome to the `exclusive` bonus content for readers of the Surviving High School novel!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "12487",
+          "text_bbcode": "Welcome to the [b]exclusive[/b] bonus content for readers of the Surviving High School novel!"
+        },
+        {
+          "type": "call",
+          "segment": "s1_01",
+          "offset": "12490"
+        },
+        {
+          "type": "pov_change",
+          "character": "Emily",
+          "index": "0",
+          "offset": "12499"
+        },
+        {
+          "type": "music",
+          "track_id": "8210",
+          "loop": true,
+          "offset": "12506"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_bg12250_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "12261",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "12268",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_bg12250_r"
+        }
+      ]
+    },
+    "s1_bg12250_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg12250_t",
+          "else": "s1_bg12250_r",
+          "offset": "12250",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg12250_r": {
+      "nodes": [
+        {
+          "type": "string_default",
+          "key": "$ZOE",
+          "default": "Zoe",
+          "slot": "-1",
+          "offset": "12450"
+        },
+        {
+          "type": "string_default",
+          "key": "$Scott",
+          "default": "Scott",
+          "slot": "-1",
+          "offset": "12459"
+        },
+        {
+          "type": "string_default",
+          "key": "$Travis",
+          "default": "Travis",
+          "slot": "-1",
+          "offset": "12468"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26005",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "12480"
+        },
+        {
+          "type": "narration",
+          "text": "Welcome to the `exclusive` bonus content for readers of the Surviving High School novel!",
+          "character_id": "10",
+          "expression": "0",
+          "offset": "12487",
+          "text_bbcode": "Welcome to the [b]exclusive[/b] bonus content for readers of the Surviving High School novel!"
+        },
+        {
+          "type": "call",
+          "segment": "s1_01",
+          "offset": "12490"
+        },
+        {
+          "type": "pov_change",
+          "character": "Emily",
+          "index": "0",
+          "offset": "12499"
+        },
+        {
+          "type": "music",
+          "track_id": "8210",
+          "loop": true,
+          "offset": "12506"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_enter_v0_bg12250_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "12261",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "12268",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg12250_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg12250_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg12250_t",
+          "else": "s1_enter_v0_bg12250_r",
+          "offset": "12250",
+          "op": "eq"
+        }
+      ]
+    }
+  },
+  "pack_id": "7",
+  "episode_id": "230",
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "2570",
+          "name": "Emily",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "2590",
+          "name": "Ben",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "2340",
+          "name": "Driver",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "2595",
+          "name": "Kimi",
+          "format": 1
+        },
+        {
+          "id": "4",
+          "art": "2350",
+          "name": "Nicole",
+          "format": 1
+        },
+        {
+          "id": "5",
+          "art": "2545",
+          "name": "Maria",
+          "format": 1
+        },
+        {
+          "id": "6",
+          "art": "2015",
+          "name": "Amanda",
+          "format": 1
+        },
+        {
+          "id": "7",
+          "art": "26000",
+          "name": "Dominique",
+          "format": 1
+        },
+        {
+          "id": "8",
+          "art": "2505",
+          "name": "Coach Kessler",
+          "format": 1
+        },
+        {
+          "id": "9",
+          "art": "2575",
+          "name": "Nick",
+          "format": 1
+        },
+        {
+          "id": "10",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "10"
+      }
+    }
+  },
+  "routines": {
+    "s1_r24": {
+      "entry": "s1_r24_b1",
+      "params": 3,
+      "offset": "12295"
+    }
+  },
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0
+    },
+    "set_only": [
+      "1000",
+      "1001"
+    ]
+  },
+  "name_vars": {
+    "$Scott": {
+      "default": "Scott"
+    },
+    "$Travis": {
+      "default": "Travis"
+    },
+    "$ZOE": {
+      "default": "Zoe"
+    }
+  }
+}

@@ -1,0 +1,6641 @@
+{
+  "title": "25_Tom_Princes_Carol",
+  "episode": "25: Tom Prince's Carol",
+  "cast": [
+    "Tom",
+    "Obadiah",
+    "Ghost Bear",
+    "Skazz",
+    "Young Silas",
+    "Silas",
+    "Mallika",
+    "Spike",
+    "Howard",
+    "Linda",
+    "Miriam Prince",
+    "Mr. Doom",
+    "Officer Monte",
+    "Comets' Owner"
+  ],
+  "main_characters": [
+    "Tom"
+  ],
+  "genders": {
+    "Tom": "M",
+    "Obadiah": "M",
+    "Ghost Bear": "M",
+    "Skazz": "M",
+    "Young Silas": "M",
+    "Silas": "M",
+    "Mallika": "F",
+    "Spike": "M",
+    "Howard": "M",
+    "Miriam Prince": "F",
+    "Mr. Doom": "M",
+    "Officer Monte": "M",
+    "Comets' Owner": "M"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1",
+    "2": "s2",
+    "3": "s3",
+    "4": "s4",
+    "5": "s5"
+  },
+  "scene_minigame_banks": {
+    "1": {},
+    "2": {},
+    "3": {
+      "build_word": [
+        {
+          "offset": "15",
+          "subtitle": "Escape the bear!",
+          "words": [
+            "Escape",
+            "Bear"
+          ],
+          "answers": [
+            "escape",
+            "bear"
+          ],
+          "letters": "escapebr"
+        },
+        {
+          "offset": "67",
+          "subtitle": "Stay brave!",
+          "words": [
+            "Stay",
+            "Brave"
+          ],
+          "answers": [
+            "stay",
+            "brave"
+          ],
+          "letters": "staybrve"
+        },
+        {
+          "offset": "113",
+          "subtitle": "Run and hide!",
+          "words": [
+            "Run",
+            "Hide"
+          ],
+          "answers": [
+            "run",
+            "hide"
+          ],
+          "letters": "runhide"
+        }
+      ],
+      "pick_word": [
+        {
+          "offset": "229",
+          "subtitle": "Run from the Bear! Don't trip!",
+          "correct": [
+            "Sprint!",
+            "Dash!"
+          ],
+          "decoys": [
+            "Drop!",
+            "Stumble!"
+          ]
+        }
+      ]
+    },
+    "4": {},
+    "5": {
+      "question_options": [
+        {
+          "offset": "5339",
+          "question": "How would you rate this pack?",
+          "options": [
+            "Loved it!",
+            "It had its moments.",
+            "It was ok.",
+            "Boring!"
+          ]
+        },
+        {
+          "offset": "5419",
+          "question": "Which ghost did you like best?",
+          "options": [
+            "Skazz.",
+            "The Ghost Bear.",
+            "Mr. Doom."
+          ]
+        },
+        {
+          "offset": "5485",
+          "question": "Have you ever seen a ghost?",
+          "options": [
+            "Yes, and I was so scared!",
+            "Maybe... Maybe not!",
+            "Ghosts aren't real!"
+          ]
+        }
+      ]
+    }
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    },
+    "2": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "1",
+      "valid_values": [
+        "1"
+      ],
+      "cases": [
+        {
+          "value": "1",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "1": "s2"
+      }
+    },
+    "3": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "2",
+      "valid_values": [
+        "2"
+      ],
+      "cases": [
+        {
+          "value": "2",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "2": "s3_enter_v2"
+      }
+    },
+    "4": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "3",
+      "valid_values": [
+        "3"
+      ],
+      "cases": [
+        {
+          "value": "3",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "3": "s4"
+      }
+    },
+    "5": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "4",
+      "valid_values": [
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "cases": [
+        {
+          "value": "4",
+          "key": "5"
+        },
+        {
+          "value": "5",
+          "key": "8"
+        },
+        {
+          "value": "6",
+          "key": "11"
+        },
+        {
+          "value": "7",
+          "key": "14"
+        }
+      ],
+      "bindings": [
+        {
+          "value": "4",
+          "section_offset": "6021"
+        },
+        {
+          "value": "5",
+          "section_offset": "6453",
+          "enter_at_section": true
+        },
+        {
+          "value": "6",
+          "section_offset": "6804",
+          "enter_at_section": true
+        },
+        {
+          "value": "7",
+          "section_offset": "7170",
+          "enter_at_section": true
+        }
+      ],
+      "entry_by_value": {
+        "4": "s5",
+        "5": "s5_enter_v5",
+        "6": "s5_enter_v6",
+        "7": "s5_enter_v7"
+      }
+    }
+  },
+  "segments": {
+    "s1_02_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Indeed, I am a ghost, and I have come to you tonight to bring you a warning!",
+          "character_id": "1",
+          "offset": "6984"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "The life you have chosen for yourself will bring you no happiness.",
+          "character_id": "1",
+          "offset": "6991"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Tonight, you will be visited by three spirits: The ghosts of Winter Holidays Past, Present, and Future...",
+          "character_id": "1",
+          "offset": "6998"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Heed their words, child. Mend your ways, or you will spend your afterlife enduring the same agonizing torments I do.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "7007"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "My time here is at an end... Farewell.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "7024"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Wait!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7033"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "What is it? Do you have a question?",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "7050"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Just one... Was that three spirits including you or, like, four spirits total?",
+          "character_id": "0",
+          "offset": "7057"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Oh, that's a good question. Let me see... Carry the one, divide by Pi, and then...",
+          "character_id": "1",
+          "offset": "7064"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "What do you think?!",
+          "mode": "-3",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "7076"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Um... Four total?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7085"
+        },
+        {
+          "type": "narration",
+          "text": "Obadiah Prince begins to dissolve into thin air.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "7095"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "3",
+          "image": "26018",
+          "text": "Heed... Their... Warnings... Child...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "7104"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "What? The ghost of Obadiah Prince is gone...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7113"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Maybe he was never even here...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7122"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "7128"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "Maybe this was all just a terrible dream...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "7137"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 1,
+          "offset": "7144"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s2",
+          "section_register": {
+            "var": "1001",
+            "value": "1"
+          },
+          "offset": "7151"
+        }
+      ]
+    },
+    "s1_03_opt0": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "6812"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "6818"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "Very good, child! Though you have the slack-jawed affect of a simpleton, you clearly possess some intelligence!",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "6827"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Wait... Is that a compliment?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6836"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Part compliment, part insult... In my time, such a conversational stratagem was employed to endear oneself to the feeble-minded.",
+          "character_id": "1",
+          "offset": "6843"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "2",
+          "image": "26017",
+          "text": "We called such a technique 'Ye Neg'.",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "6852"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Hey! Wait a minute... I'm not feeble-minded... And that's just a direct insult!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6861"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6867"
+        },
+        {
+          "type": "narration",
+          "text": "Tom hurls a screwdriver at Obadiah... It passes right through him!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6877"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Oh no! You... You really are a ghost!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6886"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "6892"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_04_opt1": {
+      "nodes": [
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "6901"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "I'm not a hallucination!!!",
+          "mode": "-3",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "6913"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "You could be... I remember this one time I ate day-old caviar and drank a pot of Indonesian palm civet coffee.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6922"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "When I finally got to sleep, I dreamt I was in line at the supermarket... And all of my credit cards were declined!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6931"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "I was poor! Talk about a terrible nightmare!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6940"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "1",
+          "image": "26016",
+          "text": "You think that was a nightmare? Behold!",
+          "character_id": "1",
+          "expression": "1",
+          "offset": "6949"
+        },
+        {
+          "type": "narration",
+          "text": "Obadiah kicks off his shoes to reveal hideous skeletal feet!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6959"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Oh no... Such unholy metatarsals!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6968"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "But... If you're not a hallucination... That must mean you're a... Gulp... `Ghost!`",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6977",
+          "text_bbcode": "But... If you're not a hallucination... That must mean you're a... Gulp... [color=#e23b3b][i]Ghost![/i][/color]"
+        },
+        {
+          "type": "next",
+          "next": "s1_02_after"
+        }
+      ]
+    },
+    "s1_01_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "Tom, I'm here to inform you that there will be a Winter Holiday Party at `Prince Manor` this evening.",
+          "character_id": "5",
+          "offset": "6434",
+          "text_bbcode": "Tom, I'm here to inform you that there will be a Winter Holiday Party at [color=#e23b3b][i]Prince Manor[/i][/color] this evening."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Black tie, I presume?",
+          "character_id": "0",
+          "offset": "6441"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "Indeed. But don't bother getting dressed up. You won't be attending.",
+          "character_id": "5",
+          "offset": "6450"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "What?! Why not?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6459"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "Prince Industries is attempting to secure a lucrative merchandizing contract with the `Centerscore Comets` sports team.",
+          "character_id": "5",
+          "offset": "6468",
+          "text_bbcode": "Prince Industries is attempting to secure a lucrative merchandizing contract with the [color=#e23b3b][i]Centerscore Comets[/i][/color] sports team."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "But I love the Comets! I have to meet them!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6477"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "Maybe so, but Prince Industries is all about success, and you... After your recent string of failures, are nothing more than a liability.",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "6486"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "You're telling me I can't go to a Holiday Party at my own house?!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6495"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "I'm not 'telling' you anything, Tom. I believe what I just gave you was an `order.`",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "6504",
+          "text_bbcode": "I'm not 'telling' you anything, Tom. I believe what I just gave you was an [color=#e23b3b][i]order.[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "See you in the New Year, son. After I negotiate this deal, I think I may take an extended vacation somewhere tropical.",
+          "character_id": "5",
+          "offset": "6513"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "Ta ta.",
+          "character_id": "5",
+          "offset": "6532"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Grr... Like I wanted to attend that stupid party anyway. I'm much too busy getting my revenge on Mallika.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6541"
+        },
+        {
+          "type": "narration",
+          "text": "Tom turns back toward the catapult... As he makes his final adjustments.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6559"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6565"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "6571"
+        },
+        {
+          "type": "narration",
+          "text": "`KSPRANG!!!`",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6581",
+          "text_bbcode": "[b]KSPRANG!!![/b]"
+        },
+        {
+          "type": "narration",
+          "text": "The catapult fires, striking Tom upside the head!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6591"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Ow! That really... Really...",
+          "character_id": "0",
+          "offset": "6598"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "...",
+          "character_id": "0",
+          "offset": "6605"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "6611"
+        },
+        {
+          "type": "narration",
+          "text": "Tom falls over, unconscious...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6621"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "6627"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1021",
+          "variant": "1",
+          "offset": "6637"
+        },
+        {
+          "type": "narration",
+          "text": "Later that night...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6647"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "Nnh... My head is ringing like a... What happened? I must've gotten knocked out.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6656"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "What time is it?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6665"
+        },
+        {
+          "type": "music",
+          "track_id": "8220",
+          "loop": false,
+          "offset": "6672"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Huh? What's that sound? It almost sounds like... Rattling chains?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6681"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "OooOOOooohhh!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "6690"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Who... Who goes there?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6707"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "4",
+          "image": "26019",
+          "text": "OooOOOooohhh!",
+          "character_id": "1",
+          "expression": "4",
+          "offset": "6716"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Show yourself! I'm warning you!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6725"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Very well, Tom.",
+          "character_id": "1",
+          "offset": "6732"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "What...?! Who are you?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6741"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "I am your great-great- grandfather, Obadiah Prince.",
+          "character_id": "1",
+          "offset": "6748"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "But... That's impossible! Obadiah Prince died a hundred and thirty years ago! If you were him, you would have to be a...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6757"
+        },
+        {
+          "type": "narration",
+          "text": "Obadiah rattles his chains menacingly.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6767"
+        },
+        {
+          "type": "choice",
+          "prompt": "If you were him, you would have to be a...",
+          "options": [
+            {
+              "index": "0",
+              "label": "A... A ghost?!",
+              "next": "s1_03_opt0"
+            },
+            {
+              "index": "1",
+              "label": "A hallucination.",
+              "next": "s1_04_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "If you were him, you would have to be a...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_02_after"
+        }
+      ]
+    },
+    "s1_05_opt0": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "6331"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "6337"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "Yes. That's the one. What was it she did to you again?",
+          "character_id": "5",
+          "offset": "6346"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "She pushed me into the ocean... And then laughed at me!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6355"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "And why?",
+          "character_id": "5",
+          "offset": "6364"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Because I insulted the waiter while we were on our date. And then she started dating the waiter! And then the waiter won the Flex-Games! And then...",
+          "character_id": "0",
+          "offset": "6371"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "Silence! You're life is unbelievably convoluted! Now then...",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "6380"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1_06_opt1": {
+      "nodes": [
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "6389"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "There's more than one girl?!",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "6398"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Frankly, Dad, there are a lot of ladies who don't understand how super-rich I am, and how that makes me super-cool by default.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6407"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "But don't worry... Once my bizarre and overly-elaborate schemes lead to their humiliation, they'll all want to date me.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6416"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "3",
+          "image": "26008",
+          "text": "Hmm... Perhaps I've neglected an important discussion concerning relationships. Unfortunately, it will have to wait.",
+          "character_id": "5",
+          "expression": "3",
+          "offset": "6425"
+        },
+        {
+          "type": "next",
+          "next": "s1_01_after"
+        }
+      ]
+    },
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg5882_1"
+        }
+      ]
+    },
+    "s2_02_after": {
+      "nodes": [
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "5195"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Yes... We're done. Just step through that door.",
+          "character_id": "3",
+          "offset": "5204"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 2,
+          "offset": "5213"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s3_enter_v2",
+          "section_register": {
+            "var": "1001",
+            "value": "2"
+          },
+          "offset": "5220"
+        }
+      ]
+    },
+    "s2_03_opt0": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "5041"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "5047"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": "1",
+          "image": "26021",
+          "text": "What?! No! Your father drove away your mother by focusing `only` on money!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "5056",
+          "text_bbcode": "What?! No! Your father drove away your mother by focusing [color=#e23b3b][i]only[/i][/color] on money!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Maybe so... But he got rich! Look around you! This house is tiny! Have you seen the amazing mansion we live in now?",
+          "character_id": "0",
+          "offset": "5063"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "When visitors ask to visit the indoor pool, our Butler asks, 'Which one'?",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "5072"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "Having money rules!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "5081"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": "3",
+          "image": "26023",
+          "text": "Tom, I'm not sure you're learning the appropriate lesson here...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "5090"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Yeah, whatever... We done?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "5099"
+        },
+        {
+          "type": "next",
+          "next": "s2_02_after"
+        }
+      ]
+    },
+    "s2_04_opt1": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": "2",
+          "image": "26022",
+          "text": "Excellent. You have learned your first lesson well.",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "5111"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Yeah, I mean, seriously... My Dad just let my mother walk out on him like that!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "5120"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "That must've been humiliating!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "5129"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "5135"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "He should've dropped what he was doing and gotten revenge!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "5144"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": "1",
+          "image": "26021",
+          "text": "No, Tom! Your father was poor, but your mother made him happy. When she left, no amount of money could fill the void in his heart.",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "5153"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "Really...?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5162"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": "3",
+          "image": "26023",
+          "text": "Sorry, dude, but that's the truth.",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "5171"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "But that's so... Sad... Sniff..",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5180"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "I don't think I can take any more of this... Sniff... Can we go now?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "5189"
+        },
+        {
+          "type": "next",
+          "next": "s2_02_after"
+        }
+      ]
+    },
+    "s2_01_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Hey, wait a second... who are those people? Why do they look so familiar?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "4743"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Because they're your parents.",
+          "character_id": "3",
+          "offset": "4752"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "But they're so... Young!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "4761"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "4767"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Shh... Listen!",
+          "character_id": "3",
+          "offset": "4776"
+        },
+        {
+          "type": "music",
+          "track_id": "8221",
+          "loop": false,
+          "offset": "4793"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Miriam Prince",
+          "emotion_code": null,
+          "image": "2465",
+          "text": "Silas, where are you going?!",
+          "character_id": "10",
+          "offset": "4802"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": null,
+          "image": "26010",
+          "text": "Where do you think? To work.",
+          "character_id": "4",
+          "offset": "4821"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Miriam Prince",
+          "emotion_code": "4",
+          "image": "2469",
+          "text": "Work?! But it's the Winter Holiday!",
+          "character_id": "10",
+          "expression": "4",
+          "offset": "4830"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": null,
+          "image": "26010",
+          "text": "So? Money doesn't care what day it is!",
+          "character_id": "4",
+          "offset": "4839"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Miriam Prince",
+          "emotion_code": "3",
+          "image": "2468",
+          "text": "But I do! This is the day you're supposed to spend with family! What will little Tommy think when he finds out you've gone to work again?",
+          "character_id": "10",
+          "expression": "3",
+          "offset": "4848"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "1",
+          "image": "26011",
+          "text": "Hopefully, Tom will learn the value of a dollar. It'll be the first step in ensuring he doesn't become a whining romantic like his bleeding heart mother.",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "4857"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Miriam Prince",
+          "emotion_code": "1",
+          "image": "2466",
+          "text": "Whining romantic?! That's the last straw, Silas! If you take one step out that door, you'll never see me again!",
+          "character_id": "10",
+          "expression": "1",
+          "offset": "4866"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "1",
+          "image": "26011",
+          "text": "Are you asking me to choose between making money and my wife?",
+          "character_id": "4",
+          "expression": "1",
+          "offset": "4875"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Miriam Prince",
+          "emotion_code": "3",
+          "image": "2468",
+          "text": "And what if I am?",
+          "character_id": "10",
+          "expression": "3",
+          "offset": "4884"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": null,
+          "image": "26010",
+          "text": "Then that's no choice at all. Don't be here when I get back!",
+          "character_id": "4",
+          "offset": "4903"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "4919"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Miriam Prince",
+          "emotion_code": "3",
+          "image": "2468",
+          "text": "Oh no! He left! Sniff... He actually left... Sniff...",
+          "character_id": "10",
+          "expression": "3",
+          "offset": "4928"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Wait?! So that's what happened? My father always told me my mother died in a freak gold smelting accident at Fort Knox.",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "4945"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "But really, she left him because he valued money more than her!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "4954"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Your mother was the only person who ever made your Father feel joy.",
+          "character_id": "3",
+          "offset": "4971"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "When he turned his back on her... He lost his one chance at happiness, and you lost a loving mother.",
+          "character_id": "3",
+          "offset": "4980"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Do you understand the lesson?",
+          "character_id": "3",
+          "offset": "4989"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Yeah, I think...",
+          "character_id": "0",
+          "offset": "4996"
+        },
+        {
+          "type": "choice",
+          "prompt": "Yeah, I think...",
+          "options": [
+            {
+              "index": "0",
+              "label": "Happiness is overrated!",
+              "next": "s2_03_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Money is overrated!",
+              "next": "s2_04_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Yeah, I think...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s2_02_after"
+        }
+      ]
+    },
+    "s2_05_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "That's good to hear. Spectral Dispatch says you have a lot of ground to cover tonight, but still... Pretty ironic, huh?",
+          "character_id": "3",
+          "offset": "4577"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "I mean, me talking and you listening for a change... Because usually it goes the other way.",
+          "character_id": "3",
+          "offset": "4586"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Like that time you lectured me for two hours about which fork you're supposed to use to eat pastries...",
+          "character_id": "3",
+          "offset": "4595"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Or that other time you made me balance a thesaurus on my head and recite tongue twisters about how Spain gets bad weather...",
+          "character_id": "3",
+          "offset": "4604"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Or that other time when...",
+          "character_id": "3",
+          "offset": "4613"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "4619"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Enough already, Skazz! Just... Shut up and tell me what I'm supposed to do.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "4628"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Oh... Mostly you're just supposed to look over there.",
+          "character_id": "3",
+          "offset": "4637"
+        },
+        {
+          "type": "narration",
+          "text": "As Skazz points across the room, a veil parts... Revealing the Past!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "4647"
+        },
+        {
+          "type": "next",
+          "next": "s2_01_after"
+        }
+      ]
+    },
+    "s2_06_opt1": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "4665"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "4671"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "I'm Tom Prince. I question the order of the Alphabet.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "4680"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "And when I buy the Dictionary, you can bet the P's will finally come first!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "4689"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": "1",
+          "image": "26021",
+          "text": "Look, Tom, can't you just, like, stay on topic here? You're supposed to be learning wisdom or some stuff.",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "4698"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "And you're the ghost who's going to make me 'more smarter'?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "4707"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Come on, Tom. Just look over there!",
+          "character_id": "3",
+          "offset": "4716"
+        },
+        {
+          "type": "narration",
+          "text": "As Skazz points across the room, a veil parts... Revealing the Past!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "4726"
+        },
+        {
+          "type": "next",
+          "next": "s2_01_after"
+        }
+      ]
+    },
+    "s2": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "4370"
+        },
+        {
+          "type": "music",
+          "track_id": "8203",
+          "loop": false,
+          "offset": "4377"
+        },
+        {
+          "type": "narration",
+          "text": "Tom descends the stairs and enters the Dining Room...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "4384"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "0",
+          "image": "26010",
+          "text": "What? No one is home?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "4393"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "0",
+          "image": "26010",
+          "text": "But Dad said there would be a Holiday Party tonight. There should be loads of people here.",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "4402"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "0",
+          "image": "26015",
+          "text": "Hey! Wait a minute... This isn't even my house!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "4417"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "0",
+          "image": "26010",
+          "text": "But why does it seem so familiar?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "4426"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "0",
+          "image": "26010",
+          "text": "Oh wow! This is the house we used to live in back when I was a little kid.",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "4435"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "But that doesn't make sense... My Dad had it bulldozed after we moved out.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "4444"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "How did I get here?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "4453"
+        },
+        {
+          "type": "music",
+          "track_id": "8220",
+          "loop": false,
+          "offset": "4460"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "The question isn't 'where you are'... The question is 'when'...",
+          "character_id": "3",
+          "offset": "4469"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Uh... Skazz, is that you?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "4486"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Yo, Dude...",
+          "character_id": "3",
+          "offset": "4495"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Skazz, why are you dressed up like a ghost?",
+          "character_id": "0",
+          "offset": "4502"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "Because I am the Ghost of Winter Holidays Past! OOooOOOooo!!!",
+          "character_id": "3",
+          "offset": "4511"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "That doesn't even make sense. First off, you may be 'brain dead', but that doesn't mean you aren't technically still alive...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "4520"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "And second, you're the exact same age as me. What would you know about Holidays past?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "4529"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": "1",
+          "image": "26021",
+          "text": "You dare to question the supernatur... Uh... Supernocturn... Uh... You dare question a spooky ghost?!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "4538"
+        },
+        {
+          "type": "choice",
+          "prompt": "You dare question a spooky ghost?!",
+          "options": [
+            {
+              "index": "0",
+              "label": "I'll hear you out... For now.",
+              "next": "s2_05_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Uh... Duh! Of course, I do.",
+              "next": "s2_06_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "You dare question a spooky ghost?!",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s2_01_after"
+        }
+      ]
+    },
+    "s3_01_win": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "6175"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1057",
+          "variant": "1",
+          "offset": "6185"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6191"
+        },
+        {
+          "type": "narration",
+          "text": "Tom pushes through a thick swash of branches and emerges at the rear of a pleasant, well-lit home!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6201"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Thank goodness! Somebody help me! There's a bear after me!",
+          "character_id": "0",
+          "offset": "6208"
+        },
+        {
+          "type": "narration",
+          "text": "Tom pounds on the windows.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6226"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Help! Heeeeelp!",
+          "character_id": "0",
+          "offset": "6241"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "They can't hear you, Tom! You're incorporeal.",
+          "character_id": "2",
+          "offset": "6250"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "6256"
+        },
+        {
+          "type": "next",
+          "next": "s3_02_lose_cont"
+        }
+      ]
+    },
+    "s3_04_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Easy... Easy...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7247"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "7253"
+        },
+        {
+          "type": "narration",
+          "text": "Tom takes a step backward...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "7263"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "7269"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 3,
+          "offset": "7278"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s4",
+          "section_register": {
+            "var": "1001",
+            "value": "3"
+          },
+          "offset": "7285"
+        }
+      ]
+    },
+    "s3_05_opt0": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Excellent, Tom. You have uncovered a great truth.",
+          "character_id": "2",
+          "offset": "7072"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "The size of one's heart and the size of one's bank account have nothing to do with each other!",
+          "character_id": "2",
+          "offset": "7081"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Look, I get that Spike is a good person... But are you sure there's zero correlation...?",
+          "character_id": "0",
+          "offset": "7088"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Because I'm super rich. So if there was even just a fractional positive correlation, that would mean...",
+          "character_id": "0",
+          "offset": "7095"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "7101"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "No!!! There is no correlation whatsoever!!!",
+          "mode": "-3",
+          "character_id": "2",
+          "offset": "7113"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7119"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Okay... Lesson learned... Moving on.",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7128"
+        },
+        {
+          "type": "next",
+          "next": "s3_04_after"
+        }
+      ]
+    },
+    "s3_06_opt1": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "7146"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "7152"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "No... Tom, what's the matter with you? Did you not just hear what she said?",
+          "character_id": "2",
+          "offset": "7161"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Mallika likes Spike because he's a `good person!` She doesn't care how much money he has! He makes her happy!",
+          "character_id": "2",
+          "offset": "7170",
+          "text_bbcode": "Mallika likes Spike because he's a [color=#e23b3b][i]good person![/i][/color] She doesn't care how much money he has! He makes her happy!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Where'd you pick up that little gem... On a Holiday card?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "7179"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Get a clue, Baloo. Mallika likes Spike because he won the Flex-Games...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "7188"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "That means he's `famous.` Get it?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "7197",
+          "text_bbcode": "That means he's [color=#e23b3b][i]famous.[/i][/color] Get it?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Seriously, if Skazz had won the competition, she would've totally gone after that loser, too.",
+          "character_id": "0",
+          "offset": "7204"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "You imbecile! Did you not just witness true happiness? How emotionally stunted are you?",
+          "character_id": "2",
+          "offset": "7213"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Yeah... Whatever... Can we hit the next stop already. I want to check out my totally awesome future.",
+          "character_id": "0",
+          "offset": "7220"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7226"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "ROOOOOAAARRR!!!",
+          "mode": "-3",
+          "character_id": "2",
+          "offset": "7238"
+        },
+        {
+          "type": "next",
+          "next": "s3_04_after"
+        }
+      ]
+    },
+    "s3_03_after": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "You are both of those things, and yet, Mallika chose Spike over you.",
+          "character_id": "2",
+          "offset": "6878"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "I know! What's up with that? Sure, he's cool... But he's totally poor!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6887"
+        },
+        {
+          "type": "narration",
+          "text": "The Ghost Bear indicates that Tom should look through the window once more...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6897"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "6911"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "See the answer for yourself, Tom.",
+          "character_id": "2",
+          "offset": "6920"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "6930"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Spike",
+          "emotion_code": null,
+          "image": "2400",
+          "text": "I'm sorry I didn't get you a more expensive present, Mallika.",
+          "character_id": "7",
+          "offset": "6939"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": null,
+          "image": "2280",
+          "text": "Spike, I think just being with you is the best Holiday gift I could've asked for.",
+          "character_id": "6",
+          "offset": "6948"
+        },
+        {
+          "type": "narration",
+          "text": "Mallika and Spike kiss.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6958"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Spike",
+          "emotion_code": null,
+          "image": "2400",
+          "text": "Happy holidays, Mallika.",
+          "character_id": "7",
+          "offset": "6967"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "6973"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": null,
+          "image": "2280",
+          "text": "You too, Spike.",
+          "character_id": "6",
+          "offset": "6982"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1057",
+          "variant": "1",
+          "offset": "6992"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Eww! They're kissing! With tongue! Why'd you make me see that?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "7009"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Because you must learn, Tom!",
+          "character_id": "2",
+          "offset": "7026"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "So you're saying that there's a lesson here? Huh... Maybe I'm supposed to learn that Mallika likes Spike because...",
+          "character_id": "0",
+          "offset": "7033"
+        },
+        {
+          "type": "choice",
+          "prompt": "Maybe I'm supposed to learn that Mallika likes Spike because...",
+          "options": [
+            {
+              "index": "0",
+              "label": "Spike is a good person.",
+              "next": "s3_05_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Spike is good at skateboarding.",
+              "next": "s3_06_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Maybe I'm supposed to learn that Mallika likes Spike because...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s3_04_after"
+        }
+      ]
+    },
+    "s3_07_opt0": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "6773"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "6779"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Mallika knew what she was doing when she pushed me into the ocean.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6788"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "You pull something like that, and there will be consequences!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6797"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "And those consequences will be totally extreme, and may involve catapults or eels or seventeen grandfather clocks placed in strategic locations inside a rat-infested catacomb.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6806"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "That's it? Nothing else?",
+          "character_id": "2",
+          "offset": "6815"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "Well... Maybe I did also kind of like her... Sort of... But why didn't she like me back? I'm rich. I'm handsome... I'm rich...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6824"
+        },
+        {
+          "type": "next",
+          "next": "s3_03_after"
+        }
+      ]
+    },
+    "s3_08_opt1": {
+      "nodes": [
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "6833"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "I am kind of attracted to Mallika... Sort of... I mean, it's not like the poems I write her are super long or anything...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6842"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "And it's not like I made her `two` CDs of original musical compositions detailing the depths of my amorous infatuation...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6851",
+          "text_bbcode": "And it's not like I made her [color=#e23b3b][i]two[/i][/color] CDs of original musical compositions detailing the depths of my amorous infatuation..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "Honestly, it's all just a meaningless crush.",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6860"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "But what I really want to know is why she doesn't like me back? I'm rich. I'm handsome... I'm rich...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6869"
+        },
+        {
+          "type": "next",
+          "next": "s3_03_after"
+        }
+      ]
+    },
+    "s3_02_lose": {
+      "nodes": [
+        {
+          "type": "narration",
+          "text": "While racing though the forest, Tom trips over a gnarled root. His shoe comes loose.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6277"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Uh oh!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6294"
+        },
+        {
+          "type": "next",
+          "next": "s3_02_lose_cont"
+        }
+      ]
+    },
+    "s3": {
+      "nodes": [
+        {
+          "type": "loading",
+          "blocking": true,
+          "offset": "5753"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1060",
+          "variant": "1",
+          "offset": "5885"
+        },
+        {
+          "type": "narration",
+          "text": "Tom steps through the door and enters a dense mist...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "5903"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "I can't see anything! Where am I? Well, I feel a tree here, so I must be outside...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "5912"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "But if that was a tree, why is there shag carpet... On the wall?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5921"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Lower!",
+          "character_id": "2",
+          "offset": "5930"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "What?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5939"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Scratch me lower! In the small of my back!",
+          "character_id": "2",
+          "offset": "5948"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "That's not shag carpet! That's fur!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5957"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Of course! What else would it be? I'm a bear!",
+          "character_id": "2",
+          "offset": "5966"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": false,
+          "offset": "5973"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5979"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "You're a bear... And you can talk?! Nyaaaahhhh!!!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5996"
+        },
+        {
+          "type": "narration",
+          "text": "Tom tears off through the woods...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6014"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Don't make me chase you, Tom! You'll make me very angry!",
+          "character_id": "2",
+          "offset": "6031"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "You can talk, and you know my `name?!` So not cool!!!",
+          "character_id": "0",
+          "offset": "6046",
+          "text_bbcode": "You can talk, and you know my [color=#e23b3b][i]name?![/i][/color] So not cool!!!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "ROOOOOAAARRR!!!",
+          "mode": "-3",
+          "character_id": "2",
+          "offset": "6066"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Nyaaaahhhh!!!",
+          "character_id": "0",
+          "offset": "6081"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "6087"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": true,
+          "offset": "6094"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "1000",
+          "offset": "6143"
+        },
+        {
+          "type": "music",
+          "track_id": "8203",
+          "loop": false,
+          "offset": "6150"
+        },
+        {
+          "type": "minigame",
+          "minigame_type": "pick_word",
+          "kind": "content_fork",
+          "minigame_id": "1000",
+          "via": "by_id",
+          "trigger": "6143",
+          "win_threshold": "5",
+          "offset": "6160",
+          "win": "s3_01_win",
+          "lose": "s3_02_lose",
+          "setup": {
+            "bank": "pick_word",
+            "rounds": [
+              {
+                "offset": "229",
+                "subtitle": "Run from the Bear! Don't trip!",
+                "correct": [
+                  "Sprint!",
+                  "Dash!"
+                ],
+                "decoys": [
+                  "Drop!",
+                  "Stumble!"
+                ]
+              }
+            ],
+            "timer_ms": "20000"
+          },
+          "timed": true,
+          "timer_ms": "20000",
+          "variants": [
+            {
+              "platform": "mobile",
+              "bank": "pick_word",
+              "rounds": [
+                {
+                  "offset": "229",
+                  "subtitle": "Run from the Bear! Don't trip!",
+                  "correct": [
+                    "Sprint!",
+                    "Dash!"
+                  ],
+                  "decoys": [
+                    "Drop!",
+                    "Stumble!"
+                  ]
+                }
+              ]
+            },
+            {
+              "platform": "tablet",
+              "bank": "build_word",
+              "rounds": [
+                {
+                  "offset": "15",
+                  "subtitle": "Escape the bear!",
+                  "words": [
+                    "Escape",
+                    "Bear"
+                  ],
+                  "answers": [
+                    "escape",
+                    "bear"
+                  ],
+                  "letters": "escapebr"
+                },
+                {
+                  "offset": "67",
+                  "subtitle": "Stay brave!",
+                  "words": [
+                    "Stay",
+                    "Brave"
+                  ],
+                  "answers": [
+                    "stay",
+                    "brave"
+                  ],
+                  "letters": "staybrve"
+                },
+                {
+                  "offset": "113",
+                  "subtitle": "Run and hide!",
+                  "words": [
+                    "Run",
+                    "Hide"
+                  ],
+                  "answers": [
+                    "run",
+                    "hide"
+                  ],
+                  "letters": "runhide"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "s4_02_var2000_eq6": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s4_02_var2000_eq6_bg2908_1"
+        }
+      ]
+    },
+    "s4_04_var2000_eq4": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s4_04_var2000_eq4_bg2944_1"
+        }
+      ]
+    },
+    "s4_05_else": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 6,
+          "offset": "2975"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s5_enter_v6",
+          "section_register": {
+            "var": "1001",
+            "value": "6"
+          },
+          "offset": "2982"
+        }
+      ]
+    },
+    "s4_03_else": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "4",
+          "op": "gte",
+          "offset": "2944",
+          "then": "s4_04_var2000_eq4",
+          "else": "s4_05_else"
+        }
+      ]
+    },
+    "s4_01_after": {
+      "nodes": [
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "2817"
+        },
+        {
+          "type": "narration",
+          "text": "Tom Prince's voice echoes in the onrushing darkness...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2827"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1021",
+          "variant": "1",
+          "offset": "2837"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "I'm awake! And in my room! And I can hear a party downstairs!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2854"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "Maybe it all was just a dream...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "2863"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Regardless, I now know exactly what I must do.",
+          "character_id": "0",
+          "offset": "2878"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "2884"
+        },
+        {
+          "type": "narration",
+          "text": "Tom eyes his catapult with resolve, and then begins his preparations...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2894"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "6",
+          "op": "gte",
+          "offset": "2908",
+          "then": "s4_02_var2000_eq6",
+          "else": "s4_03_else"
+        }
+      ]
+    },
+    "s4_06_opt0": {
+      "nodes": [
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "2602"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Someone wrote 'good riddance' on my tombstone?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "2611"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "2617"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Who did this?! I'll show them good riddance! I'll get my revenge!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "2626"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "I... I...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "2635"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "But that's the problem, isn't it?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "2644"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Because I was selfish and vindictive and focused on revenge, I drove away everyone who ever cared about me...",
+          "character_id": "0",
+          "offset": "2659"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Oh no... I suddenly feel so... Cold inside... So empty.. What is this feeling?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2668"
+        },
+        {
+          "type": "narration",
+          "text": "For the first time, the Ghost speaks... His voice is raspy, chilling...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2678"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mr. Doom",
+          "emotion_code": null,
+          "image": "2335",
+          "text": "what you feel now... but a taste...  of what will come... after you die...",
+          "character_id": "11",
+          "offset": "2687"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "No! Spirit, please! I've learned my lesson! Take me back!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2696"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "2702"
+        },
+        {
+          "type": "next",
+          "next": "s4_01_after"
+        }
+      ]
+    },
+    "s4_07_opt1": {
+      "nodes": [
+        {
+          "type": "var_add",
+          "var": "2000",
+          "value": 1,
+          "offset": "2720"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "11",
+          "expression": "4",
+          "offset": "2726"
+        },
+        {
+          "type": "narration",
+          "text": "The Ghost cocks an eyebrow as if to ask, 'Uh... What'?!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2736"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "11",
+          "expression": "0",
+          "offset": "2742"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8007",
+          "offset": "2748"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "My grave... Look at it! It should be massive, like a skyscraper, and filled with all the super-awesome stuff I'm going to buy!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "2757"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "So... Did I not have enough money or what?!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "2774"
+        },
+        {
+          "type": "narration",
+          "text": "The Ghost wearily shakes his head from side to side.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2784"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "See, that's the problem right there! I need to amass way more money than my dad has. What was I thinking?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "2793"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "I must've been too focused on revenge... But what good is revenge if you're not super-rich?!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "2802"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Okay, Spirit. I think I've learned my lesson. It's time to take me back.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "2811"
+        },
+        {
+          "type": "next",
+          "next": "s4_01_after"
+        }
+      ]
+    },
+    "s4": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "2310"
+        },
+        {
+          "type": "narration",
+          "text": "And suddenly he is in his own Living Room once more.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2325"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "0",
+          "image": "26010",
+          "text": "What?! I'm home. Only... Why are there cobwebs everywhere?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2334"
+        },
+        {
+          "type": "music",
+          "track_id": "8220",
+          "loop": false,
+          "offset": "2341"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "0",
+          "image": "26010",
+          "text": "Hey, there's somebody in that chair over there.",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2358"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "0",
+          "image": "26010",
+          "text": "It's an Old Man... And he isn't moving...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2375"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "0",
+          "image": "26010",
+          "text": "I think he might be... Gulp... `Dead...`",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2384",
+          "text_bbcode": "I think he might be... Gulp... [color=#e23b3b][i]Dead...[/i][/color]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Young Silas",
+          "emotion_code": "0",
+          "image": "26010",
+          "text": "Hey! Help! There's a body in here! Somebody call the police!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2401"
+        },
+        {
+          "type": "narration",
+          "text": "A menacing, deformed figure steps up behind Tom...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2411"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mr. Doom",
+          "emotion_code": null,
+          "image": "2335",
+          "text": "...",
+          "character_id": "11",
+          "offset": "2420"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Oh no, you're him, aren't you? You're the Ghost of Winter Holidays future!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2429"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2435"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mr. Doom",
+          "emotion_code": null,
+          "image": "2335",
+          "text": "...",
+          "character_id": "11",
+          "offset": "2444"
+        },
+        {
+          "type": "narration",
+          "text": "The Ghost points to the corpse in the highback leather chair.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2454"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Why are you pointing? Are you trying to tell me something?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2471"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Ulp... That's me, isn't it?! That's how I die?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2480"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "2494"
+        },
+        {
+          "type": "narration",
+          "text": "The Ghost of Winter Holidays Future nods and beckons Tom forward...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2504"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "2510"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1060",
+          "variant": "1",
+          "offset": "2520"
+        },
+        {
+          "type": "narration",
+          "text": "Suddenly, they are walking through a shadowy graveyard.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2530"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mr. Doom",
+          "emotion_code": null,
+          "image": "2335",
+          "text": "...",
+          "character_id": "11",
+          "offset": "2539"
+        },
+        {
+          "type": "narration",
+          "text": "The Ghost points once more... This time indicating a marble headstone.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "2549"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "That's my tomb! It's...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "2566"
+        },
+        {
+          "type": "choice",
+          "prompt": "That's my tomb! It's...",
+          "options": [
+            {
+              "index": "0",
+              "label": "Been vandalized!",
+              "next": "s4_06_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Way too small!",
+              "next": "s4_07_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "That's my tomb! It's...",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s4_01_after"
+        }
+      ]
+    },
+    "s5_01_var2000_eq8": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s5_01_var2000_eq8_bg6324_1"
+        }
+      ]
+    },
+    "s5_06_opt0": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s5_07_opt1": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s5_05": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "{ We're the ghosts of the Holiday season! {",
+          "character_id": "1",
+          "offset": "7174"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": null,
+          "image": "26020",
+          "text": "{ We come when the weather gets freezin'! {",
+          "character_id": "3",
+          "offset": "7183"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mr. Doom",
+          "emotion_code": null,
+          "image": "2335",
+          "text": "{ If you've been a miser... {",
+          "character_id": "11",
+          "offset": "7192"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "{ We'll come make you wiser... {",
+          "character_id": "2",
+          "offset": "7201"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "{ By scaring you 'til you see reason! {",
+          "character_id": "1",
+          "offset": "7208"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Happy Holidays!",
+          "character_id": "2",
+          "offset": "7217"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "1",
+          "expression": "0",
+          "offset": "7223"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "3",
+          "expression": "0",
+          "offset": "7229"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "11",
+          "expression": "0",
+          "offset": "7235"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Skazz",
+          "emotion_code": "1",
+          "image": "26021",
+          "text": "And like, don't be naughty, dude!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "7244"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mr. Doom",
+          "emotion_code": "1",
+          "image": "2336",
+          "text": "Or else!",
+          "mode": "-3",
+          "character_id": "11",
+          "expression": "1",
+          "offset": "7256"
+        },
+        {
+          "type": "narration",
+          "text": "We hope you enjoyed this episode!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "7266"
+        },
+        {
+          "type": "narration",
+          "text": "Be sure to check out our new Premium Content, 'Football: Big Man on Campus'! Continue the story from Football and see your character in college!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "7276"
+        },
+        {
+          "type": "call",
+          "routine": "s5_r546",
+          "args": [],
+          "offset": "7279"
+        },
+        {
+          "type": "call",
+          "routine": "s5_r25",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing! See you in another episode!"
+            },
+            1
+          ],
+          "offset": "7290"
+        },
+        {
+          "type": "choice",
+          "prompt": "Help us improve the game by taking this optional survey.",
+          "options": [
+            {
+              "index": "0",
+              "label": "Take Survey.",
+              "next": "s5_06_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Skip Survey.",
+              "next": "s5_07_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Help us improve the game by taking this optional survey.",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          }
+        }
+      ]
+    },
+    "s5_04": {
+      "nodes": [
+        {
+          "type": "narration",
+          "text": "The door bursts open... A hush fills the room as Tom Prince enters...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6811"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": "4",
+          "image": "2284",
+          "text": "Tom, what are you doing here?",
+          "character_id": "6",
+          "expression": "4",
+          "offset": "6830"
+        },
+        {
+          "type": "music",
+          "track_id": "8221",
+          "loop": false,
+          "offset": "6837"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Mallika, I've had an epiphany.",
+          "character_id": "0",
+          "offset": "6844"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I realize that I've been a terrible person. I realize that I've been awful...",
+          "character_id": "0",
+          "offset": "6851"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "But I also realized something else. I love you desperately.",
+          "character_id": "0",
+          "offset": "6858"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I promise to change. I promise to undo all the damage that I've done...",
+          "character_id": "0",
+          "offset": "6865"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Just please... Marry me, Mallika! Make me the happiest heir to a massive family fortune in all of Centerscore.",
+          "character_id": "0",
+          "offset": "6872"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": "1",
+          "image": "2281",
+          "text": "You want me to marry you... After all the crap you pulled?!",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "6881"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Uh... well, let's not get ahead of ourselves. Marriage is so final. I was thinking more along the lines of 'engaged to be engaged'.",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6890"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "6896"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": "1",
+          "image": "2281",
+          "text": "Get out!",
+          "mode": "-3",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "6908"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "But the Ghost Bear promised me this would all work out for the best!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6917"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": "1",
+          "image": "2281",
+          "text": "Ghost bear?!",
+          "mode": "-3",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "6929"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1057",
+          "variant": "1",
+          "offset": "6939"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6953"
+        },
+        {
+          "type": "music",
+          "track_id": "8212",
+          "loop": false,
+          "offset": "6960"
+        },
+        {
+          "type": "narration",
+          "text": "Later that night, Officer Monte escorts Tom from the premises...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6970"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "1",
+          "image": "2331",
+          "text": "Come along, son.",
+          "character_id": "12",
+          "expression": "1",
+          "offset": "6979"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6988"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "I was called out of an important business meeting for this, Officer. What happened?",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "7007"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "Mental breakdown, I'm afraid... Totally gone...",
+          "character_id": "12",
+          "expression": "3",
+          "offset": "7016"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "No... I love you, Mallika... Ghost bear... Egg Nog catapult...",
+          "character_id": "0",
+          "offset": "7033"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Officer Monte",
+          "emotion_code": "3",
+          "image": "2333",
+          "text": "See what I mean?",
+          "character_id": "12",
+          "expression": "3",
+          "offset": "7052"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "3",
+          "image": "26008",
+          "text": "I always knew the boy was never cut out to be a Prince.",
+          "character_id": "5",
+          "expression": "3",
+          "offset": "7061"
+        },
+        {
+          "type": "narration",
+          "text": "Looks like professing your undying love isn't the way to real happiness, after all.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "7071"
+        },
+        {
+          "type": "narration",
+          "text": "You're going to have to try again, and next time, remember to think like Tom Prince!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "7081"
+        },
+        {
+          "type": "narration",
+          "text": "Or check out our new Premium Content, 'Football: Big Man on Campus'! Continue the story from Football and see your character in college!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "7091"
+        },
+        {
+          "type": "call",
+          "routine": "s5_r25",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Try again! We know you can do it!"
+            },
+            0
+          ],
+          "offset": "7101"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1060",
+          "variant": "1",
+          "offset": "7117"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "7132"
+        },
+        {
+          "type": "narration",
+          "text": "In the Graveyard, a spooky collection of spirits have assembled...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "7142"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Ahem... All together now...",
+          "character_id": "1",
+          "offset": "7149"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7155"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "7161"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "11",
+          "expression": "2",
+          "offset": "7167"
+        },
+        {
+          "type": "next",
+          "next": "s5_05"
+        }
+      ]
+    },
+    "s5_03": {
+      "nodes": [
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": null,
+          "image": "2280",
+          "text": "Thanks, Howard. I do try. Of course, this year Spike was a big help.",
+          "character_id": "6",
+          "offset": "6453"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Spike",
+          "emotion_code": null,
+          "image": "2400",
+          "text": "No biggie. If I didn't do it, I'm sure Mallika would've been able to find someone else to climb up the chimney and put lights on the roof.",
+          "character_id": "7",
+          "offset": "6462"
+        },
+        {
+          "type": "music",
+          "track_id": "8220",
+          "loop": false,
+          "offset": "6469"
+        },
+        {
+          "type": "narration",
+          "text": "Suddenly, the windows `explode` inward...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6479",
+          "text_bbcode": "Suddenly, the windows [b]explode[/b] inward..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": null,
+          "image": "2280",
+          "text": "What is that?",
+          "character_id": "6",
+          "offset": "6508"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Spike",
+          "emotion_code": null,
+          "image": "2400",
+          "text": "I don't know... But it tastes like... Nog?!",
+          "character_id": "7",
+          "offset": "6517"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "That's right, Mallika. I've gotten my revenge! I can finally move on!",
+          "character_id": "0",
+          "offset": "6524"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1057",
+          "variant": "1",
+          "offset": "6534"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "6550"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "6556"
+        },
+        {
+          "type": "narration",
+          "text": "Mallika charges out the door to find Tom Prince standing by his catapult.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6566"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": null,
+          "image": "2280",
+          "text": "Tom, what do you think you're doing? You just ruined my Holiday Party!",
+          "character_id": "6",
+          "offset": "6575"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I was getting revenge. Didn't you hear what I just said?",
+          "character_id": "0",
+          "offset": "6582"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "But it's okay now. We're cool. You pushed me into the ocean. I ruined your Holiday Party. We're square.",
+          "character_id": "0",
+          "offset": "6589"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": null,
+          "image": "2280",
+          "text": "Tom Prince, I hate you!",
+          "character_id": "6",
+          "offset": "6598"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6604"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8006",
+          "offset": "6610"
+        },
+        {
+          "type": "narration",
+          "text": "Mallika shoves Tom Prince backward... He flies into the icy cold swimming pool... Sploosh!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6620"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "S-s-sooo C-c-cooolldd...",
+          "character_id": "0",
+          "offset": "6637"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": null,
+          "image": "2280",
+          "text": "Why don't you get 'square' with that, Tom?!",
+          "character_id": "6",
+          "offset": "6646"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6652"
+        },
+        {
+          "type": "narration",
+          "text": "Tom Prince climbs out of the pool. He fixes Mallika in an icy glare.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6672"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Oh, I w-w-will, Mallika. I will have my r-r-revenge!",
+          "character_id": "0",
+          "offset": "6679"
+        },
+        {
+          "type": "narration",
+          "text": "What?! Mallika pushed Tom into the water, and now Tom wants revenge?",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6689"
+        },
+        {
+          "type": "narration",
+          "text": "We're exactly back where we started! We know you can do better than that!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6699"
+        },
+        {
+          "type": "narration",
+          "text": "Play again, and next time, remember to think like Tom Prince!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6709"
+        },
+        {
+          "type": "narration",
+          "text": "Or check out our new Premium Content, 'Football: Big Man on Campus'! Continue the story from Football and see your character in college!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6719"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "6725"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "6",
+          "expression": "0",
+          "offset": "6731"
+        },
+        {
+          "type": "call",
+          "routine": "s5_r25",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Try again! We know you can do it!"
+            },
+            0
+          ],
+          "offset": "6741"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "6757"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "6764"
+        },
+        {
+          "type": "narration",
+          "text": "Across town...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6774"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Thanks for throwing the Holiday party again this year, Mallika. You always do the best job with the decorations.",
+          "character_id": "8",
+          "offset": "6783"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": null,
+          "image": "2280",
+          "text": "Thanks, Howard. I do try. Of course, this year Spike was a big help.",
+          "character_id": "6",
+          "offset": "6792"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Spike",
+          "emotion_code": null,
+          "image": "2400",
+          "text": "No biggie. If I didn't do it, I'm sure Mallika would've been able to find someone else to climb up the chimney and put lights on the roof.",
+          "character_id": "7",
+          "offset": "6801"
+        },
+        {
+          "type": "next",
+          "next": "s5_04"
+        }
+      ]
+    },
+    "s5_02_else": {
+      "nodes": [
+        {
+          "type": "set_expression",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "6368"
+        },
+        {
+          "type": "narration",
+          "text": "But you weren't quite perfect. Try again to get the bonus scene.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6378"
+        },
+        {
+          "type": "narration",
+          "text": "Or check out our new Premium Content, 'Football: Big Man on Campus'! Continue the story from Football and see your character in college!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6388"
+        },
+        {
+          "type": "call",
+          "routine": "s5_r546",
+          "args": [],
+          "offset": "6391"
+        },
+        {
+          "type": "call",
+          "routine": "s5_r25",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing! See you in another episode!"
+            },
+            1
+          ],
+          "offset": "6402"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "6418"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "6425"
+        },
+        {
+          "type": "narration",
+          "text": "Across town...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6435"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Thanks for throwing the Holiday party again this year, Mallika. You always do the best job with the decorations.",
+          "character_id": "8",
+          "offset": "6444"
+        },
+        {
+          "type": "next",
+          "next": "s5_03"
+        }
+      ]
+    },
+    "s5": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "6001"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "6008"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": "5",
+          "image": "26020",
+          "text": "Son, what are you doing here? I thought I forbade you to come to this Holiday party?",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "6015"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "0",
+          "image": "2450",
+          "text": "Look, Dad, I get why you're worried.",
+          "character_id": "0",
+          "offset": "6021"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "5",
+          "image": "2455",
+          "text": "You do?",
+          "character_id": "5",
+          "offset": "6027"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "0",
+          "image": "2450",
+          "text": "Sure. You're worried that I'm going to turn out just like Mom... All soft inside...",
+          "character_id": "0",
+          "offset": "6033"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "0",
+          "image": "2450",
+          "text": "You think my obsession with Mallika was making me a loser...",
+          "character_id": "0",
+          "offset": "6039"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "But here's the thing. You were right... I was totally wasting my time and talent on trying to get revenge.",
+          "character_id": "0",
+          "offset": "6046"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "What I should've been doing is getting rich!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "6055"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Like, way richer than you! Or Great-Great-Grandpa Obadiah! Or anybody!",
+          "character_id": "0",
+          "offset": "6062"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I'm going to be the richest person who ever walked the planet. And when I die, I'm going to make a giant mausoleum and take everything with me!",
+          "character_id": "0",
+          "offset": "6069"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "Tom, I appreciate your newfound enthusiasm, but right now, I'm trying to make an important sales pitch to the owner of the Centerscore Comets.",
+          "character_id": "5",
+          "offset": "6078"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Comets' Owner",
+          "emotion_code": null,
+          "image": "2300",
+          "text": "I don't think you have to worry about that anymore, Silas.",
+          "character_id": "13",
+          "offset": "6087"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "4",
+          "image": "26009",
+          "text": "What!? Why not?",
+          "character_id": "5",
+          "expression": "4",
+          "offset": "6106"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Comets' Owner",
+          "emotion_code": null,
+          "image": "2300",
+          "text": "Because your son just showed me the prototype for his new 'T-Shirt Catapult'.",
+          "character_id": "13",
+          "offset": "6115"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Comets' Owner",
+          "emotion_code": null,
+          "image": "2300",
+          "text": "With it, we can launch hundreds of promotional T-shirts into the crowd at one time.",
+          "character_id": "13",
+          "offset": "6124"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Comets' Owner",
+          "emotion_code": "2",
+          "image": "2302",
+          "text": "Think of the cost-savings!",
+          "character_id": "13",
+          "expression": "2",
+          "offset": "6133"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Comets' Owner",
+          "emotion_code": null,
+          "image": "2300",
+          "text": "It's exactly this kind of retro-futuristic, turn-the-box-inside-out thinking that attracted me to Prince Industries in the first place.",
+          "character_id": "13",
+          "offset": "6142"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "4",
+          "image": "26009",
+          "text": "So... We have a deal then?",
+          "character_id": "5",
+          "expression": "4",
+          "offset": "6151"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Comets' Owner",
+          "emotion_code": null,
+          "image": "2300",
+          "text": "The paperwork will be sent over in the morning.",
+          "character_id": "13",
+          "offset": "6160"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Comets' Owner",
+          "emotion_code": null,
+          "image": "2300",
+          "text": "Now, if you'll excuse me... I think I may have overindulged on the caviar and Indonesian palm civet coffee.",
+          "character_id": "13",
+          "offset": "6179"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "Well now... You've done me proud, son.",
+          "character_id": "5",
+          "offset": "6198"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Like I care...",
+          "character_id": "0",
+          "offset": "6205"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "What?!",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "6224"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "I didn't do this for you. I did it for the money.",
+          "character_id": "0",
+          "offset": "6231"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "And if you want that contract with the Centerscore Comets, you're going to pay through the nose for the patent to my T-shirt catapult.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6240"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "Enjoy the party, Dad!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "6257"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "6263"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "Why you ungrateful, little...",
+          "character_id": "5",
+          "offset": "6280"
+        },
+        {
+          "type": "narration",
+          "text": "You've done well. It looks like Tom Prince has aced his first business deal.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6290"
+        },
+        {
+          "type": "narration",
+          "text": "And he's gotten over his obsession with Mallika.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6300"
+        },
+        {
+          "type": "narration",
+          "text": "You played a great game!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6310"
+        },
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "8",
+          "offset": "6324",
+          "then": "s5_01_var2000_eq8",
+          "else": "s5_02_else"
+        }
+      ]
+    },
+    "s3_02_lose_cont": {
+      "nodes": [
+        {
+          "type": "narration",
+          "text": "Tom spins around to find the Bear lumbering toward him.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6304"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6320"
+        },
+        {
+          "type": "narration",
+          "text": "The Ghost Bear takes Tom's loose shoe into its massive jaws and eviscerates it!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6330"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Noooo! That shoe is made from genuine Italian leather! Don't...",
+          "character_id": "0",
+          "offset": "6337"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6343"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Chomp... Chomp... `Urp!`",
+          "character_id": "2",
+          "offset": "6352",
+          "text_bbcode": "Chomp... Chomp... [color=#e23b3b][i]Urp![/i][/color]"
+        },
+        {
+          "type": "narration",
+          "text": "The Ghost Bear spits a slobbery, compacted mass of leather onto the forest floor.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6362"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "What have you done?!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6371"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "The heifer that shoe was made from was fed a diet high in essential oils... Groomed by orthodox monks using platinum-hilted hide combs...",
+          "character_id": "0",
+          "offset": "6378"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "And then its pelt was brined in salt retrieved from the bottom of the Dead Sea...",
+          "character_id": "0",
+          "offset": "6385"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "It...",
+          "character_id": "0",
+          "offset": "6392"
+        },
+        {
+          "type": "sfx",
+          "sfx_id": "8003",
+          "offset": "6398"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "SILENCE!",
+          "mode": "-3",
+          "character_id": "2",
+          "offset": "6410"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "6416"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Please don't eat me!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6425"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "I'm not going to eat you, Tom. I'm The Ghost Bear of Winter Holidays Present.",
+          "character_id": "2",
+          "offset": "6434"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "You... You are?",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6443"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Indeed.",
+          "character_id": "2",
+          "offset": "6452"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Well, that's a relief. I...",
+          "character_id": "0",
+          "offset": "6459"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Hey! Wait a second, what do bears have to do with the Winter Holiday? Shouldn't you be off hibernating or something?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6468"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "ROOOOOAAARRR!!!",
+          "mode": "-3",
+          "character_id": "2",
+          "offset": "6480"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Gulp... Or not...",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6489"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Ahem... Now that I have your attention, look!",
+          "character_id": "2",
+          "offset": "6508"
+        },
+        {
+          "type": "narration",
+          "text": "The Ghost Bear indicates the pleasant, well-lit home.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6526"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "See anything familiar?",
+          "character_id": "2",
+          "offset": "6535"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Come, Tom Prince... Follow me... And if you try to run again, I may decide to change my mind.",
+          "character_id": "2",
+          "offset": "6547"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "20",
+          "offset": "6553"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Gulp!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6562"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1057",
+          "variant": "1",
+          "offset": "6572"
+        },
+        {
+          "type": "narration",
+          "text": "Tom Prince follows the Ghost Bear through the woods. Eventually, they reach a pleasant, well-lit home.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6590"
+        },
+        {
+          "type": "music",
+          "track_id": "8221",
+          "loop": false,
+          "offset": "6605",
+          "id": "3.63"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "Wait a minute! I know this place. Mallika lives here!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "6614"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Indeed, and tonight, she is throwing a Winter Holiday party.",
+          "character_id": "2",
+          "offset": "6623"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "So... Where is your invitation, Tom?",
+          "character_id": "2",
+          "offset": "6632"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "3",
+          "image": "2453",
+          "text": "She sent me one... It must've... Gotten lost in the mail...",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "6649"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Humph!",
+          "character_id": "2",
+          "offset": "6658"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Hey, it happens!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6667"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Look inside, Tom. See all the happy party-goers?",
+          "character_id": "2",
+          "offset": "6676"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "So they're having a good time. So what?",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6693"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Earlier, you were conspiring to ruin this party. Why?",
+          "character_id": "2",
+          "offset": "6702"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Because Mallika humiliated me!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6719"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "You were hurt... So you intend to hurt her back? Is that all there is?",
+          "character_id": "2",
+          "offset": "6728"
+        },
+        {
+          "type": "choice",
+          "prompt": "Is that all there is?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Yeah... Duh... ",
+              "next": "s3_07_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Not exactly...",
+              "next": "s3_08_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "Is that all there is?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s3_03_after"
+        }
+      ]
+    },
+    "s1_enter_v0": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "14",
+          "offset": "6041"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg5882_1"
+        }
+      ]
+    },
+    "s3_enter_v2": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1060",
+          "variant": "1",
+          "offset": "5885"
+        },
+        {
+          "type": "narration",
+          "text": "Tom steps through the door and enters a dense mist...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "5903"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "I can't see anything! Where am I? Well, I feel a tree here, so I must be outside...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "5912"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "But if that was a tree, why is there shag carpet... On the wall?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5921"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Lower!",
+          "character_id": "2",
+          "offset": "5930"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "What?!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5939"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Scratch me lower! In the small of my back!",
+          "character_id": "2",
+          "offset": "5948"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "That's not shag carpet! That's fur!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5957"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Of course! What else would it be? I'm a bear!",
+          "character_id": "2",
+          "offset": "5966"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": false,
+          "offset": "5973"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5979"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "4",
+          "image": "2454",
+          "text": "You're a bear... And you can talk?! Nyaaaahhhh!!!",
+          "character_id": "0",
+          "expression": "4",
+          "offset": "5996"
+        },
+        {
+          "type": "narration",
+          "text": "Tom tears off through the woods...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6014"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "Don't make me chase you, Tom! You'll make me very angry!",
+          "character_id": "2",
+          "offset": "6031"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "You can talk, and you know my `name?!` So not cool!!!",
+          "character_id": "0",
+          "offset": "6046",
+          "text_bbcode": "You can talk, and you know my [color=#e23b3b][i]name?![/i][/color] So not cool!!!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Ghost Bear",
+          "emotion_code": null,
+          "image": "26000",
+          "text": "ROOOOOAAARRR!!!",
+          "mode": "-3",
+          "character_id": "2",
+          "offset": "6066"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": null,
+          "image": "2450",
+          "text": "Nyaaaahhhh!!!",
+          "character_id": "0",
+          "offset": "6081"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "6087"
+        },
+        {
+          "type": "music",
+          "track_id": "8201",
+          "loop": true,
+          "offset": "6094"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "1000",
+          "offset": "6143"
+        },
+        {
+          "type": "music",
+          "track_id": "8203",
+          "loop": false,
+          "offset": "6150"
+        },
+        {
+          "type": "minigame",
+          "minigame_type": "pick_word",
+          "kind": "content_fork",
+          "minigame_id": "1000",
+          "via": "by_id",
+          "trigger": "6143",
+          "win_threshold": "5",
+          "offset": "6160",
+          "win": "s3_01_win",
+          "lose": "s3_02_lose",
+          "setup": {
+            "bank": "pick_word",
+            "rounds": [
+              {
+                "offset": "229",
+                "subtitle": "Run from the Bear! Don't trip!",
+                "correct": [
+                  "Sprint!",
+                  "Dash!"
+                ],
+                "decoys": [
+                  "Drop!",
+                  "Stumble!"
+                ]
+              }
+            ],
+            "timer_ms": "20000"
+          },
+          "timed": true,
+          "timer_ms": "20000",
+          "variants": [
+            {
+              "platform": "mobile",
+              "bank": "pick_word",
+              "rounds": [
+                {
+                  "offset": "229",
+                  "subtitle": "Run from the Bear! Don't trip!",
+                  "correct": [
+                    "Sprint!",
+                    "Dash!"
+                  ],
+                  "decoys": [
+                    "Drop!",
+                    "Stumble!"
+                  ]
+                }
+              ]
+            },
+            {
+              "platform": "tablet",
+              "bank": "build_word",
+              "rounds": [
+                {
+                  "offset": "15",
+                  "subtitle": "Escape the bear!",
+                  "words": [
+                    "Escape",
+                    "Bear"
+                  ],
+                  "answers": [
+                    "escape",
+                    "bear"
+                  ],
+                  "letters": "escapebr"
+                },
+                {
+                  "offset": "67",
+                  "subtitle": "Stay brave!",
+                  "words": [
+                    "Stay",
+                    "Brave"
+                  ],
+                  "answers": [
+                    "stay",
+                    "brave"
+                  ],
+                  "letters": "staybrve"
+                },
+                {
+                  "offset": "113",
+                  "subtitle": "Run and hide!",
+                  "words": [
+                    "Run",
+                    "Hide"
+                  ],
+                  "answers": [
+                    "run",
+                    "hide"
+                  ],
+                  "letters": "runhide"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "s5_enter_v5": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "6418"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "6425"
+        },
+        {
+          "type": "narration",
+          "text": "Across town...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6435"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Thanks for throwing the Holiday party again this year, Mallika. You always do the best job with the decorations.",
+          "character_id": "8",
+          "offset": "6444"
+        },
+        {
+          "type": "next",
+          "next": "s5_03"
+        }
+      ]
+    },
+    "s5_enter_v6": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1048",
+          "variant": "1",
+          "offset": "6757"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "6764"
+        },
+        {
+          "type": "narration",
+          "text": "Across town...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6774"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Howard",
+          "emotion_code": null,
+          "image": "2210",
+          "text": "Thanks for throwing the Holiday party again this year, Mallika. You always do the best job with the decorations.",
+          "character_id": "8",
+          "offset": "6783"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Mallika",
+          "emotion_code": null,
+          "image": "2280",
+          "text": "Thanks, Howard. I do try. Of course, this year Spike was a big help.",
+          "character_id": "6",
+          "offset": "6792"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Spike",
+          "emotion_code": null,
+          "image": "2400",
+          "text": "No biggie. If I didn't do it, I'm sure Mallika would've been able to find someone else to climb up the chimney and put lights on the roof.",
+          "character_id": "7",
+          "offset": "6801"
+        },
+        {
+          "type": "next",
+          "next": "s5_04"
+        }
+      ]
+    },
+    "s5_enter_v7": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1060",
+          "variant": "1",
+          "offset": "7117"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "7132"
+        },
+        {
+          "type": "narration",
+          "text": "In the Graveyard, a spooky collection of spirits have assembled...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "7142"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Obadiah",
+          "emotion_code": null,
+          "image": "26015",
+          "text": "Ahem... All together now...",
+          "character_id": "1",
+          "offset": "7149"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "7155"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "3",
+          "expression": "2",
+          "offset": "7161"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "11",
+          "expression": "2",
+          "offset": "7167"
+        },
+        {
+          "type": "next",
+          "next": "s5_05"
+        }
+      ]
+    },
+    "s5_r25_b1": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 33,
+          "name": "show_card",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            4000
+          ]
+        },
+        {
+          "type": "yield",
+          "yield": 7,
+          "name": "end_episode",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            {
+              "local": -3
+            }
+          ]
+        },
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s5_r546_b1": {
+      "nodes": [
+        {
+          "type": "let",
+          "to": {
+            "local": 2
+          },
+          "value": 0
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 3
+          },
+          "value": 0
+        },
+        {
+          "type": "next",
+          "next": "s5_r546_b2"
+        }
+      ]
+    },
+    "s5_r546_b2": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 1,
+          "name": "choice",
+          "args": [
+            {
+              "text": "Make your choice!"
+            },
+            {
+              "text": "Take Survey.|Skip Survey."
+            },
+            {
+              "text": "Help us improve the game by taking this optional survey."
+            },
+            -1,
+            -1,
+            -2,
+            -1,
+            1
+          ],
+          "to": 5
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 3
+          },
+          "value": {
+            "local": 5
+          }
+        },
+        {
+          "type": "if",
+          "cond": {
+            "op": "not",
+            "a": {
+              "op": "==",
+              "a": {
+                "local": 3
+              },
+              "b": 1
+            }
+          },
+          "then": "s5_r546_b3",
+          "else": "s5_r546_b4"
+        }
+      ]
+    },
+    "s5_r546_b3": {
+      "nodes": [
+        {
+          "type": "let",
+          "to": {
+            "scratch": 4
+          },
+          "value": 3
+        },
+        {
+          "type": "let",
+          "to": {
+            "scratch": 5
+          },
+          "value": 2
+        },
+        {
+          "type": "next",
+          "next": "s5_r546_b6"
+        }
+      ]
+    },
+    "s5_r546_b4": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s5_r546_b5"
+        }
+      ]
+    },
+    "s5_r546_b5": {
+      "nodes": [
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s5_r546_b6": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s5_r546_b7"
+        }
+      ]
+    },
+    "s5_r546_b7": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 1,
+          "name": "choice",
+          "args": [
+            {
+              "text": "Make your choice!"
+            },
+            {
+              "text": "Loved it!|It had its moments.|It was ok.|Boring!"
+            },
+            {
+              "text": "How would you rate this pack?"
+            },
+            -1,
+            -1,
+            -2,
+            -1,
+            1
+          ],
+          "to": 5
+        },
+        {
+          "type": "let",
+          "to": {
+            "scratch": 6
+          },
+          "value": {
+            "local": 5
+          }
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 4
+          },
+          "value": 0
+        },
+        {
+          "type": "next",
+          "next": "s5_r546_b8"
+        }
+      ]
+    },
+    "s5_r546_b8": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s5_r546_b9"
+        }
+      ]
+    },
+    "s5_r546_b9": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 1,
+          "name": "choice",
+          "args": [
+            {
+              "text": "Make your choice!"
+            },
+            {
+              "text": "Skazz.|The Ghost Bear.|Mr. Doom."
+            },
+            {
+              "text": "Which ghost did you like best?"
+            },
+            -1,
+            -1,
+            -2,
+            -1,
+            1
+          ],
+          "to": 5
+        },
+        {
+          "type": "let",
+          "to": {
+            "scratch": 7
+          },
+          "value": {
+            "local": 5
+          }
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 4
+          },
+          "value": 1
+        },
+        {
+          "type": "next",
+          "next": "s5_r546_b10"
+        }
+      ]
+    },
+    "s5_r546_b10": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s5_r546_b11"
+        }
+      ]
+    },
+    "s5_r546_b11": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 1,
+          "name": "choice",
+          "args": [
+            {
+              "text": "Make your choice!"
+            },
+            {
+              "text": "Yes, and I was so scared!|Maybe... Maybe not!|Ghosts aren't real!"
+            },
+            {
+              "text": "Have you ever seen a ghost?"
+            },
+            -1,
+            -1,
+            -2,
+            -1,
+            1
+          ],
+          "to": 5
+        },
+        {
+          "type": "let",
+          "to": {
+            "scratch": 8
+          },
+          "value": {
+            "local": 5
+          }
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 4
+          },
+          "value": 2
+        },
+        {
+          "type": "next",
+          "next": "s5_r546_b12"
+        }
+      ]
+    },
+    "s5_r546_b12": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s5_r546_b13"
+        }
+      ]
+    },
+    "s5_r546_b13": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 9,
+          "name": "submit_poll",
+          "args": [
+            10280,
+            2,
+            {
+              "scratch_addr": 4
+            },
+            6,
+            2,
+            {
+              "scratch_addr": 0
+            },
+            4
+          ],
+          "to": 5
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 2
+          },
+          "value": {
+            "local": 5
+          }
+        },
+        {
+          "type": "if",
+          "cond": {
+            "op": "not",
+            "a": {
+              "op": "==",
+              "a": {
+                "local": 2
+              },
+              "b": 1
+            }
+          },
+          "then": "s5_r546_b14",
+          "else": "s5_r546_b15"
+        }
+      ]
+    },
+    "s5_r546_b14": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 65,
+          "name": "narration",
+          "args": [
+            14,
+            {
+              "text": "Connection failed. Please try again later."
+            },
+            0
+          ],
+          "to": 5
+        },
+        {
+          "type": "next",
+          "next": "s5_r546_b16"
+        }
+      ]
+    },
+    "s5_r546_b15": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 65,
+          "name": "narration",
+          "args": [
+            14,
+            {
+              "text": "Thanks for taking the survey!"
+            },
+            0
+          ],
+          "to": 5
+        },
+        {
+          "type": "yield",
+          "yield": 0,
+          "name": "format",
+          "args": [
+            {
+              "text": "Poll results:\nHave you ever seen a ghost?\nYes, and I was so scared!: %d.%d\nMeh... Just the once.: %d.%d\nGhosts aren't real!: %d.%d"
+            },
+            {
+              "op": "/",
+              "a": {
+                "scratch": 0
+              },
+              "b": 10
+            },
+            {
+              "op": "%",
+              "a": {
+                "scratch": 0
+              },
+              "b": 10
+            },
+            {
+              "op": "/",
+              "a": {
+                "scratch": 1
+              },
+              "b": 10
+            },
+            {
+              "op": "%",
+              "a": {
+                "scratch": 1
+              },
+              "b": 10
+            },
+            {
+              "op": "/",
+              "a": {
+                "scratch": 2
+              },
+              "b": 10
+            },
+            {
+              "op": "%",
+              "a": {
+                "scratch": 2
+              },
+              "b": 10
+            }
+          ],
+          "to": 5
+        },
+        {
+          "type": "yield",
+          "yield": 65,
+          "name": "narration",
+          "args": [
+            14,
+            {
+              "local": 5
+            },
+            0
+          ],
+          "to": 5
+        },
+        {
+          "type": "next",
+          "next": "s5_r546_b16"
+        }
+      ]
+    },
+    "s5_r546_b16": {
+      "nodes": [
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s1_bg5882_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "14",
+          "offset": "6041"
+        },
+        {
+          "type": "pov_change",
+          "character": "Tom",
+          "index": "0",
+          "offset": "6051"
+        },
+        {
+          "type": "narration",
+          "text": "Want to catch up? Grab the Season 1 Set, now available in our store, and get Episodes 1-20 for 50% off!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6058"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "6065"
+        },
+        {
+          "type": "title_card",
+          "title": "Tom Prince's Carol",
+          "subtitle": "Can Tom change his ways?",
+          "asset_id": "1078",
+          "flag": "0",
+          "offset": "6078"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1021",
+          "variant": "1",
+          "offset": "6088"
+        },
+        {
+          "type": "narration",
+          "text": "In houses across Centerscore, hearts are brimming over with Holiday cheer.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6106"
+        },
+        {
+          "type": "narration",
+          "text": "In all except one, that is...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6116"
+        },
+        {
+          "type": "narration",
+          "text": "In the Prince Residence, hearts are steeled toward thoughts of revenge...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6126"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Mallika and her lousy friends may have gotten the better of me at the Concert, the Flex Games, and even at the Prince Prix...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6135"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "But tonight, I will have my revenge!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6144"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "When this catapult I've designed is finished, I'll use it to egg Mallika's Holiday Party with gallons of gooey Holiday Nog!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6153"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "Their holiday will be ruined!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "6162"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "6168"
+        },
+        {
+          "type": "narration",
+          "text": "Whoa! Time out!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6178"
+        },
+        {
+          "type": "narration",
+          "text": "Now, we're well aware that Tom Prince's schemes aren't exactly in keeping with the Spirit of the Holiday Season...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6188"
+        },
+        {
+          "type": "narration",
+          "text": "But then again, Tom Prince isn't exactly the nicest guy, either.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6198"
+        },
+        {
+          "type": "narration",
+          "text": "So before we let you get back to the story, we'd like to offer up a word of caution...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6208"
+        },
+        {
+          "type": "narration",
+          "text": "To get a perfect game, you'll need to `think like Tom Prince.`",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6218",
+          "text_bbcode": "To get a perfect game, you'll need to [b]think like Tom Prince.[/b]"
+        },
+        {
+          "type": "narration",
+          "text": "Now then, where were we?",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6228"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "Yes! Yes! It's gonna be so sweet!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "6237"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "6243"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "Ah, Tom... There you are. Talking to yourself again?",
+          "character_id": "5",
+          "offset": "6260"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "What is it, Dad? I'm busy.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6277"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "Still occupied with your petty grievance against... What was her name again?",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "6286"
+        },
+        {
+          "type": "choice",
+          "prompt": "What was her name again?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Mallika.",
+              "next": "s1_05_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Could you be more specific?",
+              "next": "s1_06_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "What was her name again?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after"
+        }
+      ]
+    },
+    "s1_bg5882_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "5893",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "5900",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_bg5882_r"
+        }
+      ]
+    },
+    "s1_bg5882_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg5882_t",
+          "else": "s1_bg5882_r",
+          "offset": "5882",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg5882_r": {
+      "nodes": [
+        {
+          "type": "pov_change",
+          "character": "Tom",
+          "index": "0",
+          "offset": "6051"
+        },
+        {
+          "type": "narration",
+          "text": "Want to catch up? Grab the Season 1 Set, now available in our store, and get Episodes 1-20 for 50% off!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6058"
+        },
+        {
+          "type": "music",
+          "track_id": "8217",
+          "loop": false,
+          "offset": "6065"
+        },
+        {
+          "type": "title_card",
+          "title": "Tom Prince's Carol",
+          "subtitle": "Can Tom change his ways?",
+          "asset_id": "1078",
+          "flag": "0",
+          "offset": "6078"
+        },
+        {
+          "type": "background",
+          "style": "standard",
+          "asset_id": "1021",
+          "variant": "1",
+          "offset": "6088"
+        },
+        {
+          "type": "narration",
+          "text": "In houses across Centerscore, hearts are brimming over with Holiday cheer.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6106"
+        },
+        {
+          "type": "narration",
+          "text": "In all except one, that is...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6116"
+        },
+        {
+          "type": "narration",
+          "text": "In the Prince Residence, hearts are steeled toward thoughts of revenge...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6126"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "Mallika and her lousy friends may have gotten the better of me at the Concert, the Flex Games, and even at the Prince Prix...",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6135"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "But tonight, I will have my revenge!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6144"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "When this catapult I've designed is finished, I'll use it to egg Mallika's Holiday Party with gallons of gooey Holiday Nog!",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6153"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "Their holiday will be ruined!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "6162"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "6168"
+        },
+        {
+          "type": "narration",
+          "text": "Whoa! Time out!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6178"
+        },
+        {
+          "type": "narration",
+          "text": "Now, we're well aware that Tom Prince's schemes aren't exactly in keeping with the Spirit of the Holiday Season...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6188"
+        },
+        {
+          "type": "narration",
+          "text": "But then again, Tom Prince isn't exactly the nicest guy, either.",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6198"
+        },
+        {
+          "type": "narration",
+          "text": "So before we let you get back to the story, we'd like to offer up a word of caution...",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6208"
+        },
+        {
+          "type": "narration",
+          "text": "To get a perfect game, you'll need to `think like Tom Prince.`",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6218",
+          "text_bbcode": "To get a perfect game, you'll need to [b]think like Tom Prince.[/b]"
+        },
+        {
+          "type": "narration",
+          "text": "Now then, where were we?",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6228"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "2",
+          "image": "2452",
+          "text": "Yes! Yes! It's gonna be so sweet!",
+          "character_id": "0",
+          "expression": "2",
+          "offset": "6237"
+        },
+        {
+          "type": "set_expression",
+          "character_id": "0",
+          "expression": "0",
+          "offset": "6243"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": null,
+          "image": "26005",
+          "text": "Ah, Tom... There you are. Talking to yourself again?",
+          "character_id": "5",
+          "offset": "6260"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Tom",
+          "emotion_code": "1",
+          "image": "2451",
+          "text": "What is it, Dad? I'm busy.",
+          "character_id": "0",
+          "expression": "1",
+          "offset": "6277"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Silas",
+          "emotion_code": "1",
+          "image": "26006",
+          "text": "Still occupied with your petty grievance against... What was her name again?",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "6286"
+        },
+        {
+          "type": "choice",
+          "prompt": "What was her name again?",
+          "options": [
+            {
+              "index": "0",
+              "label": "Mallika.",
+              "next": "s1_05_opt0"
+            },
+            {
+              "index": "1",
+              "label": "Could you be more specific?",
+              "next": "s1_06_opt1"
+            }
+          ],
+          "menu": {
+            "title": "Make your choice!",
+            "text": "What was her name again?",
+            "timeout_ms": "-1",
+            "timeout_result": "-1",
+            "character_id": "-2",
+            "reserved": "-1",
+            "portrait_mode": "1"
+          },
+          "after": "s1_01_after"
+        }
+      ]
+    },
+    "s1_enter_v0_bg5882_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "5893",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "5900",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg5882_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg5882_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg5882_t",
+          "else": "s1_enter_v0_bg5882_r",
+          "offset": "5882",
+          "op": "eq"
+        }
+      ]
+    },
+    "s4_02_var2000_eq6_bg2908_r": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s4_02_var2000_eq6_bg2908_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 4,
+          "offset": "2917"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s5",
+          "section_register": {
+            "var": "1001",
+            "value": "4"
+          },
+          "offset": "2924"
+        },
+        {
+          "type": "return"
+        }
+      ]
+    },
+    "s4_02_var2000_eq6_bg2908_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "6",
+          "then": "s4_02_var2000_eq6_bg2908_t",
+          "else": "s4_02_var2000_eq6_bg2908_r",
+          "offset": "2908",
+          "op": "gte"
+        }
+      ]
+    },
+    "s4_04_var2000_eq4_bg2944_r": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s4_04_var2000_eq4_bg2944_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 5,
+          "offset": "2953"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s5_enter_v5",
+          "section_register": {
+            "var": "1001",
+            "value": "5"
+          },
+          "offset": "2960"
+        },
+        {
+          "type": "return"
+        }
+      ]
+    },
+    "s4_04_var2000_eq4_bg2944_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "4",
+          "then": "s4_04_var2000_eq4_bg2944_t",
+          "else": "s4_04_var2000_eq4_bg2944_r",
+          "offset": "2944",
+          "op": "gte"
+        }
+      ]
+    },
+    "s5_01_var2000_eq8_bg6324_r": {
+      "nodes": [
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s5_01_var2000_eq8_bg6324_t": {
+      "nodes": [
+        {
+          "type": "set_expression",
+          "character_id": "5",
+          "expression": "0",
+          "offset": "6330"
+        },
+        {
+          "type": "narration",
+          "text": "In fact, you were perfect! Enjoy your bonus scene!",
+          "character_id": "14",
+          "expression": "0",
+          "offset": "6340"
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 7,
+          "offset": "6349"
+        },
+        {
+          "type": "goto_scene",
+          "file": "s5_enter_v7",
+          "section_register": {
+            "var": "1001",
+            "value": "7"
+          },
+          "offset": "6356"
+        },
+        {
+          "type": "return"
+        }
+      ]
+    },
+    "s5_01_var2000_eq8_bg6324_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "2000",
+          "equals": "8",
+          "then": "s5_01_var2000_eq8_bg6324_t",
+          "else": "s5_01_var2000_eq8_bg6324_r",
+          "offset": "6324",
+          "op": "eq"
+        }
+      ]
+    }
+  },
+  "pack_id": "201",
+  "episode_id": "25",
+  "localized_titles": [
+    "25: Tom Prince's Carol",
+    "25 - Tom Prince's Carol",
+    "25: Tom Prince's Carol",
+    "25. Tom Prince's Carol",
+    "25: Tom Prince's Carol"
+  ],
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "2450",
+          "name": "Tom",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "26015",
+          "name": "Obadiah",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "26000",
+          "name": "Ghost Bear",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "26020",
+          "name": "Skazz",
+          "format": 1
+        },
+        {
+          "id": "4",
+          "art": "26010",
+          "name": "Young Silas",
+          "format": 1
+        },
+        {
+          "id": "5",
+          "art": "26005",
+          "name": "Silas",
+          "format": 1
+        },
+        {
+          "id": "6",
+          "art": "2280",
+          "name": "Mallika",
+          "format": 1
+        },
+        {
+          "id": "7",
+          "art": "2400",
+          "name": "Spike",
+          "format": 1
+        },
+        {
+          "id": "8",
+          "art": "2210",
+          "name": "Howard",
+          "format": 1
+        },
+        {
+          "id": "9",
+          "art": "2260",
+          "name": "Linda",
+          "format": 1
+        },
+        {
+          "id": "10",
+          "art": "2465",
+          "name": "Miriam Prince",
+          "format": 1
+        },
+        {
+          "id": "11",
+          "art": "2335",
+          "name": "Mr. Doom",
+          "format": 1
+        },
+        {
+          "id": "12",
+          "art": "2330",
+          "name": "Officer Monte",
+          "format": 1
+        },
+        {
+          "id": "13",
+          "art": "2300",
+          "name": "Comets' Owner",
+          "format": 1
+        },
+        {
+          "id": "14",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "14",
+        "74": "0"
+      }
+    },
+    "2": {
+      "characters": [],
+      "ui_defaults": {}
+    },
+    "3": {
+      "characters": [],
+      "ui_defaults": {}
+    },
+    "4": {
+      "characters": [],
+      "ui_defaults": {}
+    },
+    "5": {
+      "characters": [],
+      "ui_defaults": {}
+    }
+  },
+  "routines": {
+    "s5_r25": {
+      "entry": "s5_r25_b1",
+      "params": 3,
+      "offset": "5966"
+    },
+    "s5_r546": {
+      "entry": "s5_r546_b1",
+      "params": 0,
+      "offset": "7299"
+    }
+  },
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0,
+      "2000": 0
+    },
+    "set_only": [
+      "1000",
+      "1001"
+    ]
+  }
+}

@@ -1,0 +1,1731 @@
+{
+  "title": "MTX_Story_Vote_Ticket",
+  "episode": "Story Vote Ticket",
+  "cast": [
+    "Kara",
+    "Gabriel",
+    "Miranda",
+    "Professor Au Fait",
+    "Athena",
+    "Briar",
+    "Siegfried",
+    "Fermi",
+    "Terra"
+  ],
+  "main_characters": [
+    "Kara",
+    "Athena",
+    "Siegfried",
+    "Terra"
+  ],
+  "genders": {
+    "Kara": "F",
+    "Gabriel": "M",
+    "Professor Au Fait": "F",
+    "Athena": "F",
+    "Briar": "F",
+    "Siegfried": "F",
+    "Fermi": "M",
+    "Terra": "F"
+  },
+  "entry": "s1",
+  "scene_entries": {
+    "1": "s1"
+  },
+  "scene_minigame_banks": {
+    "1": {}
+  },
+  "section_dispatch": {
+    "1": {
+      "register": "1001",
+      "transform_operand": "3",
+      "chapter_base": "0",
+      "valid_values": [
+        "0"
+      ],
+      "cases": [
+        {
+          "value": "0",
+          "key": "2"
+        }
+      ],
+      "entry_by_value": {
+        "0": "s1_enter_v0"
+      }
+    }
+  },
+  "segments": {
+    "s1": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_bg3656_1"
+        }
+      ]
+    },
+    "s1_enter_v0": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "9",
+          "offset": "3843"
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg3656_1"
+        }
+      ]
+    },
+    "s1_r24_b1": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 33,
+          "name": "show_card",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            4000
+          ]
+        },
+        {
+          "type": "yield",
+          "yield": 7,
+          "name": "end_episode",
+          "args": [
+            {
+              "local": -5
+            },
+            {
+              "local": -4
+            },
+            {
+              "local": -3
+            }
+          ]
+        },
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s1_r347_b1": {
+      "nodes": [
+        {
+          "type": "let",
+          "to": {
+            "local": 2
+          },
+          "value": 0
+        },
+        {
+          "type": "next",
+          "next": "s1_r347_b2"
+        }
+      ]
+    },
+    "s1_r347_b2": {
+      "nodes": [
+        {
+          "type": "let",
+          "to": {
+            "scratch": 4
+          },
+          "value": 1
+        },
+        {
+          "type": "let",
+          "to": {
+            "scratch": 5
+          },
+          "value": 0
+        },
+        {
+          "type": "next",
+          "next": "s1_r347_b3"
+        }
+      ]
+    },
+    "s1_r347_b3": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_r347_b4"
+        }
+      ]
+    },
+    "s1_r347_b4": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 1,
+          "name": "choice",
+          "args": [
+            {
+              "text": "Make your choice!"
+            },
+            {
+              "text": "Vampires!|Magic!|Fairy tales!|Sci-Fi!"
+            },
+            {
+              "text": "Cast your vote for our new genre!"
+            },
+            -1,
+            -1,
+            -2,
+            -1,
+            1
+          ],
+          "to": 4
+        },
+        {
+          "type": "let",
+          "to": {
+            "scratch": 6
+          },
+          "value": {
+            "local": 4
+          }
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 3
+          },
+          "value": 0
+        },
+        {
+          "type": "next",
+          "next": "s1_r347_b5"
+        }
+      ]
+    },
+    "s1_r347_b5": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_r347_b6"
+        }
+      ]
+    },
+    "s1_r347_b6": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 9,
+          "name": "submit_poll",
+          "args": [
+            140,
+            2,
+            {
+              "scratch_addr": 4
+            },
+            6,
+            2,
+            {
+              "scratch_addr": 0
+            },
+            4
+          ],
+          "to": 4
+        },
+        {
+          "type": "let",
+          "to": {
+            "local": 2
+          },
+          "value": {
+            "local": 4
+          }
+        },
+        {
+          "type": "if",
+          "cond": {
+            "op": "not",
+            "a": {
+              "op": "==",
+              "a": {
+                "local": 2
+              },
+              "b": 1
+            }
+          },
+          "then": "s1_r347_b7",
+          "else": "s1_r347_b8"
+        }
+      ]
+    },
+    "s1_r347_b7": {
+      "nodes": [
+        {
+          "type": "yield",
+          "yield": 65,
+          "name": "narration",
+          "args": [
+            9,
+            {
+              "text": "Connection failed. Please try again later."
+            },
+            0
+          ],
+          "to": 4
+        },
+        {
+          "type": "next",
+          "next": "s1_r347_b9"
+        }
+      ]
+    },
+    "s1_r347_b8": {
+      "nodes": [
+        {
+          "type": "next",
+          "next": "s1_r347_b9"
+        }
+      ]
+    },
+    "s1_r347_b9": {
+      "nodes": [
+        {
+          "type": "ret"
+        }
+      ]
+    },
+    "s1_bg3656_r": {
+      "nodes": [
+        {
+          "type": "set_ui_default",
+          "value": "9",
+          "offset": "3843"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26008",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "3867"
+        },
+        {
+          "type": "wobble",
+          "offset": "3870"
+        },
+        {
+          "type": "narration",
+          "text": "Thanks for buying this Story Vote Ticket!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3877"
+        },
+        {
+          "type": "narration",
+          "text": "The writers of Surviving High School are working on a brand new series to be sold in Surviving High School's On Demand store...",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3884"
+        },
+        {
+          "type": "narration",
+          "text": "And for the first time ever, we're letting `YOU` decide what we write!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3891",
+          "text_bbcode": "And for the first time ever, we're letting [b]YOU[/b] decide what we write!"
+        },
+        {
+          "type": "narration",
+          "text": "Play through the four sneak peeks that follow this message and then cast your vote for the genre you want to play!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3901"
+        },
+        {
+          "type": "narration",
+          "text": "Remember, the two genres with the fewest votes `will be eliminated...`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3911",
+          "text_bbcode": "Remember, the two genres with the fewest votes [b]will be eliminated...[/b]"
+        },
+        {
+          "type": "narration",
+          "text": "After that, we'll put the two remaining genres head-to-head for a `final showdown!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3921",
+          "text_bbcode": "After that, we'll put the two remaining genres head-to-head for a [b]final showdown![/b]"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "3927"
+        },
+        {
+          "type": "narration",
+          "text": "And now...",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3937"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26007",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "3949"
+        },
+        {
+          "type": "music",
+          "track_id": "26010",
+          "loop": true,
+          "offset": "3956"
+        },
+        {
+          "type": "narration",
+          "text": "`GENRE #1: VAMPIRES!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3966",
+          "text_bbcode": "[b]GENRE #1: VAMPIRES![/b]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26001",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "3978"
+        },
+        {
+          "type": "pov_change",
+          "character": "Kara",
+          "index": "0",
+          "offset": "3982"
+        },
+        {
+          "type": "narration",
+          "text": "Do you want to experience the supernatural as an alluring and mysterious `vampire?`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3992",
+          "text_bbcode": "Do you want to experience the supernatural as an alluring and mysterious [b]vampire?[/b]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kara",
+          "emotion_code": "3",
+          "image": "26017",
+          "text": "Whoa... My head, it's swimming, and everything feels so... `Vivid...` So alive... Do you always feel like this after you feed?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "4001",
+          "text_bbcode": "Whoa... My head, it's swimming, and everything feels so... [color=#3b78e2][i]Vivid...[/i][/color] So alive... Do you always feel like this after you feed?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Gabriel",
+          "emotion_code": "2",
+          "image": "26021",
+          "text": "After a while, you learn to control yourself, but at first, the taste of blood is intoxicating, overpowering...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "4010"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Gabriel",
+          "emotion_code": "3",
+          "image": "26022",
+          "text": "If you're not careful, it's easy to lose control.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "4019"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Gabriel",
+          "emotion_code": "3",
+          "image": "26022",
+          "text": "And that could make you a target... For hunters, the vaeittir, or worse...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "4028"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kara",
+          "emotion_code": null,
+          "image": "26014",
+          "text": "Okay, but Gabriel, what if I `wanted` to lose control...",
+          "character_id": "0",
+          "offset": "4035",
+          "text_bbcode": "Okay, but Gabriel, what if I [color=#3b78e2][i]wanted[/i][/color] to lose control..."
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "4041"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "4500",
+          "offset": "4047"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kara",
+          "emotion_code": null,
+          "image": "26014",
+          "text": "What if there was someone I wanted to lose control `with?`",
+          "character_id": "0",
+          "offset": "4054",
+          "text_bbcode": "What if there was someone I wanted to lose control [color=#3b78e2][i]with?[/i][/color]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26005",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4066"
+        },
+        {
+          "type": "music",
+          "track_id": "26012",
+          "loop": true,
+          "offset": "4073"
+        },
+        {
+          "type": "narration",
+          "text": "`GENRE #2: MAGIC!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4083",
+          "text_bbcode": "[b]GENRE #2: MAGIC![/b]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26002",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4095"
+        },
+        {
+          "type": "pov_change",
+          "character": "Athena",
+          "index": "4",
+          "offset": "4101"
+        },
+        {
+          "type": "narration",
+          "text": "Would you like to hone your magical abilities and become a powerful `witch` or `wizard?`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4111",
+          "text_bbcode": "Would you like to hone your magical abilities and become a powerful [b]witch[/b] or [b]wizard?[/b]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Professor Au Fait",
+          "emotion_code": "1",
+          "image": "26025",
+          "text": "There's no room for excuses, Athena!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "4120"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Professor Au Fait",
+          "emotion_code": "1",
+          "image": "26025",
+          "text": "If you couldn't control your magic, you never would've survived the Ordeal of Admittance and been accepted into this school!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "4129"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Professor Au Fait",
+          "emotion_code": "1",
+          "image": "26025",
+          "text": "The Necromancers are on the move! You must be ready!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "4138"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Athena",
+          "emotion_code": "3",
+          "image": "26032",
+          "text": "I know... I'm not trying to screw up, but every time I use my magic, something goes wrong.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "4147"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Professor Au Fait",
+          "emotion_code": "3",
+          "image": "26027",
+          "text": "Oh dear, I was afraid of this... Sometimes powerful emotions can short-circuit magical ability...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "4156"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "4162"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "4500",
+          "offset": "4168"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Professor Au Fait",
+          "emotion_code": "3",
+          "image": "26027",
+          "text": "So... Who's the boy you have a crush on?",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "4177"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26006",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4189"
+        },
+        {
+          "type": "narration",
+          "text": "`GENRE #3: FAIRY TALES!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4199",
+          "text_bbcode": "[b]GENRE #3: FAIRY TALES![/b]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26000",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4211"
+        },
+        {
+          "type": "pov_change",
+          "character": "Siegfried",
+          "index": "6",
+          "offset": "4217"
+        },
+        {
+          "type": "music",
+          "track_id": "26011",
+          "loop": true,
+          "offset": "4224"
+        },
+        {
+          "type": "narration",
+          "text": "Do you want to explore the storybook world of `fairy tales` come to life?",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4234",
+          "text_bbcode": "Do you want to explore the storybook world of [b]fairy tales[/b] come to life?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Briar",
+          "emotion_code": "1",
+          "image": "26035",
+          "text": "I've had enough this! Beds with vegetables stuffed under the mattresses! Snooty mirrors that always talk about prettier people...",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "4243"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Briar",
+          "emotion_code": "1",
+          "image": "26035",
+          "text": "Not to mention the glass slippers! What genius came up with footwear that `shatters?` Nobody could possibly be worth all this trouble!",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "4252",
+          "text_bbcode": "Not to mention the glass slippers! What genius came up with footwear that [color=#3b78e2][i]shatters?[/i][/color] Nobody could possibly be worth all this trouble!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Siegfried",
+          "emotion_code": null,
+          "image": "26044",
+          "text": "Really? That's not what you said the night the prince kissed you...",
+          "character_id": "6",
+          "offset": "4261"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Siegfried",
+          "emotion_code": null,
+          "image": "26044",
+          "text": "I seem to recall you mentioning that his eyes were like 'limpid pools of iridescent sea foam'...",
+          "character_id": "6",
+          "offset": "4270"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Briar",
+          "emotion_code": "2",
+          "image": "26036",
+          "text": "Okay... Okay... I admit. He is really cute... And a `prince...` And if I want to date him, I have to complete the final test...",
+          "character_id": "5",
+          "expression": "2",
+          "offset": "4279",
+          "text_bbcode": "Okay... Okay... I admit. He is really cute... And a [color=#3b78e2][i]prince...[/i][/color] And if I want to date him, I have to complete the final test..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Siegfried",
+          "emotion_code": "1",
+          "image": "26045",
+          "text": "Of course, Briar, but you know there are more pressing matters at hand than princely boys...",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "4288"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "4294"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "4500",
+          "offset": "4300"
+        },
+        {
+          "type": "wobble",
+          "offset": "4303"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Siegfried",
+          "emotion_code": "1",
+          "image": "26045",
+          "text": "Like the `dragon` headed right this way! `EEEEE!!!`",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "4312",
+          "text_bbcode": "Like the [color=#3b78e2][i]dragon[/i][/color] headed right this way! [color=#3b78e2][i]EEEEE!!![/i][/color]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26004",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4324"
+        },
+        {
+          "type": "music",
+          "track_id": "26013",
+          "loop": true,
+          "offset": "4331"
+        },
+        {
+          "type": "narration",
+          "text": "`GENRE #4: SCI-FI!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4341",
+          "text_bbcode": "[b]GENRE #4: SCI-FI![/b]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26003",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4353"
+        },
+        {
+          "type": "pov_change",
+          "character": "Terra",
+          "index": "8",
+          "offset": "4359"
+        },
+        {
+          "type": "narration",
+          "text": "Would you like to sneak a glimpse into the future and blast off in an epic `sci-fi` adventure?",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4369",
+          "text_bbcode": "Would you like to sneak a glimpse into the future and blast off in an epic [b]sci-fi[/b] adventure?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Fermi",
+          "emotion_code": "3",
+          "image": "26052",
+          "text": "Terra, you don't have to push yourself like this. The combat simulator will still be here in the morning...",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "4378"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Terra",
+          "emotion_code": "1",
+          "image": "26055",
+          "text": "Yeah, and by then I'll have logged another 8 hours of flight time.",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "4387"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Terra",
+          "emotion_code": "3",
+          "image": "26057",
+          "text": "Admiral Gosschalk was the best cadet ever to graduate from Astrocademy, and you know what happened to him when he traveled to the Outer Void...",
+          "character_id": "8",
+          "expression": "3",
+          "offset": "4396"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "4402"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "4500",
+          "offset": "4408"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Terra",
+          "emotion_code": "3",
+          "image": "26057",
+          "text": "I have to be better. I have to... `For Peter.`",
+          "character_id": "8",
+          "expression": "3",
+          "offset": "4417",
+          "text_bbcode": "I have to be better. I have to... [color=#3b78e2][i]For Peter.[/i][/color]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26008",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4429"
+        },
+        {
+          "type": "narration",
+          "text": "Those were the sneak peeks!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4439"
+        },
+        {
+          "type": "narration",
+          "text": "Now let us know which genre `you` want to play by casting your vote in the poll!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4449",
+          "text_bbcode": "Now let us know which genre [b]you[/b] want to play by casting your vote in the poll!"
+        },
+        {
+          "type": "pov_change",
+          "character": "Siegfried",
+          "index": "6",
+          "offset": "4455"
+        },
+        {
+          "type": "call",
+          "routine": "s1_r347",
+          "args": [],
+          "offset": "4458"
+        },
+        {
+          "type": "narration",
+          "text": "Thanks for letting us know which genre `YOU` want to play!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4469",
+          "text_bbcode": "Thanks for letting us know which genre [b]YOU[/b] want to play!"
+        },
+        {
+          "type": "narration",
+          "text": "And stay alert... Once the genres with the fewest votes are `eliminated...`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4479",
+          "text_bbcode": "And stay alert... Once the genres with the fewest votes are [b]eliminated...[/b]"
+        },
+        {
+          "type": "narration",
+          "text": "We'll put the two remaining genres head-to-head for a `final showdown!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4489",
+          "text_bbcode": "We'll put the two remaining genres head-to-head for a [b]final showdown![/b]"
+        },
+        {
+          "type": "call",
+          "routine": "s1_r24",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing!"
+            },
+            1
+          ],
+          "offset": "4499"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_bg3656_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "3667",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "3674",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_bg3656_r"
+        }
+      ]
+    },
+    "s1_bg3656_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_bg3656_t",
+          "else": "s1_bg3656_r",
+          "offset": "3656",
+          "op": "eq"
+        }
+      ]
+    },
+    "s1_enter_v0_bg3656_r": {
+      "nodes": [
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26008",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "3867"
+        },
+        {
+          "type": "wobble",
+          "offset": "3870"
+        },
+        {
+          "type": "narration",
+          "text": "Thanks for buying this Story Vote Ticket!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3877"
+        },
+        {
+          "type": "narration",
+          "text": "The writers of Surviving High School are working on a brand new series to be sold in Surviving High School's On Demand store...",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3884"
+        },
+        {
+          "type": "narration",
+          "text": "And for the first time ever, we're letting `YOU` decide what we write!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3891",
+          "text_bbcode": "And for the first time ever, we're letting [b]YOU[/b] decide what we write!"
+        },
+        {
+          "type": "narration",
+          "text": "Play through the four sneak peeks that follow this message and then cast your vote for the genre you want to play!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3901"
+        },
+        {
+          "type": "narration",
+          "text": "Remember, the two genres with the fewest votes `will be eliminated...`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3911",
+          "text_bbcode": "Remember, the two genres with the fewest votes [b]will be eliminated...[/b]"
+        },
+        {
+          "type": "narration",
+          "text": "After that, we'll put the two remaining genres head-to-head for a `final showdown!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3921",
+          "text_bbcode": "After that, we'll put the two remaining genres head-to-head for a [b]final showdown![/b]"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "3927"
+        },
+        {
+          "type": "narration",
+          "text": "And now...",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3937"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26007",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "3949"
+        },
+        {
+          "type": "music",
+          "track_id": "26010",
+          "loop": true,
+          "offset": "3956"
+        },
+        {
+          "type": "narration",
+          "text": "`GENRE #1: VAMPIRES!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3966",
+          "text_bbcode": "[b]GENRE #1: VAMPIRES![/b]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26001",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "3978"
+        },
+        {
+          "type": "pov_change",
+          "character": "Kara",
+          "index": "0",
+          "offset": "3982"
+        },
+        {
+          "type": "narration",
+          "text": "Do you want to experience the supernatural as an alluring and mysterious `vampire?`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "3992",
+          "text_bbcode": "Do you want to experience the supernatural as an alluring and mysterious [b]vampire?[/b]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kara",
+          "emotion_code": "3",
+          "image": "26017",
+          "text": "Whoa... My head, it's swimming, and everything feels so... `Vivid...` So alive... Do you always feel like this after you feed?",
+          "character_id": "0",
+          "expression": "3",
+          "offset": "4001",
+          "text_bbcode": "Whoa... My head, it's swimming, and everything feels so... [color=#3b78e2][i]Vivid...[/i][/color] So alive... Do you always feel like this after you feed?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Gabriel",
+          "emotion_code": "2",
+          "image": "26021",
+          "text": "After a while, you learn to control yourself, but at first, the taste of blood is intoxicating, overpowering...",
+          "character_id": "1",
+          "expression": "2",
+          "offset": "4010"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Gabriel",
+          "emotion_code": "3",
+          "image": "26022",
+          "text": "If you're not careful, it's easy to lose control.",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "4019"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Gabriel",
+          "emotion_code": "3",
+          "image": "26022",
+          "text": "And that could make you a target... For hunters, the vaeittir, or worse...",
+          "character_id": "1",
+          "expression": "3",
+          "offset": "4028"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kara",
+          "emotion_code": null,
+          "image": "26014",
+          "text": "Okay, but Gabriel, what if I `wanted` to lose control...",
+          "character_id": "0",
+          "offset": "4035",
+          "text_bbcode": "Okay, but Gabriel, what if I [color=#3b78e2][i]wanted[/i][/color] to lose control..."
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "4041"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "4500",
+          "offset": "4047"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Kara",
+          "emotion_code": null,
+          "image": "26014",
+          "text": "What if there was someone I wanted to lose control `with?`",
+          "character_id": "0",
+          "offset": "4054",
+          "text_bbcode": "What if there was someone I wanted to lose control [color=#3b78e2][i]with?[/i][/color]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26005",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4066"
+        },
+        {
+          "type": "music",
+          "track_id": "26012",
+          "loop": true,
+          "offset": "4073"
+        },
+        {
+          "type": "narration",
+          "text": "`GENRE #2: MAGIC!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4083",
+          "text_bbcode": "[b]GENRE #2: MAGIC![/b]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26002",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4095"
+        },
+        {
+          "type": "pov_change",
+          "character": "Athena",
+          "index": "4",
+          "offset": "4101"
+        },
+        {
+          "type": "narration",
+          "text": "Would you like to hone your magical abilities and become a powerful `witch` or `wizard?`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4111",
+          "text_bbcode": "Would you like to hone your magical abilities and become a powerful [b]witch[/b] or [b]wizard?[/b]"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Professor Au Fait",
+          "emotion_code": "1",
+          "image": "26025",
+          "text": "There's no room for excuses, Athena!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "4120"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Professor Au Fait",
+          "emotion_code": "1",
+          "image": "26025",
+          "text": "If you couldn't control your magic, you never would've survived the Ordeal of Admittance and been accepted into this school!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "4129"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Professor Au Fait",
+          "emotion_code": "1",
+          "image": "26025",
+          "text": "The Necromancers are on the move! You must be ready!",
+          "character_id": "3",
+          "expression": "1",
+          "offset": "4138"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Athena",
+          "emotion_code": "3",
+          "image": "26032",
+          "text": "I know... I'm not trying to screw up, but every time I use my magic, something goes wrong.",
+          "character_id": "4",
+          "expression": "3",
+          "offset": "4147"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Professor Au Fait",
+          "emotion_code": "3",
+          "image": "26027",
+          "text": "Oh dear, I was afraid of this... Sometimes powerful emotions can short-circuit magical ability...",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "4156"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "4162"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "4500",
+          "offset": "4168"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Professor Au Fait",
+          "emotion_code": "3",
+          "image": "26027",
+          "text": "So... Who's the boy you have a crush on?",
+          "character_id": "3",
+          "expression": "3",
+          "offset": "4177"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26006",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4189"
+        },
+        {
+          "type": "narration",
+          "text": "`GENRE #3: FAIRY TALES!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4199",
+          "text_bbcode": "[b]GENRE #3: FAIRY TALES![/b]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26000",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4211"
+        },
+        {
+          "type": "pov_change",
+          "character": "Siegfried",
+          "index": "6",
+          "offset": "4217"
+        },
+        {
+          "type": "music",
+          "track_id": "26011",
+          "loop": true,
+          "offset": "4224"
+        },
+        {
+          "type": "narration",
+          "text": "Do you want to explore the storybook world of `fairy tales` come to life?",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4234",
+          "text_bbcode": "Do you want to explore the storybook world of [b]fairy tales[/b] come to life?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Briar",
+          "emotion_code": "1",
+          "image": "26035",
+          "text": "I've had enough this! Beds with vegetables stuffed under the mattresses! Snooty mirrors that always talk about prettier people...",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "4243"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Briar",
+          "emotion_code": "1",
+          "image": "26035",
+          "text": "Not to mention the glass slippers! What genius came up with footwear that `shatters?` Nobody could possibly be worth all this trouble!",
+          "character_id": "5",
+          "expression": "1",
+          "offset": "4252",
+          "text_bbcode": "Not to mention the glass slippers! What genius came up with footwear that [color=#3b78e2][i]shatters?[/i][/color] Nobody could possibly be worth all this trouble!"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Siegfried",
+          "emotion_code": null,
+          "image": "26044",
+          "text": "Really? That's not what you said the night the prince kissed you...",
+          "character_id": "6",
+          "offset": "4261"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Siegfried",
+          "emotion_code": null,
+          "image": "26044",
+          "text": "I seem to recall you mentioning that his eyes were like 'limpid pools of iridescent sea foam'...",
+          "character_id": "6",
+          "offset": "4270"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Briar",
+          "emotion_code": "2",
+          "image": "26036",
+          "text": "Okay... Okay... I admit. He is really cute... And a `prince...` And if I want to date him, I have to complete the final test...",
+          "character_id": "5",
+          "expression": "2",
+          "offset": "4279",
+          "text_bbcode": "Okay... Okay... I admit. He is really cute... And a [color=#3b78e2][i]prince...[/i][/color] And if I want to date him, I have to complete the final test..."
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Siegfried",
+          "emotion_code": "1",
+          "image": "26045",
+          "text": "Of course, Briar, but you know there are more pressing matters at hand than princely boys...",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "4288"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "4294"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "4500",
+          "offset": "4300"
+        },
+        {
+          "type": "wobble",
+          "offset": "4303"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Siegfried",
+          "emotion_code": "1",
+          "image": "26045",
+          "text": "Like the `dragon` headed right this way! `EEEEE!!!`",
+          "character_id": "6",
+          "expression": "1",
+          "offset": "4312",
+          "text_bbcode": "Like the [color=#3b78e2][i]dragon[/i][/color] headed right this way! [color=#3b78e2][i]EEEEE!!![/i][/color]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26004",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4324"
+        },
+        {
+          "type": "music",
+          "track_id": "26013",
+          "loop": true,
+          "offset": "4331"
+        },
+        {
+          "type": "narration",
+          "text": "`GENRE #4: SCI-FI!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4341",
+          "text_bbcode": "[b]GENRE #4: SCI-FI![/b]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26003",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4353"
+        },
+        {
+          "type": "pov_change",
+          "character": "Terra",
+          "index": "8",
+          "offset": "4359"
+        },
+        {
+          "type": "narration",
+          "text": "Would you like to sneak a glimpse into the future and blast off in an epic `sci-fi` adventure?",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4369",
+          "text_bbcode": "Would you like to sneak a glimpse into the future and blast off in an epic [b]sci-fi[/b] adventure?"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Fermi",
+          "emotion_code": "3",
+          "image": "26052",
+          "text": "Terra, you don't have to push yourself like this. The combat simulator will still be here in the morning...",
+          "character_id": "7",
+          "expression": "3",
+          "offset": "4378"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Terra",
+          "emotion_code": "1",
+          "image": "26055",
+          "text": "Yeah, and by then I'll have logged another 8 hours of flight time.",
+          "character_id": "8",
+          "expression": "1",
+          "offset": "4387"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Terra",
+          "emotion_code": "3",
+          "image": "26057",
+          "text": "Admiral Gosschalk was the best cadet ever to graduate from Astrocademy, and you know what happened to him when he traveled to the Outer Void...",
+          "character_id": "8",
+          "expression": "3",
+          "offset": "4396"
+        },
+        {
+          "type": "set_scene_value",
+          "value": "6",
+          "offset": "4402"
+        },
+        {
+          "type": "music",
+          "action": "stop",
+          "fade_ms": "4500",
+          "offset": "4408"
+        },
+        {
+          "type": "dialogue",
+          "speaker": "Terra",
+          "emotion_code": "3",
+          "image": "26057",
+          "text": "I have to be better. I have to... `For Peter.`",
+          "character_id": "8",
+          "expression": "3",
+          "offset": "4417",
+          "text_bbcode": "I have to be better. I have to... [color=#3b78e2][i]For Peter.[/i][/color]"
+        },
+        {
+          "type": "background",
+          "style": "custom",
+          "asset_id": "26008",
+          "variant": "-1",
+          "character_id": "-1",
+          "expression": "-1",
+          "via": "35",
+          "offset": "4429"
+        },
+        {
+          "type": "narration",
+          "text": "Those were the sneak peeks!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4439"
+        },
+        {
+          "type": "narration",
+          "text": "Now let us know which genre `you` want to play by casting your vote in the poll!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4449",
+          "text_bbcode": "Now let us know which genre [b]you[/b] want to play by casting your vote in the poll!"
+        },
+        {
+          "type": "pov_change",
+          "character": "Siegfried",
+          "index": "6",
+          "offset": "4455"
+        },
+        {
+          "type": "call",
+          "routine": "s1_r347",
+          "args": [],
+          "offset": "4458"
+        },
+        {
+          "type": "narration",
+          "text": "Thanks for letting us know which genre `YOU` want to play!",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4469",
+          "text_bbcode": "Thanks for letting us know which genre [b]YOU[/b] want to play!"
+        },
+        {
+          "type": "narration",
+          "text": "And stay alert... Once the genres with the fewest votes are `eliminated...`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4479",
+          "text_bbcode": "And stay alert... Once the genres with the fewest votes are [b]eliminated...[/b]"
+        },
+        {
+          "type": "narration",
+          "text": "We'll put the two remaining genres head-to-head for a `final showdown!`",
+          "character_id": "9",
+          "expression": "0",
+          "offset": "4489",
+          "text_bbcode": "We'll put the two remaining genres head-to-head for a [b]final showdown![/b]"
+        },
+        {
+          "type": "call",
+          "routine": "s1_r24",
+          "args": [
+            {
+              "text": "Surviving High School"
+            },
+            {
+              "text": "Thanks for playing!"
+            },
+            1
+          ],
+          "offset": "4499"
+        },
+        {
+          "type": "end"
+        }
+      ]
+    },
+    "s1_enter_v0_bg3656_t": {
+      "nodes": [
+        {
+          "type": "var_set",
+          "var": "1000",
+          "value": 1,
+          "offset": "3667",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "var_set",
+          "var": "1001",
+          "value": 0,
+          "offset": "3674",
+          "when": {
+            "var": "1000",
+            "equals": "0"
+          }
+        },
+        {
+          "type": "next",
+          "next": "s1_enter_v0_bg3656_r"
+        }
+      ]
+    },
+    "s1_enter_v0_bg3656_1": {
+      "nodes": [
+        {
+          "type": "gate",
+          "var": "1000",
+          "equals": "0",
+          "then": "s1_enter_v0_bg3656_t",
+          "else": "s1_enter_v0_bg3656_r",
+          "offset": "3656",
+          "op": "eq"
+        }
+      ]
+    }
+  },
+  "pack_id": "23345",
+  "episode_id": "1",
+  "scene_setup": {
+    "1": {
+      "characters": [
+        {
+          "id": "0",
+          "art": "26014",
+          "name": "Kara",
+          "format": 1
+        },
+        {
+          "id": "1",
+          "art": "26019",
+          "name": "Gabriel",
+          "format": 1
+        },
+        {
+          "id": "2",
+          "art": "2030",
+          "name": "Miranda",
+          "format": 1
+        },
+        {
+          "id": "3",
+          "art": "26024",
+          "name": "Professor Au Fait",
+          "format": 1
+        },
+        {
+          "id": "4",
+          "art": "26029",
+          "name": "Athena",
+          "format": 1
+        },
+        {
+          "id": "5",
+          "art": "26034",
+          "name": "Briar",
+          "format": 1
+        },
+        {
+          "id": "6",
+          "art": "26044",
+          "name": "Siegfried",
+          "format": 1
+        },
+        {
+          "id": "7",
+          "art": "26049",
+          "name": "Fermi",
+          "format": 1
+        },
+        {
+          "id": "8",
+          "art": "26054",
+          "name": "Terra",
+          "format": 1
+        },
+        {
+          "id": "9",
+          "art": "-1",
+          "name": "Event",
+          "format": 1
+        }
+      ],
+      "ui_defaults": {
+        "75": "9"
+      }
+    }
+  },
+  "routines": {
+    "s1_r24": {
+      "entry": "s1_r24_b1",
+      "params": 3,
+      "offset": "3701"
+    },
+    "s1_r347": {
+      "entry": "s1_r347_b1",
+      "params": 0,
+      "offset": "4508"
+    }
+  },
+  "variable_defaults": {
+    "values": {
+      "1000": 0,
+      "1001": 0
+    },
+    "set_only": [
+      "1000",
+      "1001"
+    ]
+  }
+}
